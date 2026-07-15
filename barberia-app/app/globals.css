@@ -1,0 +1,13 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-display: "Fraunces", serif;
+  --font-body: "Inter", sans-serif;
+}
+
+body {
+  background-color: #141110;
+  color: #efe7dc;
+}
