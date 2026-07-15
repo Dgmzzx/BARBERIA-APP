@@ -49,20 +49,25 @@ export default function BookingForm({
     setEnviando(true);
     setError("");
 
-    const supabase = crearClienteSupabase();
-    const { error: errorInsert } = await supabase.from("citas").insert({
-      negocio_id: negocio.id,
-      servicio_id: servicioElegido.id,
-      nombre_cliente: nombre,
-      telefono_cliente: telefono,
-      fecha,
-      hora,
+    const respuesta = await fetch("/api/citas", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        negocio_id: negocio.id,
+        servicio_id: servicioElegido.id,
+        nombre_cliente: nombre,
+        telefono_cliente: telefono,
+        fecha,
+        hora,
+      }),
     });
 
     setEnviando(false);
 
-    if (errorInsert) {
-      setError("No se pudo reservar la cita. Intenta de nuevo.");
+    if (!respuesta.ok) {
+      const data = await respuesta.json().catch(() => null);
+      setError(data?.error ?? "No se pudo reservar la cita. Intenta de nuevo.");
+      if (respuesta.status === 409) alElegirFecha(fecha);
       return;
     }
     setPaso("confirmado");
