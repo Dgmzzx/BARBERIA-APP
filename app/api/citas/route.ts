@@ -126,47 +126,47 @@ export async function POST(request: Request) {
     // 6. Envío de correo: Inicializamos Resend AQUÍ ADENTRO para evitar el error de Vercel en el Build.
     const resendApiKey = process.env.RESEND_API_KEY;
     if (negocio?.correo_notificaciones && resendApiKey) {
-      try {
-        const resend = new Resend(resendApiKey);
+      const resend = new Resend(resendApiKey);
 
-        await resend.emails.send({
-          from: "Reservas <onboarding@resend.dev>",
-          to: negocio.correo_notificaciones,
-          subject: `Nueva cita: ${nombre_cliente} — ${fecha} ${formatearHora12h(hora)}`,
-          html: `
-            <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; color: #333;">
-              <h2 style="color: #111; border-bottom: 2px solid #eee; padding-bottom: 10px;">
-                📅 Nueva cita reservada
-              </h2>
-              <p>Tienes una nueva reserva confirmada para <strong>${negocio.nombre}</strong>:</p>
-              <table style="width: 100%; border-collapse: collapse; margin-top: 15px;">
-                <tr>
-                  <td style="padding: 8px 0; border-bottom: 1px solid #f0f0f0;"><strong>Cliente:</strong></td>
-                  <td style="padding: 8px 0; border-bottom: 1px solid #f0f0f0;">${nombre_cliente}</td>
-                </tr>
-                <tr>
-                  <td style="padding: 8px 0; border-bottom: 1px solid #f0f0f0;"><strong>Teléfono:</strong></td>
-                  <td style="padding: 8px 0; border-bottom: 1px solid #f0f0f0;"><a href="tel:${telefono_cliente}">${telefono_cliente}</a></td>
-                </tr>
-                <tr>
-                  <td style="padding: 8px 0; border-bottom: 1px solid #f0f0f0;"><strong>Servicio:</strong></td>
-                  <td style="padding: 8px 0; border-bottom: 1px solid #f0f0f0;">${servicio?.nombre ?? "Servicio general"}</td>
-                </tr>
-                <tr>
-                  <td style="padding: 8px 0; border-bottom: 1px solid #f0f0f0;"><strong>Fecha y Hora:</strong></td>
-                  <td style="padding: 8px 0; border-bottom: 1px solid #f0f0f0;">${fecha} a las ${formatearHora12h(hora)}</td>
-                </tr>
-              </table>
-              <p style="font-size: 12px; color: #777; margin-top: 30px;">
-                Este es un mensaje automático del sistema de reservas.
-              </p>
-            </div>
-          `,
-        });
-      } catch (emailError) {
-        // No bloqueamos la respuesta principal si falla el correo, 
-        // pero sí lo registramos en los logs del servidor para depurar.
+      const { data: emailData, error: emailError } = await resend.emails.send({
+        from: "Reservas <onboarding@resend.dev>",
+        to: negocio.correo_notificaciones,
+        subject: `Nueva cita: ${nombre_cliente} — ${fecha} ${formatearHora12h(hora)}`,
+        html: `
+          <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; color: #333;">
+            <h2 style="color: #111; border-bottom: 2px solid #eee; padding-bottom: 10px;">
+              Nueva cita reservada
+            </h2>
+            <p>Tienes una nueva reserva confirmada para <strong>${negocio.nombre}</strong>:</p>
+            <table style="width: 100%; border-collapse: collapse; margin-top: 15px;">
+              <tr>
+                <td style="padding: 8px 0; border-bottom: 1px solid #f0f0f0;"><strong>Cliente:</strong></td>
+                <td style="padding: 8px 0; border-bottom: 1px solid #f0f0f0;">${nombre_cliente}</td>
+              </tr>
+              <tr>
+                <td style="padding: 8px 0; border-bottom: 1px solid #f0f0f0;"><strong>Teléfono:</strong></td>
+                <td style="padding: 8px 0; border-bottom: 1px solid #f0f0f0;"><a href="tel:${telefono_cliente}">${telefono_cliente}</a></td>
+              </tr>
+              <tr>
+                <td style="padding: 8px 0; border-bottom: 1px solid #f0f0f0;"><strong>Servicio:</strong></td>
+                <td style="padding: 8px 0; border-bottom: 1px solid #f0f0f0;">${servicio?.nombre ?? "Servicio general"}</td>
+              </tr>
+              <tr>
+                <td style="padding: 8px 0; border-bottom: 1px solid #f0f0f0;"><strong>Fecha y Hora:</strong></td>
+                <td style="padding: 8px 0; border-bottom: 1px solid #f0f0f0;">${fecha} a las ${formatearHora12h(hora)}</td>
+              </tr>
+            </table>
+            <p style="font-size: 12px; color: #777; margin-top: 30px;">
+              Este es un mensaje automático del sistema de reservas.
+            </p>
+          </div>
+        `,
+      });
+
+      if (emailError) {
         console.error("Error enviando correo de notificación en Resend:", emailError);
+      } else {
+        console.log("Correo de notificación enviado, id:", emailData?.id);
       }
     }
 
