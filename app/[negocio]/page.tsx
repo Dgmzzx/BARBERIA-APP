@@ -2,6 +2,8 @@ import { crearClienteSupabaseServidor } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";
 import BookingForm from "@/components/BookingForm";
 
+export const dynamic = "force-dynamic";
+
 export default async function PaginaReserva({
   params,
 }: {
