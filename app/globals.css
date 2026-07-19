@@ -3,11 +3,32 @@
 @tailwind utilities;
 
 :root {
-  --font-display: "Fraunces", serif;
+  --font-display: "DM Serif Display", serif;
   --font-body: "Inter", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+}
+
+::selection {
+  background-color: #d4893a;
+  color: #0a0807;
 }
 
 body {
-  background-color: #141110;
-  color: #efe7dc;
+  background-color: #0a0807;
+  color: #e8d5b7;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(0.7) sepia(0.3) hue-rotate(10deg);
+  opacity: 0.6;
+  cursor: pointer;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .motion-safe\:animate-fade-up,
+  .motion-safe\:animate-stamp-in {
+    animation: none !important;
+  }
 }

@@ -108,124 +108,208 @@ export default function BookingForm({
   }
 
   if (paso === "confirmado") {
+    const fechaObj = new Date(fecha + "T12:00:00");
+    const fechaFormateada = fechaObj.toLocaleDateString("es-MX", {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    });
+
     return (
-      <div className="border border-line rounded-lg p-6 text-center">
-        <p className="text-accent text-sm uppercase tracking-widest mb-2">
-          Cita confirmada
-        </p>
-        <p className="font-display text-2xl mb-4">{nombre}, te esperamos</p>
-        <p className="text-cream/80">
-          {servicioElegido?.nombre} — {fecha} a las {hora}
-        </p>
+      <div className="motion-safe:animate-fade-up">
+        <div className="bg-cream text-base rounded-sm overflow-hidden">
+          <div className="p-6 sm:p-8">
+            <div className="flex justify-end mb-6">
+              <div
+                className="motion-safe:animate-stamp-in font-mono text-[11px] text-stamp border border-stamp/60 px-2.5 py-0.5 tracking-[0.15em] select-none"
+                style={{ transform: "rotate(6deg)" }}
+              >
+                CONFIRMADO
+              </div>
+            </div>
+
+            <div className="mb-6">
+              <p className="font-display text-2xl sm:text-3xl text-base leading-tight">
+                {servicioElegido?.nombre}
+              </p>
+              <p className="font-mono text-xs text-base/40 mt-1.5">
+                {servicioElegido?.duracion_minutos} min
+              </p>
+            </div>
+
+            <div className="flex justify-between items-end mb-6">
+              <div>
+                <p className="font-mono text-[10px] text-base/30 uppercase tracking-widest mb-1">
+                  Fecha
+                </p>
+                <p className="font-body text-sm sm:text-base text-base">
+                  {fechaFormateada}
+                </p>
+              </div>
+              <div className="text-right">
+                <p className="font-mono text-[10px] text-base/30 uppercase tracking-widest mb-1">
+                  Hora
+                </p>
+                <p className="font-mono text-2xl sm:text-3xl text-base leading-none tracking-tight">
+                  {hora}
+                </p>
+              </div>
+            </div>
+
+            <div className="border-t border-dashed border-base/20 pt-5">
+              <p className="font-display text-lg text-base">
+                {nombre}, te esperamos
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-10">
       {/* Paso 1: servicio */}
-      <section>
-        <p className="text-sm text-cream/60 mb-3">1. Elige un servicio</p>
+      <section className="motion-safe:animate-fade-up">
+        <label className="block font-mono text-[11px] text-accent uppercase tracking-[0.15em] mb-4">
+          Servicio
+        </label>
+
+        {servicios.length === 0 && (
+          <p className="font-mono text-xs text-cream/30">
+            No hay servicios disponibles por el momento.
+          </p>
+        )}
+
         <div className="space-y-2">
-          {servicios.map((s) => (
-            <button
-              key={s.id}
-              onClick={() => {
-                setServicioElegido(s);
-                setPaso("horario");
-              }}
-              className={`w-full text-left border rounded-lg p-4 transition ${
-                servicioElegido?.id === s.id
-                  ? "border-accent bg-accent/10"
-                  : "border-line hover:border-cream/30"
-              }`}
-            >
-              <div className="flex justify-between">
-                <span>{s.nombre}</span>
-                <span className="text-cream/60">${s.precio}</span>
-              </div>
-              <span className="text-xs text-cream/40">
-                {s.duracion_minutos} min
-              </span>
-            </button>
-          ))}
+          {servicios.map((s) => {
+            const selected = servicioElegido?.id === s.id;
+            return (
+              <button
+                key={s.id}
+                onClick={() => {
+                  setServicioElegido(s);
+                  setPaso("horario");
+                }}
+                className={`w-full text-left border rounded-sm p-4 transition-all duration-200
+                  ${selected
+                    ? "border-accent/60 bg-accent/[0.06] border-l-2 border-l-accent"
+                    : "border-line hover:border-cream/20 hover:bg-surface/50 border-l-2 border-l-transparent"
+                  }`}
+              >
+                <div className="flex justify-between items-baseline">
+                  <span className={`font-display text-lg ${selected ? "text-cream" : "text-cream/90"}`}>
+                    {s.nombre}
+                  </span>
+                  <span className="font-mono text-sm text-accent tabular-nums shrink-0 ml-4">
+                    ${s.precio}
+                  </span>
+                </div>
+                <span className="font-mono text-[11px] text-cream/30 tracking-wide">
+                  {s.duracion_minutos} min
+                </span>
+              </button>
+            );
+          })}
         </div>
       </section>
 
       {/* Paso 2: fecha y hora */}
       {servicioElegido && (
-        <section>
-          <p className="text-sm text-cream/60 mb-3">2. Elige fecha y hora</p>
-          <input
-            type="date"
-            value={fecha}
-            min={new Date().toISOString().split("T")[0]}
-            onChange={(e) => alElegirFecha(e.target.value)}
-            className="w-full bg-surface border border-line rounded-lg p-3 mb-3"
-          />
+        <section className="motion-safe:animate-fade-up">
+          <label className="block font-mono text-[11px] text-accent uppercase tracking-[0.15em] mb-4">
+            Fecha y hora
+          </label>
+          <div className="space-y-4">
+            <input
+              type="date"
+              value={fecha}
+              min={new Date().toISOString().split("T")[0]}
+              onChange={(e) => alElegirFecha(e.target.value)}
+              className="w-full bg-surface border border-line rounded-sm px-4 py-3
+                         font-mono text-sm text-cream/90 placeholder-cream/20
+                         focus:outline-none focus:border-accent/40
+                         transition-colors"
+            />
 
-          {fechaInvalida && (
-            <p className="text-sm text-cream/40 mb-3">{fechaInvalida}</p>
-          )}
+            {fechaInvalida && (
+              <p className="font-mono text-xs text-cream/40">{fechaInvalida}</p>
+            )}
 
-          {cargandoHoras && (
-            <p className="text-sm text-cream/40">Buscando horarios disponibles...</p>
-          )}
+            {cargandoHoras && (
+              <p className="font-mono text-xs text-cream/30">Buscando horarios disponibles...</p>
+            )}
 
-          {!cargandoHoras && !fechaInvalida && fecha && horasDisponibles.length === 0 && (
-            <p className="text-sm text-cream/40">
-              No hay horarios disponibles ese día. Elige otra fecha.
-            </p>
-          )}
+            {!cargandoHoras && !fechaInvalida && fecha && horasDisponibles.length === 0 && (
+              <p className="font-mono text-xs text-cream/30">
+                No hay horarios disponibles ese día. Elige otra fecha.
+              </p>
+            )}
 
-          {!cargandoHoras && !fechaInvalida && horasDisponibles.length > 0 && (
-            <div className="grid grid-cols-4 gap-2">
-              {horasDisponibles.map((h) => (
-                <button
-                  key={h}
-                  onClick={() => setHora(h)}
-                  className={`text-sm border rounded-lg py-2 ${
-                    hora === h
-                      ? "border-accent bg-accent/10"
-                      : "border-line hover:border-cream/30"
-                  }`}
-                >
-                  {h}
-                </button>
-              ))}
-            </div>
-          )}
+            {!cargandoHoras && !fechaInvalida && horasDisponibles.length > 0 && (
+              <div className="grid grid-cols-4 sm:grid-cols-5 gap-2">
+                {horasDisponibles.map((h) => (
+                  <button
+                    key={h}
+                    onClick={() => setHora(h)}
+                    className={`font-mono text-sm border rounded-sm py-2.5 px-2 transition-all duration-150
+                      ${hora === h
+                        ? "bg-accent text-base border-accent font-medium"
+                        : "border-line text-cream/70 hover:border-accent/30 hover:text-cream/90"
+                      }`}
+                  >
+                    {h}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
         </section>
       )}
 
       {/* Paso 3: datos del cliente */}
       {servicioElegido && fecha && hora && !fechaInvalida && (
-        <section className="space-y-3">
-          <p className="text-sm text-cream/60">3. Tus datos</p>
-          <input
-            type="text"
-            placeholder="Nombre completo"
-            value={nombre}
-            onChange={(e) => setNombre(e.target.value)}
-            className="w-full bg-surface border border-line rounded-lg p-3"
-          />
-          <input
-            type="tel"
-            placeholder="Teléfono"
-            value={telefono}
-            onChange={(e) => setTelefono(e.target.value)}
-            className="w-full bg-surface border border-line rounded-lg p-3"
-          />
+        <section className="motion-safe:animate-fade-up space-y-4">
+          <label className="block font-mono text-[11px] text-accent uppercase tracking-[0.15em]">
+            Tus datos
+          </label>
+          <div className="space-y-3">
+            <input
+              type="text"
+              placeholder="Nombre completo"
+              value={nombre}
+              onChange={(e) => setNombre(e.target.value)}
+              className="w-full bg-surface border border-line rounded-sm px-4 py-3
+                         font-body text-sm text-cream/90 placeholder-cream/20
+                         focus:outline-none focus:border-accent/40
+                         transition-colors"
+            />
+            <input
+              type="tel"
+              placeholder="Teléfono"
+              value={telefono}
+              onChange={(e) => setTelefono(e.target.value)}
+              className="w-full bg-surface border border-line rounded-sm px-4 py-3
+                         font-body text-sm text-cream/90 placeholder-cream/20
+                         focus:outline-none focus:border-accent/40
+                         transition-colors"
+            />
 
-          {error && <p className="text-red-400 text-sm">{error}</p>}
+            {error && (
+              <p className="font-mono text-xs text-stamp">{error}</p>
+            )}
 
-          <button
-            onClick={confirmarCita}
-            disabled={!nombre || !telefono || enviando}
-            className="w-full bg-accent text-base font-medium rounded-lg py-3 disabled:opacity-40"
-          >
-            {enviando ? "Reservando..." : "Confirmar cita"}
-          </button>
+            <button
+              onClick={confirmarCita}
+              disabled={!nombre || !telefono || enviando}
+              className="w-full bg-accent text-base text-sm font-medium rounded-sm py-3.5
+                         tracking-wider transition-all duration-200
+                         hover:bg-accent/90
+                         disabled:opacity-25 disabled:cursor-not-allowed disabled:hover:bg-accent"
+            >
+              {enviando ? "Reservando..." : "Confirmar cita"}
+            </button>
+          </div>
         </section>
       )}
     </div>
