@@ -1,4 +1,5 @@
-import { crearClienteSupabaseServidor } from "@/lib/supabase/server";
+import { obtenerNegocio } from "@/lib/supabase/server";
+import { notFound } from "next/navigation";
 import AdminSidebar from "@/components/AdminSidebar";
 
 export default async function PanelLayout({
@@ -8,13 +9,8 @@ export default async function PanelLayout({
   children: React.ReactNode;
   params: { negocio: string };
 }) {
-  const supabase = crearClienteSupabaseServidor();
-
-  const { data: negocio } = await supabase
-    .from("negocios")
-    .select("nombre")
-    .eq("slug", params.negocio)
-    .single();
+  const negocio = await obtenerNegocio(params.negocio);
+  if (!negocio) notFound();
 
   return (
     <div className="flex min-h-screen bg-base">

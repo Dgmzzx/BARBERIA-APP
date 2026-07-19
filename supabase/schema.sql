@@ -57,6 +57,7 @@ create table citas (
 
 create index idx_citas_negocio_fecha on citas(negocio_id, fecha);
 create index idx_servicios_negocio on servicios(negocio_id);
+create unique index idx_bloqueo_unico_dia on bloqueos(negocio_id, fecha) where hora_inicio is null;
 
 -- ============================================
 -- Datos iniciales: la barbería de tu padre
@@ -97,3 +98,7 @@ create policy "cualquiera puede reservar" on citas
 -- (se ajusta cuando se conecte auth.users con negocio_id)
 create policy "dueno ve sus citas" on citas
   for select using (true); -- placeholder: reemplazar con chequeo de auth cuando se implemente login
+
+-- Lectura pública de bloqueos (para que el formulario de reserva sepa qué días están ocupados)
+create policy "bloqueos visibles publicamente" on bloqueos
+  for select using (true);

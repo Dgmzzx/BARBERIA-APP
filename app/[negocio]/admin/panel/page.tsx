@@ -1,4 +1,4 @@
-import { crearClienteSupabaseServidor } from "@/lib/supabase/server";
+import { obtenerNegocio, crearClienteSupabaseServidor } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
@@ -9,13 +9,7 @@ export default async function Dashboard({
   params: { negocio: string };
 }) {
   const supabase = crearClienteSupabaseServidor();
-
-  const { data: negocio } = await supabase
-    .from("negocios")
-    .select("*")
-    .eq("slug", params.negocio)
-    .single();
-
+  const negocio = await obtenerNegocio(params.negocio);
   if (!negocio) notFound();
 
   const hoy = new Date().toISOString().split("T")[0];

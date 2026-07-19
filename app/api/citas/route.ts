@@ -40,7 +40,45 @@ export async function POST(request: Request) {
       );
     }
 
-    // 3. Inserto de la cita en Supabase
+    // 3. Validar que el día sea laborable y no esté bloqueado
+    const { data: negocio } = await supabaseAdmin
+      .from("negocios")
+      .select("nombre, correo_notificaciones, hora_apertura, hora_cierre, dias_laborales")
+      .eq("id", negocio_id)
+      .single();
+
+    if (!negocio) {
+      return NextResponse.json(
+        { error: "Negocio no encontrado" },
+        { status: 404 }
+      );
+    }
+
+    const d = new Date(fecha + "T12:00:00");
+    const diaLocal = d.getDay() === 0 ? 7 : d.getDay();
+
+    if (!negocio.dias_laborales.includes(diaLocal)) {
+      return NextResponse.json(
+        { error: "Ese día no es laborable." },
+        { status: 409 }
+      );
+    }
+
+    const { data: bloqueo } = await supabaseAdmin
+      .from("bloqueos")
+      .select("id")
+      .eq("negocio_id", negocio_id)
+      .eq("fecha", fecha)
+      .maybeSingle();
+
+    if (bloqueo) {
+      return NextResponse.json(
+        { error: "Ese día está bloqueado." },
+        { status: 409 }
+      );
+    }
+
+    // 4. Inserto de la cita en Supabase
     const { data: cita, error: errorInsert } = await supabaseAdmin
       .from("citas")
       .insert({
@@ -70,24 +108,14 @@ export async function POST(request: Request) {
       );
     }
 
-    // 4. Búsqueda en paralelo de detalles de negocio y servicio para optimizar la velocidad
-    const [negocioRes, servicioRes] = await Promise.all([
-      supabaseAdmin
-        .from("negocios")
-        .select("nombre, correo_notificaciones")
-        .eq("id", negocio_id)
-        .single(),
-      supabaseAdmin
-        .from("servicios")
-        .select("nombre")
-        .eq("id", servicio_id)
-        .single(),
-    ]);
+    // 5. Buscar servicio para el correo
+    const { data: servicio } = await supabaseAdmin
+      .from("servicios")
+      .select("nombre")
+      .eq("id", servicio_id)
+      .single();
 
-    const negocio = negocioRes.data;
-    const servicio = servicioRes.data;
-
-    // 5. Envío de correo: Inicializamos Resend AQUÍ ADENTRO para evitar el error de Vercel en el Build.
+    // 6. Envío de correo: Inicializamos Resend AQUÍ ADENTRO para evitar el error de Vercel en el Build.
     const resendApiKey = process.env.RESEND_API_KEY;
     if (negocio?.correo_notificaciones && resendApiKey) {
       try {
@@ -134,7 +162,7 @@ export async function POST(request: Request) {
       }
     }
 
-    // 6. Retorno exitoso de la cita
+    // 7. Retorno exitoso de la cita
     return NextResponse.json({ cita }, { status: 201 });
 
   } catch (error) {

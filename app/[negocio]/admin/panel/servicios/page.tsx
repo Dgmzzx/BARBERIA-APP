@@ -1,4 +1,4 @@
-import { crearClienteSupabaseServidor } from "@/lib/supabase/server";
+import { obtenerNegocio, crearClienteSupabaseServidor } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";
 import ServiciosList from "@/components/ServiciosList";
 
@@ -8,13 +8,7 @@ export default async function PaginaServicios({
   params: { negocio: string };
 }) {
   const supabase = crearClienteSupabaseServidor();
-
-  const { data: negocio } = await supabase
-    .from("negocios")
-    .select("*")
-    .eq("slug", params.negocio)
-    .single();
-
+  const negocio = await obtenerNegocio(params.negocio);
   if (!negocio) notFound();
 
   const { data: servicios } = await supabase

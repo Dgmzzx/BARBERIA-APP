@@ -23,13 +23,47 @@ export default function BookingForm({
   const [error, setError] = useState("");
   const [horasOcupadas, setHorasOcupadas] = useState<string[]>([]);
   const [cargandoHoras, setCargandoHoras] = useState(false);
+  const [fechaInvalida, setFechaInvalida] = useState("");
 
   const todasLasHoras = generarHoras(negocio.hora_apertura, negocio.hora_cierre);
   const horasDisponibles = todasLasHoras.filter((h) => !horasOcupadas.includes(h));
 
+  function diaEsLaborable(fechaStr: string): boolean {
+    const d = new Date(fechaStr + "T12:00:00");
+    const jsDay = d.getDay();
+    const diaLocal = jsDay === 0 ? 7 : jsDay;
+    return negocio.dias_laborales.includes(diaLocal);
+  }
+
+  async function fechaEstaBloqueada(fechaStr: string): Promise<boolean> {
+    const supabase = crearClienteSupabase();
+    const { data } = await supabase
+      .from("bloqueos")
+      .select("id")
+      .eq("negocio_id", negocio.id)
+      .eq("fecha", fechaStr)
+      .maybeSingle();
+    return !!data;
+  }
+
   async function alElegirFecha(nuevaFecha: string) {
     setFecha(nuevaFecha);
     setHora("");
+    setError("");
+    setHorasOcupadas([]);
+    setFechaInvalida("");
+
+    if (!diaEsLaborable(nuevaFecha)) {
+      setFechaInvalida("Ese día no es laborable.");
+      return;
+    }
+
+    const bloqueada = await fechaEstaBloqueada(nuevaFecha);
+    if (bloqueada) {
+      setFechaInvalida("Ese día está bloqueado (vacaciones, feriado…).");
+      return;
+    }
+
     setCargandoHoras(true);
 
     const supabase = crearClienteSupabase();
@@ -130,17 +164,21 @@ export default function BookingForm({
             className="w-full bg-surface border border-line rounded-lg p-3 mb-3"
           />
 
+          {fechaInvalida && (
+            <p className="text-sm text-cream/40 mb-3">{fechaInvalida}</p>
+          )}
+
           {cargandoHoras && (
             <p className="text-sm text-cream/40">Buscando horarios disponibles...</p>
           )}
 
-          {!cargandoHoras && fecha && horasDisponibles.length === 0 && (
+          {!cargandoHoras && !fechaInvalida && fecha && horasDisponibles.length === 0 && (
             <p className="text-sm text-cream/40">
               No hay horarios disponibles ese día. Elige otra fecha.
             </p>
           )}
 
-          {!cargandoHoras && horasDisponibles.length > 0 && (
+          {!cargandoHoras && !fechaInvalida && horasDisponibles.length > 0 && (
             <div className="grid grid-cols-4 gap-2">
               {horasDisponibles.map((h) => (
                 <button
@@ -161,7 +199,7 @@ export default function BookingForm({
       )}
 
       {/* Paso 3: datos del cliente */}
-      {servicioElegido && fecha && hora && (
+      {servicioElegido && fecha && hora && !fechaInvalida && (
         <section className="space-y-3">
           <p className="text-sm text-cream/60">3. Tus datos</p>
           <input
