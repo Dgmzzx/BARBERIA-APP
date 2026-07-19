@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { Negocio, Horario } from "@/lib/types";
-import { descomponerHora, componerHora } from "@/lib/helpers";
+import { formatearHora12h, parsearHora12h } from "@/lib/helpers";
 
 type Bloqueo = {
   id: string;
@@ -371,45 +371,37 @@ function SelectorHora({
   value: string;
   onChange: (val: string) => void;
 }) {
-  const fallback = value || "08:00";
-  const { h12, min, periodo } = descomponerHora(fallback);
+  const [editando, setEditando] = useState(value ? formatearHora12h(value) : "");
 
-  function actualizar(parcial: Partial<{ h12: number; min: string; periodo: "AM" | "PM" }>) {
-    onChange(componerHora(
-      parcial.h12 ?? h12,
-      parcial.min ?? min,
-      parcial.periodo ?? periodo,
-    ));
+  useEffect(() => {
+    setEditando(value ? formatearHora12h(value) : "");
+  }, [value]);
+
+  function manejarBlur() {
+    const parseada = parsearHora12h(editando);
+    if (parseada) {
+      onChange(parseada);
+      setEditando(formatearHora12h(parseada));
+    } else {
+      setEditando(value ? formatearHora12h(value) : "");
+    }
+  }
+
+  function manejarKeyDown(e: React.KeyboardEvent) {
+    if (e.key === "Enter") {
+      (e.target as HTMLInputElement).blur();
+    }
   }
 
   return (
-    <div className="flex gap-1 items-center">
-      <select
-        value={h12}
-        onChange={(e) => actualizar({ h12: Number(e.target.value) })}
-        className="bg-base border border-line rounded-md px-2 py-2 text-sm text-cream"
-      >
-        {Array.from({ length: 12 }, (_, i) => i + 1).map((h) => (
-          <option key={h} value={h}>{h}</option>
-        ))}
-      </select>
-      <span className="text-cream/30 text-sm">:</span>
-      <select
-        value={min}
-        onChange={(e) => actualizar({ min: e.target.value })}
-        className="bg-base border border-line rounded-md px-2 py-2 text-sm text-cream"
-      >
-        <option value="00">00</option>
-        <option value="30">30</option>
-      </select>
-      <select
-        value={periodo}
-        onChange={(e) => actualizar({ periodo: e.target.value as "AM" | "PM" })}
-        className="bg-base border border-line rounded-md px-2 py-2 text-sm text-cream"
-      >
-        <option value="AM">AM</option>
-        <option value="PM">PM</option>
-      </select>
-    </div>
+    <input
+      type="text"
+      value={editando}
+      onChange={(e) => setEditando(e.target.value)}
+      onBlur={manejarBlur}
+      onKeyDown={manejarKeyDown}
+      placeholder="8:00 AM"
+      className="bg-base border border-line rounded-md px-3 py-2 text-sm text-cream w-32"
+    />
   );
 }

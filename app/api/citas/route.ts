@@ -135,7 +135,7 @@ export async function POST(request: Request) {
         html: `
           <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; color: #333;">
             <h2 style="color: #111; border-bottom: 2px solid #eee; padding-bottom: 10px;">
-              Nueva cita reservada
+              📅Nueva cita reservada
             </h2>
             <p>Tienes una nueva reserva confirmada para <strong>${negocio.nombre}</strong>:</p>
             <table style="width: 100%; border-collapse: collapse; margin-top: 15px;">

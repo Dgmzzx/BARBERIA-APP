@@ -14,6 +14,22 @@ export function descomponerHora(h24: string): { h12: number; min: string; period
   return { h12, min: m, periodo: periodo as "AM" | "PM" };
 }
 
+export function parsearHora12h(texto: string): string | null {
+  const limpio = texto.trim().toUpperCase();
+  const match = limpio.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/);
+  if (!match) return null;
+
+  let h = parseInt(match[1], 10);
+  const min = match[2];
+  const periodo = match[3] as "AM" | "PM";
+
+  if (h < 1 || h > 12) return null;
+  if (periodo === "PM" && h !== 12) h += 12;
+  if (periodo === "AM" && h === 12) h = 0;
+
+  return `${String(h).padStart(2, "0")}:${min}`;
+}
+
 import type { Horario } from "./types";
 
 export function obtenerRangosDelDia(
