@@ -14,6 +14,8 @@ create table negocios (
   direccion text,
   hora_apertura time not null default '09:00',
   hora_cierre time not null default '19:00',
+  hora_apertura_2 time,
+  hora_cierre_2 time,
   dias_laborales int[] not null default '{1,2,3,4,5,6}', -- 1=lunes ... 7=domingo
   activo boolean not null default true,
   creado_en timestamptz not null default now()
@@ -29,6 +31,18 @@ create table servicios (
   activo boolean not null default true,
   creado_en timestamptz not null default now()
 );
+
+-- Horarios por día de la semana (reemplaza hora_apertura/cierre fijos)
+create table horarios (
+  id uuid primary key default uuid_generate_v4(),
+  negocio_id uuid not null references negocios(id) on delete cascade,
+  dia_semana int not null check (dia_semana between 1 and 7),
+  apertura time not null,
+  cierre time not null,
+  orden int not null default 0
+);
+
+create index idx_horarios_negocio on horarios(negocio_id, dia_semana);
 
 -- Días/horas bloqueadas manualmente (vacaciones, feriados, etc.)
 create table bloqueos (
@@ -65,6 +79,12 @@ create unique index idx_bloqueo_unico_dia on bloqueos(negocio_id, fecha) where h
 insert into negocios (nombre, slug, hora_apertura, hora_cierre)
 values ('Barbería [Nombre de tu padre]', 'barberiapapa', '09:00', '19:00');
 
+-- Horarios iniciales (Lun-Sáb 9:00-19:00, domingo cerrado)
+insert into horarios (negocio_id, dia_semana, apertura, cierre, orden)
+select id, d, '09:00', '19:00', 0
+from negocios cross join (select unnest(ARRAY[1,2,3,4,5,6]) as d) dias
+where slug = 'barberiapapa';
+
 -- Ejemplo de servicios (ajustar precios reales después)
 insert into servicios (negocio_id, nombre, duracion_minutos, precio)
 select id, 'Corte de cabello', 30, 300 from negocios where slug = 'barberiapapa';
@@ -82,6 +102,7 @@ alter table negocios enable row level security;
 alter table servicios enable row level security;
 alter table citas enable row level security;
 alter table bloqueos enable row level security;
+alter table horarios enable row level security;
 
 -- Lectura pública de negocios activos y sus servicios (para la página de reserva)
 create policy "negocios visibles publicamente" on negocios
@@ -98,6 +119,10 @@ create policy "cualquiera puede reservar" on citas
 -- (se ajusta cuando se conecte auth.users con negocio_id)
 create policy "dueno ve sus citas" on citas
   for select using (true); -- placeholder: reemplazar con chequeo de auth cuando se implemente login
+
+-- Lectura pública de horarios (para el formulario de reserva)
+create policy "horarios visibles publicamente" on horarios
+  for select using (true);
 
 -- Lectura pública de bloqueos (para que el formulario de reserva sepa qué días están ocupados)
 create policy "bloqueos visibles publicamente" on bloqueos

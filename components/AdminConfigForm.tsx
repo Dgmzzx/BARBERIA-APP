@@ -1,12 +1,20 @@
 "use client";
 
 import { useState } from "react";
-import type { Negocio } from "@/lib/types";
+import type { Negocio, Horario } from "@/lib/types";
+import { descomponerHora, componerHora } from "@/lib/helpers";
 
 type Bloqueo = {
   id: string;
   fecha: string;
   motivo: string | null;
+};
+
+type HorarioEdit = {
+  dia_semana: number;
+  apertura: string;
+  cierre: string;
+  orden: number;
 };
 
 const DIAS: { n: number; label: string }[] = [
@@ -19,6 +27,24 @@ const DIAS: { n: number; label: string }[] = [
   { n: 7, label: "Domingo" },
 ];
 
+function horariosIniciales(negocio: Negocio): HorarioEdit[] {
+  const h = (negocio as any).horarios as Horario[] | undefined;
+  if (!h || h.length === 0) {
+    return DIAS.map((d) => ({
+      dia_semana: d.n,
+      apertura: "09:00",
+      cierre: "17:00",
+      orden: 0,
+    }));
+  }
+  return h.map((h) => ({
+    dia_semana: h.dia_semana,
+    apertura: h.apertura.slice(0, 5),
+    cierre: h.cierre.slice(0, 5),
+    orden: h.orden,
+  }));
+}
+
 export default function AdminConfigForm({
   negocio,
   bloqueosIniciales,
@@ -26,22 +52,67 @@ export default function AdminConfigForm({
   negocio: Negocio;
   bloqueosIniciales: Bloqueo[];
 }) {
-  const [apertura, setApertura] = useState(negocio.hora_apertura.slice(0, 5));
-  const [cierre, setCierre] = useState(negocio.hora_cierre.slice(0, 5));
-  const [dias, setDias] = useState<number[]>([...negocio.dias_laborales]);
+  const [horarios, setHorarios] = useState<HorarioEdit[]>(horariosIniciales(negocio));
   const [bloqueos, setBloqueos] = useState<Bloqueo[]>(bloqueosIniciales);
   const [guardando, setGuardando] = useState(false);
   const [exito, setExito] = useState("");
   const [error, setError] = useState("");
 
+  const [diaExpandido, setDiaExpandido] = useState<number | null>(null);
   const [nuevoBloqueoFecha, setNuevoBloqueoFecha] = useState("");
   const [nuevoBloqueoMotivo, setNuevoBloqueoMotivo] = useState("");
   const [creandoBloqueo, setCreandoBloqueo] = useState(false);
 
+  function bloquesDelDia(dia: number) {
+    return horarios
+      .filter((h) => h.dia_semana === dia)
+      .sort((a, b) => a.orden - b.orden);
+  }
+
   function toggleDia(n: number) {
-    setDias((prev) =>
-      prev.includes(n) ? prev.filter((d) => d !== n) : [...prev, n].sort()
+    const tieneBloques = bloquesDelDia(n).length > 0;
+    if (tieneBloques) {
+      setHorarios((prev) => prev.filter((h) => h.dia_semana !== n));
+    } else {
+      const maxOrden = horarios
+        .filter((h) => h.dia_semana === n)
+        .reduce((max, h) => Math.max(max, h.orden), -1);
+      setHorarios((prev) => [
+        ...prev,
+        { dia_semana: n, apertura: "09:00", cierre: "17:00", orden: maxOrden + 1 },
+      ]);
+    }
+  }
+
+  function agregarBloque(dia: number) {
+    const bloques = bloquesDelDia(dia);
+    const ultimo = bloques[bloques.length - 1];
+    const nuevaApertura = ultimo?.cierre ?? "09:00";
+    const nuevoCierre = sumarHora(nuevaApertura, 8);
+    setHorarios((prev) => [
+      ...prev,
+      { dia_semana: dia, apertura: nuevaApertura, cierre: nuevoCierre, orden: bloques.length },
+    ]);
+  }
+
+  function eliminarBloque(dia: number, orden: number) {
+    setHorarios((prev) => prev.filter((h) => !(h.dia_semana === dia && h.orden === orden)));
+  }
+
+  function actualizarBloque(dia: number, orden: number, campo: "apertura" | "cierre", valor: string) {
+    setHorarios((prev) =>
+      prev.map((h) =>
+        h.dia_semana === dia && h.orden === orden ? { ...h, [campo]: valor } : h
+      )
     );
+  }
+
+  function sumarHora(hora: string, horasSumar: number): string {
+    const [h, m] = hora.split(":").map(Number);
+    const totalMin = h * 60 + m + horasSumar * 60;
+    const nuevaH = Math.floor(totalMin / 60) % 24;
+    const nuevoM = totalMin % 60;
+    return `${String(nuevaH).padStart(2, "0")}:${String(nuevoM).padStart(2, "0")}`;
   }
 
   async function guardarConfig() {
@@ -54,9 +125,12 @@ export default function AdminConfigForm({
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         id: negocio.id,
-        hora_apertura: apertura,
-        hora_cierre: cierre,
-        dias_laborales: dias,
+        horarios: horarios.map((h) => ({
+          dia_semana: h.dia_semana,
+          apertura: h.apertura,
+          cierre: h.cierre,
+          orden: h.orden,
+        })),
       }),
     });
 
@@ -122,57 +196,86 @@ export default function AdminConfigForm({
         <p className="text-sm text-cream/40 mt-1">Datos del negocio</p>
       </div>
 
-      {/* Horario */}
+      {/* Horarios por día */}
       <div className="border border-line rounded-lg p-5 bg-surface/30 space-y-4">
         <p className="text-xs text-cream/40 uppercase tracking-widest">
-          Horario
+          Horarios por día
         </p>
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="text-[10px] text-cream/30 uppercase tracking-wider block mb-1.5">
-              Apertura
-            </label>
-            <input
-              type="time"
-              value={apertura}
-              onChange={(e) => setApertura(e.target.value)}
-              className="w-full bg-base border border-line rounded-md px-3 py-2 text-sm text-cream"
-            />
-          </div>
-          <div>
-            <label className="text-[10px] text-cream/30 uppercase tracking-wider block mb-1.5">
-              Cierre
-            </label>
-            <input
-              type="time"
-              value={cierre}
-              onChange={(e) => setCierre(e.target.value)}
-              className="w-full bg-base border border-line rounded-md px-3 py-2 text-sm text-cream"
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* Días laborales */}
-      <div className="border border-line rounded-lg p-5 bg-surface/30 space-y-4">
-        <p className="text-xs text-cream/40 uppercase tracking-widest">
-          Días laborales
+        <p className="text-[10px] text-cream/20 leading-relaxed">
+          Activa o desactiva días y agrega bloques de horario para cada uno.
         </p>
-        <div className="flex flex-wrap gap-2">
+        <div className="space-y-1">
           {DIAS.map(({ n, label }) => {
-            const activo = dias.includes(n);
+            const bloques = bloquesDelDia(n);
+            const activo = bloques.length > 0;
+            const expandido = diaExpandido === n;
             return (
-              <button
-                key={n}
-                onClick={() => toggleDia(n)}
-                className={`text-sm px-4 py-2 rounded-full border transition-colors ${
-                  activo
-                    ? "border-accent bg-accent/10 text-accent"
-                    : "border-line text-cream/30 hover:text-cream/50"
-                }`}
-              >
-                {label}
-              </button>
+              <div key={n}>
+                <div
+                  className={`flex items-center justify-between px-3 py-2.5 rounded-lg cursor-pointer select-none transition-colors ${
+                    expandido
+                      ? "bg-base border border-line"
+                      : activo
+                        ? "hover:bg-base/50 border border-transparent"
+                        : "hover:bg-base/30 border border-transparent"
+                  }`}
+                  onClick={() => setDiaExpandido(expandido ? null : n)}
+                >
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] text-cream/20 font-mono">{expandido ? "▾" : "▸"}</span>
+                    <span className={`font-mono text-xs uppercase tracking-wider transition-colors ${activo ? "text-cream/80" : "text-cream/20"}`}>
+                      {label}
+                    </span>
+                    {activo && (
+                      <span className="text-[10px] text-cream/20 font-mono">
+                        {bloques.length} bloque{bloques.length !== 1 ? "s" : ""}
+                      </span>
+                    )}
+                    {!activo && (
+                      <span className="text-[9px] text-cream/20 font-mono">Inactivo</span>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+                    {activo && expandido && (
+                      <button
+                        onClick={() => agregarBloque(n)}
+                        className="text-[10px] text-accent/60 hover:text-accent transition-colors uppercase tracking-wider"
+                      >
+                        + Bloque
+                      </button>
+                    )}
+                    <button
+                      onClick={() => toggleDia(n)}
+                      className={`text-xs transition-colors ${activo ? "text-red-400/40 hover:text-red-400" : "text-accent/50 hover:text-accent"}`}
+                    >
+                      {activo ? "✕" : "+"}
+                    </button>
+                  </div>
+                </div>
+                {expandido && activo && (
+                  <div className="space-y-2 ml-6 mt-2 mb-2">
+                    {bloques.map((bloque) => (
+                      <div key={bloque.orden} className="flex items-center gap-2">
+                        <SelectorHora
+                          value={bloque.apertura}
+                          onChange={(v) => actualizarBloque(n, bloque.orden, "apertura", v)}
+                        />
+                        <span className="text-cream/20 text-xs">a</span>
+                        <SelectorHora
+                          value={bloque.cierre}
+                          onChange={(v) => actualizarBloque(n, bloque.orden, "cierre", v)}
+                        />
+                        <button
+                          onClick={() => eliminarBloque(n, bloque.orden)}
+                          className="text-red-400/40 hover:text-red-400 transition-colors text-xs ml-1"
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
             );
           })}
         </div>
@@ -257,6 +360,56 @@ export default function AdminConfigForm({
         {exito && <p className="text-xs text-green-400">{exito}</p>}
         {error && <p className="text-xs text-red-400">{error}</p>}
       </div>
+    </div>
+  );
+}
+
+function SelectorHora({
+  value,
+  onChange,
+}: {
+  value: string;
+  onChange: (val: string) => void;
+}) {
+  const fallback = value || "08:00";
+  const { h12, min, periodo } = descomponerHora(fallback);
+
+  function actualizar(parcial: Partial<{ h12: number; min: string; periodo: "AM" | "PM" }>) {
+    onChange(componerHora(
+      parcial.h12 ?? h12,
+      parcial.min ?? min,
+      parcial.periodo ?? periodo,
+    ));
+  }
+
+  return (
+    <div className="flex gap-1 items-center">
+      <select
+        value={h12}
+        onChange={(e) => actualizar({ h12: Number(e.target.value) })}
+        className="bg-base border border-line rounded-md px-2 py-2 text-sm text-cream"
+      >
+        {Array.from({ length: 12 }, (_, i) => i + 1).map((h) => (
+          <option key={h} value={h}>{h}</option>
+        ))}
+      </select>
+      <span className="text-cream/30 text-sm">:</span>
+      <select
+        value={min}
+        onChange={(e) => actualizar({ min: e.target.value })}
+        className="bg-base border border-line rounded-md px-2 py-2 text-sm text-cream"
+      >
+        <option value="00">00</option>
+        <option value="30">30</option>
+      </select>
+      <select
+        value={periodo}
+        onChange={(e) => actualizar({ periodo: e.target.value as "AM" | "PM" })}
+        className="bg-base border border-line rounded-md px-2 py-2 text-sm text-cream"
+      >
+        <option value="AM">AM</option>
+        <option value="PM">PM</option>
+      </select>
     </div>
   );
 }

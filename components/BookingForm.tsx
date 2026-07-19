@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { crearClienteSupabase } from "@/lib/supabase/client";
 import type { Negocio, Servicio } from "@/lib/types";
+import { formatearHora12h, obtenerRangosDelDia } from "@/lib/helpers";
 
 type Paso = "servicio" | "horario" | "datos" | "confirmado";
 
@@ -22,17 +23,18 @@ export default function BookingForm({
   const [enviando, setEnviando] = useState(false);
   const [error, setError] = useState("");
   const [horasOcupadas, setHorasOcupadas] = useState<string[]>([]);
+  const [horasPosibles, setHorasPosibles] = useState<string[]>([]);
   const [cargandoHoras, setCargandoHoras] = useState(false);
   const [fechaInvalida, setFechaInvalida] = useState("");
 
-  const todasLasHoras = generarHoras(negocio.hora_apertura, negocio.hora_cierre);
-  const horasDisponibles = todasLasHoras.filter((h) => !horasOcupadas.includes(h));
+  const horasDisponibles = horasPosibles.filter((h) => !horasOcupadas.includes(h));
+  const horarios: any[] = (negocio as any).horarios ?? [];
 
   function diaEsLaborable(fechaStr: string): boolean {
     const d = new Date(fechaStr + "T12:00:00");
     const jsDay = d.getDay();
     const diaLocal = jsDay === 0 ? 7 : jsDay;
-    return negocio.dias_laborales.includes(diaLocal);
+    return horarios.some((h) => h.dia_semana === diaLocal);
   }
 
   async function fechaEstaBloqueada(fechaStr: string): Promise<boolean> {
@@ -63,6 +65,11 @@ export default function BookingForm({
       setFechaInvalida("Ese día está bloqueado (vacaciones, feriado…).");
       return;
     }
+
+    const d = new Date(nuevaFecha + "T12:00:00");
+    const diaLocal = d.getDay() === 0 ? 7 : d.getDay();
+    const rangos = obtenerRangosDelDia(horarios, diaLocal);
+    setHorasPosibles(rangos.length > 0 ? generarHoras(rangos) : []);
 
     setCargandoHoras(true);
 
@@ -151,7 +158,7 @@ export default function BookingForm({
                   Hora
                 </p>
                 <p className="font-mono text-2xl sm:text-3xl text-base leading-none tracking-tight">
-                  {hora}
+                  {formatearHora12h(hora)}
                 </p>
               </div>
             </div>
@@ -258,7 +265,7 @@ export default function BookingForm({
                         : "border-line text-cream/70 hover:border-accent/30 hover:text-cream/90"
                       }`}
                   >
-                    {h}
+                    {formatearHora12h(h)}
                   </button>
                 ))}
               </div>
@@ -316,17 +323,15 @@ export default function BookingForm({
   );
 }
 
-function generarHoras(apertura: string, cierre: string): string[] {
+function generarHoras(rangos: { apertura: string; cierre: string }[]): string[] {
   const horas: string[] = [];
-  let [h, m] = apertura.split(":").map(Number);
-  const [hFin, mFin] = cierre.split(":").map(Number);
-
-  while (h < hFin || (h === hFin && m < mFin)) {
-    horas.push(`${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`);
-    m += 30;
-    if (m >= 60) {
-      m = 0;
-      h += 1;
+  for (const { apertura, cierre } of rangos) {
+    let [h, m] = apertura.split(":").map(Number);
+    const [hFin, mFin] = cierre.split(":").map(Number);
+    while (h < hFin || (h === hFin && m < mFin)) {
+      horas.push(`${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`);
+      m += 30;
+      if (m >= 60) { m = 0; h += 1; }
     }
   }
   return horas;

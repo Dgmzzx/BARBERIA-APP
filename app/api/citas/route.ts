@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { Resend } from "resend";
+import { formatearHora12h } from "@/lib/helpers";
 
 // Se inicializa Supabase una sola vez afuera porque sus variables
 // no suelen causar el error del constructor durante el build.
@@ -43,7 +44,7 @@ export async function POST(request: Request) {
     // 3. Validar que el día sea laborable y no esté bloqueado
     const { data: negocio } = await supabaseAdmin
       .from("negocios")
-      .select("nombre, correo_notificaciones, hora_apertura, hora_cierre, dias_laborales")
+      .select("nombre, correo_notificaciones")
       .eq("id", negocio_id)
       .single();
 
@@ -57,7 +58,14 @@ export async function POST(request: Request) {
     const d = new Date(fecha + "T12:00:00");
     const diaLocal = d.getDay() === 0 ? 7 : d.getDay();
 
-    if (!negocio.dias_laborales.includes(diaLocal)) {
+    const { data: horariosDia } = await supabaseAdmin
+      .from("horarios")
+      .select("id")
+      .eq("negocio_id", negocio_id)
+      .eq("dia_semana", diaLocal)
+      .limit(1);
+
+    if (!horariosDia || horariosDia.length === 0) {
       return NextResponse.json(
         { error: "Ese día no es laborable." },
         { status: 409 }
@@ -124,7 +132,7 @@ export async function POST(request: Request) {
         await resend.emails.send({
           from: "Reservas <onboarding@resend.dev>",
           to: negocio.correo_notificaciones,
-          subject: `Nueva cita: ${nombre_cliente} — ${fecha} ${hora}`,
+          subject: `Nueva cita: ${nombre_cliente} — ${fecha} ${formatearHora12h(hora)}`,
           html: `
             <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; color: #333;">
               <h2 style="color: #111; border-bottom: 2px solid #eee; padding-bottom: 10px;">
@@ -146,7 +154,7 @@ export async function POST(request: Request) {
                 </tr>
                 <tr>
                   <td style="padding: 8px 0; border-bottom: 1px solid #f0f0f0;"><strong>Fecha y Hora:</strong></td>
-                  <td style="padding: 8px 0; border-bottom: 1px solid #f0f0f0;">${fecha} a las ${hora}</td>
+                  <td style="padding: 8px 0; border-bottom: 1px solid #f0f0f0;">${fecha} a las ${formatearHora12h(hora)}</td>
                 </tr>
               </table>
               <p style="font-size: 12px; color: #777; margin-top: 30px;">

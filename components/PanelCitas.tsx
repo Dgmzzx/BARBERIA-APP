@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { crearClienteSupabase } from "@/lib/supabase/client";
+import { formatearHora12h } from "@/lib/helpers";
 
 type CitaConServicio = {
   id: string;
@@ -45,7 +46,7 @@ export default function PanelCitas({
           <div>
             <p className="font-medium">{cita.nombre_cliente}</p>
             <p className="text-sm text-cream/60">
-              {cita.servicios?.nombre} · {cita.fecha} {cita.hora}
+              {cita.servicios?.nombre} · {cita.fecha} {formatearHora12h(cita.hora)}
             </p>
             <p className="text-sm text-cream/40">{cita.telefono_cliente}</p>
           </div>

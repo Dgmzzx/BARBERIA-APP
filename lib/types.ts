@@ -6,6 +6,8 @@ export type Negocio = {
   direccion: string | null;
   hora_apertura: string;
   hora_cierre: string;
+  hora_apertura_2?: string | null;
+  hora_cierre_2?: string | null;
   dias_laborales: number[];
   activo: boolean;
 };
@@ -17,6 +19,15 @@ export type Servicio = {
   duracion_minutos: number;
   precio: number;
   activo: boolean;
+};
+
+export type Horario = {
+  id: string;
+  negocio_id: string;
+  dia_semana: number;
+  apertura: string;
+  cierre: string;
+  orden: number;
 };
 
 export type Cita = {

@@ -11,7 +11,7 @@ export default async function PaginaReserva({
 
   const { data: negocio } = await supabase
     .from("negocios")
-    .select("*")
+    .select("*, horarios(*)")
     .eq("slug", params.negocio)
     .eq("activo", true)
     .single();

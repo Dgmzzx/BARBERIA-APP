@@ -2,6 +2,7 @@ import { obtenerNegocio, crearClienteSupabaseServidor } from "@/lib/supabase/ser
 import { notFound } from "next/navigation";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
+import { formatearHora12h } from "@/lib/helpers";
 
 export default async function Dashboard({
   params,
@@ -75,8 +76,8 @@ export default async function Dashboard({
               className="border border-line rounded-lg p-4 bg-surface/30 flex items-center justify-between"
             >
               <div className="flex items-center gap-4">
-                <span className="font-mono text-sm text-accent tabular-nums w-12">
-                  {cita.hora.slice(0, 5)}
+                <span className="font-mono text-sm text-accent tabular-nums w-16">
+                  {formatearHora12h(cita.hora)}
                 </span>
                 <div>
                   <p className="font-medium text-sm">{cita.nombre_cliente}</p>

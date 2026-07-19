@@ -25,7 +25,7 @@ export const obtenerNegocio = cache(async (slug: string) => {
   const supabase = crearClienteSupabaseServidor();
   const { data } = await supabase
     .from("negocios")
-    .select("*")
+    .select("*, horarios(*)")
     .eq("slug", slug)
     .single();
   return data;
