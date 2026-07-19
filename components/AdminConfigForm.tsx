@@ -29,14 +29,7 @@ const DIAS: { n: number; label: string }[] = [
 
 function horariosIniciales(negocio: Negocio): HorarioEdit[] {
   const h = (negocio as any).horarios as Horario[] | undefined;
-  if (!h || h.length === 0) {
-    return DIAS.map((d) => ({
-      dia_semana: d.n,
-      apertura: "09:00",
-      cierre: "17:00",
-      orden: 0,
-    }));
-  }
+  if (!h) return [];
   return h.map((h) => ({
     dia_semana: h.dia_semana,
     apertura: h.apertura.slice(0, 5),
