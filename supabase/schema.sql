@@ -18,6 +18,7 @@ create table negocios (
   hora_cierre_2 time,
   dias_laborales int[] not null default '{1,2,3,4,5,6}', -- 1=lunes ... 7=domingo
   activo boolean not null default true,
+  correo_notificaciones text,
   creado_en timestamptz not null default now()
 );
 
