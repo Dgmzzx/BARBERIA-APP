@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { crearClienteSupabase } from "@/lib/supabase/client";
-import type { Negocio, Servicio } from "@/lib/types";
+import type { Negocio, Servicio, Horario } from "@/lib/types";
 import { formatearHora12h, obtenerRangosDelDia } from "@/lib/helpers";
 
 type Paso = "servicio" | "horario" | "datos" | "confirmado";
@@ -10,9 +10,11 @@ type Paso = "servicio" | "horario" | "datos" | "confirmado";
 export default function BookingForm({
   negocio,
   servicios,
+  horarios: horariosProp,
 }: {
   negocio: Negocio;
   servicios: Servicio[];
+  horarios: Horario[];
 }) {
   const [paso, setPaso] = useState<Paso>("servicio");
   const [servicioElegido, setServicioElegido] = useState<Servicio | null>(null);
@@ -28,7 +30,7 @@ export default function BookingForm({
   const [fechaInvalida, setFechaInvalida] = useState("");
 
   const horasDisponibles = horasPosibles.filter((h) => !horasOcupadas.includes(h));
-  const horarios: any[] = (negocio as any).horarios ?? [];
+  const horarios = horariosProp;
 
   function diaEsLaborable(fechaStr: string): boolean {
     const d = new Date(fechaStr + "T12:00:00");
