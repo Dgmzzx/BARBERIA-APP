@@ -183,20 +183,25 @@ export default function AdminConfigForm({
   }
 
   return (
-    <div className="max-w-2xl space-y-6">
+    <div className="max-w-2xl space-y-8">
       <div>
-        <h1 className="font-display text-2xl">Configuración</h1>
-        <p className="text-sm text-cream/40 mt-1">Datos del negocio</p>
+        <h1 className="font-display text-2xl text-cream">Configuraci&oacute;n</h1>
+        <p className="text-sm text-cream/40 mt-1">Horarios y bloqueos del negocio</p>
       </div>
 
-      {/* Horarios por día */}
-      <div className="border border-line rounded-lg p-5 bg-surface/30 space-y-4">
-        <p className="text-xs text-cream/40 uppercase tracking-widest">
-          Horarios por día
+      {/* Horarios */}
+      <section className="border border-line rounded-xl p-6 bg-surface/20">
+        <div className="flex items-center gap-2 mb-6">
+          <span className="w-1.5 h-1.5 rounded-full bg-brass" />
+          <p className="text-xs text-brass/70 uppercase tracking-[0.15em] font-medium">
+            Horarios por d&iacute;a
+          </p>
+        </div>
+
+        <p className="text-xs text-cream/25 leading-relaxed mb-5">
+          Activa o desactiva d&iacute;as y ajusta los bloques de horario.
         </p>
-        <p className="text-[10px] text-cream/20 leading-relaxed">
-          Activa o desactiva días y agrega bloques de horario para cada uno.
-        </p>
+
         <div className="space-y-1">
           {DIAS.map(({ n, label }) => {
             const bloques = bloquesDelDia(n);
@@ -205,64 +210,90 @@ export default function AdminConfigForm({
             return (
               <div key={n}>
                 <div
-                  className={`flex items-center justify-between px-3 py-2.5 rounded-lg cursor-pointer select-none transition-colors ${
+                  className={`flex items-center justify-between px-4 py-3 rounded-lg cursor-pointer select-none transition-all ${
                     expandido
-                      ? "bg-ink border border-line"
+                      ? "bg-ink border-l-2 border-brass"
                       : activo
-                        ? "hover:bg-ink/50 border border-transparent"
-                        : "hover:bg-ink/30 border border-transparent"
+                        ? "hover:bg-ink/60 border-l-2 border-transparent hover:border-brass/30"
+                        : "hover:bg-ink/30 border-l-2 border-transparent"
                   }`}
                   onClick={() => setDiaExpandido(expandido ? null : n)}
                 >
-                  <div className="flex items-center gap-2">
-                    <span className="text-[10px] text-cream/20 font-mono">{expandido ? "▾" : "▸"}</span>
+                  <div className="flex items-center gap-3">
+                    <span className={`transition-colors text-xs font-mono ${activo ? "text-brass" : "text-cream/15"}`}>
+                      <span className="inline-block w-4 text-center">{expandido ? "▾" : "▸"}</span>
+                    </span>
                     <span className={`font-mono text-xs uppercase tracking-wider transition-colors ${activo ? "text-cream/80" : "text-cream/20"}`}>
                       {label}
                     </span>
                     {activo && (
-                      <span className="text-[10px] text-cream/20 font-mono">
+                      <span className="text-[9px] text-cream/20 font-mono tracking-wider">
                         {bloques.length} bloque{bloques.length !== 1 ? "s" : ""}
                       </span>
                     )}
                     {!activo && (
-                      <span className="text-[9px] text-cream/20 font-mono">Inactivo</span>
+                      <span className="text-[9px] text-cream/15 font-mono tracking-wider">Inactivo</span>
                     )}
                   </div>
                   <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
                     {activo && expandido && (
                       <button
                         onClick={() => agregarBloque(n)}
-                        className="text-[10px] text-brass/60 hover:text-brass transition-colors uppercase tracking-wider"
+                        className="text-[10px] text-brass/60 hover:text-brass transition-colors uppercase tracking-[0.12em] font-medium"
                       >
                         + Bloque
                       </button>
                     )}
                     <button
                       onClick={() => toggleDia(n)}
-                      className={`text-xs transition-colors ${activo ? "text-signal/50 hover:text-signal" : "text-brass/50 hover:text-brass"}`}
+                      className={`text-xs transition-colors ${
+                        activo
+                          ? "text-signal/50 hover:text-signal"
+                          : "text-brass/40 hover:text-brass"
+                      }`}
                     >
-                      {activo ? "✕" : "+"}
+                      {activo ? (
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                          <line x1="18" y1="6" x2="6" y2="18" />
+                          <line x1="6" y1="6" x2="18" y2="18" />
+                        </svg>
+                      ) : (
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                          <line x1="12" y1="5" x2="12" y2="19" />
+                          <line x1="5" y1="12" x2="19" y2="12" />
+                        </svg>
+                      )}
                     </button>
                   </div>
                 </div>
+
                 {expandido && activo && (
-                  <div className="space-y-2 ml-6 mt-2 mb-2">
+                  <div className="space-y-2 ml-10 mt-2 mb-3">
                     {bloques.map((bloque) => (
-                      <div key={bloque.orden} className="flex items-center gap-2">
-                        <SelectorHora
-                          value={bloque.apertura}
-                          onChange={(v) => actualizarBloque(n, bloque.orden, "apertura", v)}
-                        />
-                        <span className="text-cream/20 text-xs">a</span>
-                        <SelectorHora
-                          value={bloque.cierre}
-                          onChange={(v) => actualizarBloque(n, bloque.orden, "cierre", v)}
-                        />
+                      <div key={bloque.orden} className="flex items-center gap-2 px-1">
+                        <span className="text-[9px] text-brass/30 font-mono w-3">{bloque.orden + 1}</span>
+                        <div className="flex items-center gap-2 border border-brass/20 rounded-lg px-3 py-1.5 bg-ink/60">
+                          <SelectorHora
+                            value={bloque.apertura}
+                            onChange={(v) => actualizarBloque(n, bloque.orden, "apertura", v)}
+                          />
+                          <span className="text-brass/40 text-xs font-mono">—</span>
+                          <SelectorHora
+                            value={bloque.cierre}
+                            onChange={(v) => actualizarBloque(n, bloque.orden, "cierre", v)}
+                          />
+                        </div>
                         <button
                           onClick={() => eliminarBloque(n, bloque.orden)}
-                          className="text-red-400/40 hover:text-red-400 transition-colors text-xs ml-1"
+                          className="text-cream/15 hover:text-signal/70 transition-colors"
                         >
-                          ✕
+                          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+                            <path d="M3 6h18" />
+                            <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
+                            <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+                            <line x1="10" y1="11" x2="10" y2="17" />
+                            <line x1="14" y1="11" x2="14" y2="17" />
+                          </svg>
                         </button>
                       </div>
                     ))}
@@ -272,32 +303,36 @@ export default function AdminConfigForm({
             );
           })}
         </div>
-      </div>
+      </section>
 
       {/* Bloqueos */}
-      <div className="border border-line rounded-lg p-5 bg-surface/30 space-y-4">
-        <p className="text-xs text-cream/40 uppercase tracking-widest">
-          Días bloqueados (vacaciones, feriados…)
-        </p>
+      <section className="border border-line rounded-xl p-6 bg-surface/20">
+        <div className="flex items-center gap-2 mb-5">
+          <span className="w-1.5 h-1.5 rounded-full bg-signal" />
+          <p className="text-xs text-signal/70 uppercase tracking-[0.15em] font-medium">
+            D&iacute;as bloqueados
+          </p>
+        </div>
 
         {bloqueos.length === 0 ? (
-          <p className="text-sm text-cream/30">No hay días bloqueados</p>
+          <p className="text-sm text-cream/25 mb-5">No hay d&iacute;as bloqueados</p>
         ) : (
-          <div className="space-y-2">
+          <div className="space-y-2 mb-5">
             {bloqueos.map((b) => (
               <div
                 key={b.id}
-                className="flex items-center justify-between bg-ink rounded-md px-3 py-2"
+                className="flex items-center justify-between border border-line/50 rounded-lg px-4 py-2.5 bg-ink/40"
               >
-                <div className="text-sm">
-                  <span className="font-mono text-cream/80">{b.fecha}</span>
+                <div className="flex items-center gap-2.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-signal/60" />
+                  <span className="font-mono text-sm text-brass/80">{b.fecha}</span>
                   {b.motivo && (
-                    <span className="text-cream/40 ml-2">— {b.motivo}</span>
+                    <span className="text-cream/30 text-xs ml-1">— {b.motivo}</span>
                   )}
                 </div>
                 <button
                   onClick={() => eliminarBloqueo(b.id)}
-                  className="text-xs text-red-400/60 hover:text-red-400 transition-colors"
+                  className="text-[10px] text-cream/20 hover:text-signal/60 transition-colors uppercase tracking-wider"
                 >
                   Eliminar
                 </button>
@@ -306,9 +341,9 @@ export default function AdminConfigForm({
           </div>
         )}
 
-        <div className="flex gap-2 items-end">
+        <div className="flex flex-wrap gap-3 items-end">
           <div>
-            <label className="text-[10px] text-cream/30 uppercase tracking-wider block mb-1">
+            <label className="text-[9px] text-cream/20 uppercase tracking-[0.12em] block mb-1.5">
               Fecha
             </label>
             <input
@@ -316,11 +351,11 @@ export default function AdminConfigForm({
               value={nuevoBloqueoFecha}
               onChange={(e) => setNuevoBloqueoFecha(e.target.value)}
               min={new Date().toISOString().split("T")[0]}
-              className="bg-ink border border-line rounded-md px-3 py-2 text-sm text-cream"
+              className="bg-ink border border-line rounded-lg px-3 py-2 text-sm text-cream w-40"
             />
           </div>
           <div>
-            <label className="text-[10px] text-cream/30 uppercase tracking-wider block mb-1">
+            <label className="text-[9px] text-cream/20 uppercase tracking-[0.12em] block mb-1.5">
               Motivo (opcional)
             </label>
             <input
@@ -328,30 +363,36 @@ export default function AdminConfigForm({
               placeholder="Ej: Vacaciones"
               value={nuevoBloqueoMotivo}
               onChange={(e) => setNuevoBloqueoMotivo(e.target.value)}
-              className="bg-ink border border-line rounded-md px-3 py-2 text-sm text-cream placeholder:text-cream/20"
+              className="bg-ink border border-line rounded-lg px-3 py-2 text-sm text-cream placeholder:text-cream/15 w-40"
             />
           </div>
           <button
             onClick={agregarBloqueo}
             disabled={!nuevoBloqueoFecha || creandoBloqueo}
-            className="text-sm px-4 py-2 rounded-md bg-signal text-cream font-medium disabled:opacity-40 transition-opacity"
+            className="text-xs px-4 py-2.5 rounded-lg bg-signal/90 hover:bg-signal text-cream font-medium disabled:opacity-30 transition-all tracking-wide"
           >
             {creandoBloqueo ? "..." : "Bloquear"}
           </button>
         </div>
-      </div>
+      </section>
 
-      {/* Guardar horario */}
+      {/* Guardar */}
       <div className="flex items-center gap-4">
         <button
           onClick={guardarConfig}
           disabled={guardando}
-          className="text-sm px-6 py-2.5 rounded-md bg-signal text-cream font-semibold tracking-wide transition-opacity disabled:opacity-40"
+          className="inline-flex items-center gap-2 text-sm px-8 py-3 rounded-xl bg-signal text-cream font-semibold tracking-wide transition-all hover:bg-signal/90 disabled:opacity-40 active:scale-[0.98]"
         >
-          {guardando ? "Guardando..." : "Guardar horario y días"}
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="6" cy="6" r="2.5" />
+            <circle cx="6" cy="18" r="2.5" />
+            <line x1="8.5" y1="8.5" x2="20" y2="20" />
+            <line x1="8.5" y1="15.5" x2="20" y2="4" />
+          </svg>
+          {guardando ? "Guardando..." : "Guardar horario y d&iacute;as"}
         </button>
-        {exito && <p className="text-xs text-green-400">{exito}</p>}
-        {error && <p className="text-xs text-signal">{error}</p>}
+        {exito && <p className="text-xs text-brass/70">{exito}</p>}
+        {error && <p className="text-xs text-signal/80">{error}</p>}
       </div>
     </div>
   );
@@ -376,33 +417,43 @@ function SelectorHora({
   }
 
   return (
-    <div className="flex gap-1 items-center">
+    <div className="flex items-center gap-1">
       <select
         value={h12}
         onChange={(e) => actualizar({ h12: Number(e.target.value) })}
-        className="bg-ink border border-line rounded-md px-2 py-2 text-sm text-cream"
+        className="bg-transparent text-cream text-sm font-mono appearance-none cursor-pointer outline-none w-6 text-center"
       >
         {Array.from({ length: 12 }, (_, i) => i + 1).map((h) => (
-          <option key={h} value={h}>{h}</option>
+          <option key={h} value={h} className="bg-ink">{h}</option>
         ))}
       </select>
-      <span className="text-cream/30 text-sm">:</span>
+      <span className="text-brass/40 text-xs font-mono">:</span>
       <select
         value={min}
         onChange={(e) => actualizar({ min: e.target.value })}
-        className="bg-ink border border-line rounded-md px-2 py-2 text-sm text-cream"
+        className="bg-transparent text-cream text-sm font-mono appearance-none cursor-pointer outline-none w-6 text-center"
       >
-        <option value="00">00</option>
-        <option value="30">30</option>
+        <option value="00" className="bg-ink">00</option>
+        <option value="30" className="bg-ink">30</option>
       </select>
-      <select
-        value={periodo}
-        onChange={(e) => actualizar({ periodo: e.target.value as "AM" | "PM" })}
-        className="bg-ink border border-line rounded-md px-2 py-2 text-sm text-cream"
-      >
-        <option value="AM">AM</option>
-        <option value="PM">PM</option>
-      </select>
+      <div className="flex rounded overflow-hidden border border-brass/15 ml-1.5">
+        <button
+          onClick={() => actualizar({ periodo: "AM" })}
+          className={`text-[9px] px-1.5 py-0.5 font-mono uppercase tracking-widest transition-colors ${
+            periodo === "AM" ? "bg-brass text-ink font-semibold" : "bg-transparent text-cream/25 hover:text-cream/60"
+          }`}
+        >
+          AM
+        </button>
+        <button
+          onClick={() => actualizar({ periodo: "PM" })}
+          className={`text-[9px] px-1.5 py-0.5 font-mono uppercase tracking-widest transition-colors ${
+            periodo === "PM" ? "bg-brass text-ink font-semibold" : "bg-transparent text-cream/25 hover:text-cream/60"
+          }`}
+        >
+          PM
+        </button>
+      </div>
     </div>
   );
 }

@@ -15,6 +15,9 @@ npm run build
 npm run lint         # next lint — no hay script de typecheck
 ```
 
+**Build:** No ejecuto `npm run build` directamente. Doy el comando exacto para que el usuario lo corra (la comunicación WSL↔Windows hace el build muy lento).
+**PowerShell:** `rm -r -force .next; npx next build` (usar `;` en vez de `&&`).
+
 ## Variables de entorno
 | Variable | De dónde se obtiene |
 |---|---|

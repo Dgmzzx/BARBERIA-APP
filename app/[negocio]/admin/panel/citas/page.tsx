@@ -21,8 +21,8 @@ export default async function PaginaCitas({
   return (
     <div className="max-w-4xl">
       <div className="mb-8">
-        <h1 className="font-display text-2xl">Citas</h1>
-        <p className="text-sm text-cream/40 mt-1">
+        <h1 className="font-display text-2xl text-midnight-on-surface">Citas</h1>
+        <p className="text-sm text-midnight-on-surface-variant mt-1">
           {citas?.length ?? 0} registro
           {(citas?.length ?? 0) !== 1 ? "s" : ""}
         </p>
