@@ -51,12 +51,12 @@ export default function AdminSidebar({
               href={`${basePath}${href}`}
               className={`block relative px-4 py-2.5 text-sm rounded-md transition-colors ${
                 esActivo
-                  ? "bg-accent/10 text-accent font-medium"
-                  : "text-cream/50 hover:text-cream hover:bg-base/40"
+                  ? "bg-signal/10 text-signal font-medium"
+                  : "text-cream/50 hover:text-cream hover:bg-ink/40"
               }`}
             >
               {esActivo && (
-                <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 bg-accent rounded-full" />
+                <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 bg-signal rounded-full" />
               )}
               {label}
             </Link>
@@ -67,7 +67,7 @@ export default function AdminSidebar({
       <div className="px-3 pb-6 pt-4 border-t border-line/50">
         <button
           onClick={cerrarSesion}
-          className="w-full text-left px-4 py-2.5 text-sm text-cream/30 hover:text-cream/60 hover:bg-base/40 rounded-md transition-colors"
+          className="w-full text-left px-4 py-2.5 text-sm text-cream/30 hover:text-cream/60 hover:bg-ink/40 rounded-md transition-colors"
         >
           Cerrar sesión
         </button>

@@ -13,7 +13,7 @@ export default async function PanelLayout({
   if (!negocio) notFound();
 
   return (
-    <div className="flex h-screen bg-base">
+    <div className="flex h-screen bg-ink">
       <AdminSidebar
         negocioSlug={params.negocio}
         negocioNombre={negocio?.nombre ?? "Admin"}

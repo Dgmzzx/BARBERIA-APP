@@ -3,32 +3,46 @@
 @tailwind utilities;
 
 :root {
-  --font-display: "DM Serif Display", serif;
+  --font-display: "Fraunces", serif;
   --font-body: "Inter", sans-serif;
   --font-mono: "JetBrains Mono", monospace;
 }
 
 ::selection {
-  background-color: #d4893a;
-  color: #0a0807;
+  background-color: #B08D57;
+  color: #1A1A1A;
 }
 
 body {
-  background-color: #0a0807;
-  color: #e8d5b7;
+  background-color: #1A1A1A;
+  color: #F5F5F0;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 input[type="date"]::-webkit-calendar-picker-indicator {
-  filter: invert(0.7) sepia(0.3) hue-rotate(10deg);
-  opacity: 0.6;
+  filter: invert(0.85) sepia(0.1) hue-rotate(0deg);
+  opacity: 0.5;
   cursor: pointer;
+}
+
+.barber-rule {
+  background: repeating-linear-gradient(
+    45deg,
+    #C41E3A 0px, #C41E3A 4px,
+    #F5F5F0 4px, #F5F5F0 8px,
+    #B08D57 8px, #B08D57 12px
+  );
+  height: 3px;
+  width: 100%;
+  border: 0;
+  margin: 0;
 }
 
 @media (prefers-reduced-motion: reduce) {
   .motion-safe\:animate-fade-up,
-  .motion-safe\:animate-stamp-in {
+  .motion-safe\:animate-stamp-in,
+  .motion-safe\:animate-press-in {
     animation: none !important;
   }
 }

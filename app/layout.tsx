@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
-import { DM_Serif_Display, Inter, JetBrains_Mono } from "next/font/google";
+import { Fraunces, Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 
-const dmSerifDisplay = DM_Serif_Display({
-  weight: "400",
+const fraunces = Fraunces({
   subsets: ["latin"],
   variable: "--font-display",
 });
@@ -31,7 +30,7 @@ export default function RootLayout({
   return (
     <html
       lang="es"
-      className={`${dmSerifDisplay.variable} ${inter.variable} ${jetbrainsMono.variable}`}
+      className={`${fraunces.variable} ${inter.variable} ${jetbrainsMono.variable}`}
     >
       <body>{children}</body>
     </html>

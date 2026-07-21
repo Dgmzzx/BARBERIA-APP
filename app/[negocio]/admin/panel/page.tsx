@@ -52,7 +52,7 @@ export default async function Dashboard({
           <p className="text-xs text-cream/40 uppercase tracking-widest mb-2">
             Pendientes
           </p>
-          <p className="font-display text-3xl text-accent">{pendientes}</p>
+          <p className="font-display text-3xl text-signal">{pendientes}</p>
         </div>
         <div className="border border-line rounded-lg p-5 bg-surface/50">
           <p className="text-xs text-cream/40 uppercase tracking-widest mb-2">
@@ -76,7 +76,7 @@ export default async function Dashboard({
               className="border border-line rounded-lg p-4 bg-surface/30 flex items-center justify-between"
             >
               <div className="flex items-center gap-4">
-                <span className="font-mono text-sm text-accent tabular-nums w-16">
+                <span className="font-mono text-sm text-brass tabular-nums w-16">
                   {formatearHora12h(cita.hora)}
                 </span>
                 <div>
@@ -92,7 +92,7 @@ export default async function Dashboard({
                     ? "bg-green-900/20 text-green-400"
                     : cita.estado === "cancelada"
                       ? "bg-red-900/20 text-red-400"
-                      : "bg-accent/15 text-accent"
+                      : "bg-signal/15 text-signal"
                 }`}
               >
                 {cita.estado === "pendiente"

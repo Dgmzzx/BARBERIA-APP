@@ -49,7 +49,7 @@ export default function LoginAdmin({
         {error && <p className="text-red-400 text-sm">{error}</p>}
         <button
           onClick={iniciarSesion}
-          className="w-full bg-accent rounded-lg py-3 font-medium"
+          className="w-full bg-signal rounded-lg py-3 font-medium text-cream"
         >
           Entrar
         </button>

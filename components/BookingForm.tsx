@@ -126,11 +126,11 @@ export default function BookingForm({
 
     return (
       <div className="motion-safe:animate-fade-up">
-        <div className="bg-cream text-base rounded-sm overflow-hidden">
+        <div className="bg-cream text-ink rounded-md overflow-hidden shadow-lg">
           <div className="p-6 sm:p-8">
             <div className="flex justify-end mb-6">
               <div
-                className="motion-safe:animate-stamp-in font-mono text-[11px] text-stamp border border-stamp/60 px-2.5 py-0.5 tracking-[0.15em] select-none"
+                className="motion-safe:animate-stamp-in font-display text-sm text-signal border border-signal/60 px-3 py-1 tracking-[0.15em] select-none"
                 style={{ transform: "rotate(6deg)" }}
               >
                 CONFIRMADO
@@ -138,35 +138,35 @@ export default function BookingForm({
             </div>
 
             <div className="mb-6">
-              <p className="font-display text-2xl sm:text-3xl text-base leading-tight">
+              <p className="font-display text-2xl sm:text-3xl text-ink leading-tight">
                 {servicioElegido?.nombre}
               </p>
-              <p className="font-mono text-xs text-base/40 mt-1.5">
+              <p className="font-mono text-xs text-ink/40 mt-1.5">
                 {servicioElegido?.duracion_minutos} min
               </p>
             </div>
 
             <div className="flex justify-between items-end mb-6">
               <div>
-                <p className="font-mono text-[10px] text-base/30 uppercase tracking-widest mb-1">
+                <p className="font-mono text-[10px] text-ink/30 uppercase tracking-widest mb-1">
                   Fecha
                 </p>
-                <p className="font-body text-sm sm:text-base text-base">
+                <p className="font-body text-sm sm:text-base text-ink">
                   {fechaFormateada}
                 </p>
               </div>
               <div className="text-right">
-                <p className="font-mono text-[10px] text-base/30 uppercase tracking-widest mb-1">
+                <p className="font-mono text-[10px] text-ink/30 uppercase tracking-widest mb-1">
                   Hora
                 </p>
-                <p className="font-mono text-2xl sm:text-3xl text-base leading-none tracking-tight">
+                <p className="font-mono text-2xl sm:text-3xl text-ink leading-none tracking-tight">
                   {formatearHora12h(hora)}
                 </p>
               </div>
             </div>
 
-            <div className="border-t border-dashed border-base/20 pt-5">
-              <p className="font-display text-lg text-base">
+            <div className="border-t border-dashed border-ink/20 pt-5">
+              <p className="font-display text-lg text-ink">
                 {nombre}, te esperamos
               </p>
             </div>
@@ -178,9 +178,12 @@ export default function BookingForm({
 
   return (
     <div className="space-y-10">
+      {/* Barber pole divider */}
+      <div className="barber-rule" role="separator" />
+
       {/* Paso 1: servicio */}
       <section className="motion-safe:animate-fade-up">
-        <label className="block font-mono text-[11px] text-accent uppercase tracking-[0.15em] mb-4">
+        <label className="block font-mono text-[11px] text-brass uppercase tracking-[0.15em] mb-4">
           Servicio
         </label>
 
@@ -200,17 +203,17 @@ export default function BookingForm({
                   setServicioElegido(s);
                   setPaso("horario");
                 }}
-                className={`w-full text-left border rounded-sm p-4 transition-all duration-200
+                className={`w-full text-left border rounded-md p-4 transition-all duration-150
                   ${selected
-                    ? "border-accent/60 bg-accent/[0.06] border-l-2 border-l-accent"
-                    : "border-line hover:border-cream/20 hover:bg-surface/50 border-l-2 border-l-transparent"
+                    ? "border-signal/60 bg-signal/[0.06] border-l-2 border-l-signal"
+                    : "border-line hover:border-brass/30 hover:bg-surface/50 border-l-2 border-l-transparent"
                   }`}
               >
                 <div className="flex justify-between items-baseline">
                   <span className={`font-display text-lg ${selected ? "text-cream" : "text-cream/90"}`}>
                     {s.nombre}
                   </span>
-                  <span className="font-mono text-sm text-accent tabular-nums shrink-0 ml-4">
+                  <span className="font-mono text-sm text-brass tabular-nums shrink-0 ml-4">
                     ${s.precio}
                   </span>
                 </div>
@@ -226,7 +229,7 @@ export default function BookingForm({
       {/* Paso 2: fecha y hora */}
       {servicioElegido && (
         <section className="motion-safe:animate-fade-up">
-          <label className="block font-mono text-[11px] text-accent uppercase tracking-[0.15em] mb-4">
+          <label className="block font-mono text-[11px] text-brass uppercase tracking-[0.15em] mb-4">
             Fecha y hora
           </label>
           <div className="space-y-4">
@@ -235,14 +238,14 @@ export default function BookingForm({
               value={fecha}
               min={new Date().toISOString().split("T")[0]}
               onChange={(e) => alElegirFecha(e.target.value)}
-              className="w-full bg-surface border border-line rounded-sm px-4 py-3
-                         font-mono text-sm text-cream/90 placeholder-cream/20
-                         focus:outline-none focus:border-accent/40
-                         transition-colors"
+              className="w-full bg-surface border border-line rounded-md px-4 py-3
+                         font-body text-sm text-cream placeholder:text-muted
+                         focus:outline-none focus:border-brass/50 focus:ring-1 focus:ring-brass/20
+                         transition-all duration-150"
             />
 
             {fechaInvalida && (
-              <p className="font-mono text-xs text-cream/40">{fechaInvalida}</p>
+              <p className="font-mono text-xs text-signal">{fechaInvalida}</p>
             )}
 
             {cargandoHoras && (
@@ -261,10 +264,10 @@ export default function BookingForm({
                   <button
                     key={h}
                     onClick={() => setHora(h)}
-                    className={`font-mono text-sm border rounded-sm py-2.5 px-2 transition-all duration-150
+                    className={`font-mono text-sm border rounded-md py-2.5 px-2 transition-all duration-150
                       ${hora === h
-                        ? "bg-accent text-base border-accent font-medium"
-                        : "border-line text-cream/70 hover:border-accent/30 hover:text-cream/90"
+                        ? "bg-brass text-ink border-brass font-medium"
+                        : "border-line text-cream/70 hover:border-brass/30 hover:text-cream/90"
                       }`}
                   >
                     {formatearHora12h(h)}
@@ -279,7 +282,7 @@ export default function BookingForm({
       {/* Paso 3: datos del cliente */}
       {servicioElegido && fecha && hora && !fechaInvalida && (
         <section className="motion-safe:animate-fade-up space-y-4">
-          <label className="block font-mono text-[11px] text-accent uppercase tracking-[0.15em]">
+          <label className="block font-mono text-[11px] text-brass uppercase tracking-[0.15em]">
             Tus datos
           </label>
           <div className="space-y-3">
@@ -288,33 +291,35 @@ export default function BookingForm({
               placeholder="Nombre completo"
               value={nombre}
               onChange={(e) => setNombre(e.target.value)}
-              className="w-full bg-surface border border-line rounded-sm px-4 py-3
-                         font-body text-sm text-cream/90 placeholder-cream/20
-                         focus:outline-none focus:border-accent/40
-                         transition-colors"
+              className="w-full bg-surface border border-line rounded-md px-4 py-3
+                         font-body text-sm text-cream placeholder:text-muted
+                         focus:outline-none focus:border-brass/50 focus:ring-1 focus:ring-brass/20
+                         transition-all duration-150"
             />
             <input
               type="tel"
               placeholder="Teléfono"
               value={telefono}
               onChange={(e) => setTelefono(e.target.value)}
-              className="w-full bg-surface border border-line rounded-sm px-4 py-3
-                         font-body text-sm text-cream/90 placeholder-cream/20
-                         focus:outline-none focus:border-accent/40
-                         transition-colors"
+              className="w-full bg-surface border border-line rounded-md px-4 py-3
+                         font-body text-sm text-cream placeholder:text-muted
+                         focus:outline-none focus:border-brass/50 focus:ring-1 focus:ring-brass/20
+                         transition-all duration-150"
             />
 
             {error && (
-              <p className="font-mono text-xs text-stamp">{error}</p>
+              <p className="font-mono text-xs text-signal">{error}</p>
             )}
 
             <button
               onClick={confirmarCita}
               disabled={!nombre || !telefono || enviando}
-              className="w-full bg-accent text-base text-sm font-medium rounded-sm py-3.5
-                         tracking-wider transition-all duration-200
-                         hover:bg-accent/90
-                         disabled:opacity-25 disabled:cursor-not-allowed disabled:hover:bg-accent"
+              className="w-full bg-signal text-cream text-sm font-semibold tracking-wide
+                         rounded-md px-8 py-3.5
+                         shadow-lg shadow-signal/20
+                         transition-all duration-150
+                         hover:bg-signal/90 active:scale-[0.97]
+                         disabled:opacity-30 disabled:cursor-not-allowed"
             >
               {enviando ? "Reservando..." : "Confirmar cita"}
             </button>

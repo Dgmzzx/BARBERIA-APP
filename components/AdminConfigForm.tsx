@@ -207,10 +207,10 @@ export default function AdminConfigForm({
                 <div
                   className={`flex items-center justify-between px-3 py-2.5 rounded-lg cursor-pointer select-none transition-colors ${
                     expandido
-                      ? "bg-base border border-line"
+                      ? "bg-ink border border-line"
                       : activo
-                        ? "hover:bg-base/50 border border-transparent"
-                        : "hover:bg-base/30 border border-transparent"
+                        ? "hover:bg-ink/50 border border-transparent"
+                        : "hover:bg-ink/30 border border-transparent"
                   }`}
                   onClick={() => setDiaExpandido(expandido ? null : n)}
                 >
@@ -232,14 +232,14 @@ export default function AdminConfigForm({
                     {activo && expandido && (
                       <button
                         onClick={() => agregarBloque(n)}
-                        className="text-[10px] text-accent/60 hover:text-accent transition-colors uppercase tracking-wider"
+                        className="text-[10px] text-brass/60 hover:text-brass transition-colors uppercase tracking-wider"
                       >
                         + Bloque
                       </button>
                     )}
                     <button
                       onClick={() => toggleDia(n)}
-                      className={`text-xs transition-colors ${activo ? "text-red-400/40 hover:text-red-400" : "text-accent/50 hover:text-accent"}`}
+                      className={`text-xs transition-colors ${activo ? "text-signal/50 hover:text-signal" : "text-brass/50 hover:text-brass"}`}
                     >
                       {activo ? "✕" : "+"}
                     </button>
@@ -287,7 +287,7 @@ export default function AdminConfigForm({
             {bloqueos.map((b) => (
               <div
                 key={b.id}
-                className="flex items-center justify-between bg-base rounded-md px-3 py-2"
+                className="flex items-center justify-between bg-ink rounded-md px-3 py-2"
               >
                 <div className="text-sm">
                   <span className="font-mono text-cream/80">{b.fecha}</span>
@@ -316,7 +316,7 @@ export default function AdminConfigForm({
               value={nuevoBloqueoFecha}
               onChange={(e) => setNuevoBloqueoFecha(e.target.value)}
               min={new Date().toISOString().split("T")[0]}
-              className="bg-base border border-line rounded-md px-3 py-2 text-sm text-cream"
+              className="bg-ink border border-line rounded-md px-3 py-2 text-sm text-cream"
             />
           </div>
           <div>
@@ -328,13 +328,13 @@ export default function AdminConfigForm({
               placeholder="Ej: Vacaciones"
               value={nuevoBloqueoMotivo}
               onChange={(e) => setNuevoBloqueoMotivo(e.target.value)}
-              className="bg-base border border-line rounded-md px-3 py-2 text-sm text-cream placeholder:text-cream/20"
+              className="bg-ink border border-line rounded-md px-3 py-2 text-sm text-cream placeholder:text-cream/20"
             />
           </div>
           <button
             onClick={agregarBloqueo}
             disabled={!nuevoBloqueoFecha || creandoBloqueo}
-            className="text-sm px-4 py-2 rounded-md bg-accent text-cream font-medium disabled:opacity-40 transition-opacity"
+            className="text-sm px-4 py-2 rounded-md bg-signal text-cream font-medium disabled:opacity-40 transition-opacity"
           >
             {creandoBloqueo ? "..." : "Bloquear"}
           </button>
@@ -346,12 +346,12 @@ export default function AdminConfigForm({
         <button
           onClick={guardarConfig}
           disabled={guardando}
-          className="text-sm px-6 py-2.5 rounded-md bg-accent text-cream font-medium disabled:opacity-40 transition-opacity"
+          className="text-sm px-6 py-2.5 rounded-md bg-signal text-cream font-semibold tracking-wide transition-opacity disabled:opacity-40"
         >
           {guardando ? "Guardando..." : "Guardar horario y días"}
         </button>
         {exito && <p className="text-xs text-green-400">{exito}</p>}
-        {error && <p className="text-xs text-red-400">{error}</p>}
+        {error && <p className="text-xs text-signal">{error}</p>}
       </div>
     </div>
   );
@@ -380,7 +380,7 @@ function SelectorHora({
       <select
         value={h12}
         onChange={(e) => actualizar({ h12: Number(e.target.value) })}
-        className="bg-base border border-line rounded-md px-2 py-2 text-sm text-cream"
+        className="bg-ink border border-line rounded-md px-2 py-2 text-sm text-cream"
       >
         {Array.from({ length: 12 }, (_, i) => i + 1).map((h) => (
           <option key={h} value={h}>{h}</option>
@@ -390,7 +390,7 @@ function SelectorHora({
       <select
         value={min}
         onChange={(e) => actualizar({ min: e.target.value })}
-        className="bg-base border border-line rounded-md px-2 py-2 text-sm text-cream"
+        className="bg-ink border border-line rounded-md px-2 py-2 text-sm text-cream"
       >
         <option value="00">00</option>
         <option value="30">30</option>
@@ -398,7 +398,7 @@ function SelectorHora({
       <select
         value={periodo}
         onChange={(e) => actualizar({ periodo: e.target.value as "AM" | "PM" })}
-        className="bg-base border border-line rounded-md px-2 py-2 text-sm text-cream"
+        className="bg-ink border border-line rounded-md px-2 py-2 text-sm text-cream"
       >
         <option value="AM">AM</option>
         <option value="PM">PM</option>

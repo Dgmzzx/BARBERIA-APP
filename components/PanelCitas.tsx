@@ -41,14 +41,14 @@ export default function PanelCitas({
       {citas.map((cita) => (
         <div
           key={cita.id}
-          className="border border-line rounded-lg p-4 flex items-center justify-between"
+          className="border border-line rounded-lg p-4 bg-surface/20 flex items-center justify-between"
         >
           <div>
-            <p className="font-medium">{cita.nombre_cliente}</p>
-            <p className="text-sm text-cream/60">
+            <p className="font-medium text-cream">{cita.nombre_cliente}</p>
+            <p className="text-sm text-cream/50">
               {cita.servicios?.nombre} · {cita.fecha} {formatearHora12h(cita.hora)}
             </p>
-            <p className="text-sm text-cream/40">{cita.telefono_cliente}</p>
+            <p className="text-sm text-cream/30">{cita.telefono_cliente}</p>
           </div>
 
           <div className="flex gap-2">
@@ -56,19 +56,23 @@ export default function PanelCitas({
               <>
                 <button
                   onClick={() => actualizarEstado(cita.id, "completada")}
-                  className="text-xs border border-line rounded-full px-3 py-1 hover:border-accent"
+                  className="text-xs border border-line rounded-full px-3 py-1 hover:border-brass hover:text-cream transition-colors"
                 >
                   Completar
                 </button>
                 <button
                   onClick={() => actualizarEstado(cita.id, "cancelada")}
-                  className="text-xs border border-line rounded-full px-3 py-1 hover:border-red-400"
+                  className="text-xs border border-line rounded-full px-3 py-1 hover:border-signal/50 hover:text-signal transition-colors"
                 >
                   Cancelar
                 </button>
               </>
             ) : (
-              <span className="text-xs text-cream/40 capitalize">
+              <span className={`text-xs capitalize px-3 py-1 rounded-full border ${
+                cita.estado === "completada"
+                  ? "text-green-400 border-green-700/30 bg-green-900/10"
+                  : "text-signal/50 border-signal/30"
+              }`}>
                 {cita.estado}
               </span>
             )}
