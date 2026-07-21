@@ -11,7 +11,7 @@ export default async function PaginaReserva({
 
   const { data: negocio } = await supabase
     .from("negocios")
-    .select("*")
+    .select("*, horarios(*)")
     .eq("slug", params.negocio)
     .eq("activo", true)
     .single();
@@ -34,7 +34,7 @@ export default async function PaginaReserva({
         <h1 className="font-display text-3xl">{negocio.nombre}</h1>
       </header>
 
-      <BookingForm negocio={negocio} servicios={servicios ?? []} />
+      <BookingForm negocio={negocio} servicios={servicios ?? []} horarios={negocio.horarios ?? []} />
     </main>
   );
 }

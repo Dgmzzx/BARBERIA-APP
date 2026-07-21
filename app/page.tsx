@@ -7,7 +7,7 @@ export default async function PaginaInicio() {
 
   const { data: negocio } = await supabase
     .from("negocios")
-    .select("*")
+    .select("*, horarios(*)")
     .eq("slug", "barberiawady")
     .eq("activo", true)
     .single();
@@ -40,7 +40,7 @@ export default async function PaginaInicio() {
         <span className="flex-1 h-px bg-current" />
       </div>
 
-      <BookingForm negocio={negocio} servicios={servicios ?? []} />
+      <BookingForm negocio={negocio} servicios={servicios ?? []} horarios={negocio.horarios ?? []} />
 
       <footer className="mt-16 text-center font-mono text-[11px] text-cream/15 tracking-wider">
         {negocio.telefono && (
