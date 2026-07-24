@@ -61,3 +61,20 @@ export function validarTelefono(telefono: string): boolean {
 export function validarEmail(email: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
+
+export function badgeColor(estado: string): string {
+  switch (estado) {
+    case "completada":
+      return "text-midnight-tertiary border-midnight-tertiary/30 bg-midnight-tertiary/20";
+    case "cancelada":
+      return "text-midnight-error border-midnight-error/30 bg-midnight-error/20";
+    case "no_asistio":
+      return "text-midnight-on-surface-variant border-midnight-outline/30 bg-midnight-surface-container-high";
+    case "en_proceso":
+      return "text-midnight-secondary border-midnight-secondary/40 bg-midnight-secondary/20";
+    case "confirmada":
+      return "text-midnight-tertiary border-midnight-tertiary/30 bg-midnight-tertiary/20";
+    default:
+      return "text-midnight-secondary border-midnight-secondary/30 bg-midnight-secondary/20";
+  }
+}

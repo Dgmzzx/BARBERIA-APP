@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { crearClienteSupabase } from "@/lib/supabase/client";
-import { formatearHora12h, normalizarTelefono } from "@/lib/helpers";
+import { formatearHora12h, normalizarTelefono, badgeColor } from "@/lib/helpers";
 import type { Horario } from "@/lib/types";
 import FichaCliente from "./FichaCliente";
 import ReprogramarCitaModal from "./ReprogramarCitaModal";
@@ -124,6 +124,50 @@ export default function PanelCitas({
             {cita.estado === "pendiente" ? (
               <>
                 <button
+                  onClick={() => actualizarEstado(cita.id, "confirmada")}
+                  className="text-xs border border-midnight-outline rounded-full px-3 py-1 hover:border-midnight-secondary hover:text-midnight-secondary transition-colors"
+                >
+                  Confirmar
+                </button>
+                <button
+                  onClick={() => setCitaCancelar(cita)}
+                  className="text-xs border border-midnight-outline rounded-full px-3 py-1 hover:border-midnight-error/50 hover:text-midnight-error transition-colors"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={() => setCitaReprogramar(cita)}
+                  className="text-xs border border-midnight-outline rounded-full px-3 py-1 hover:border-midnight-secondary hover:text-midnight-secondary transition-colors"
+                  title="Reprogramar cita"
+                >
+                  Reprogramar
+                </button>
+              </>
+            ) : cita.estado === "confirmada" ? (
+              <>
+                <button
+                  onClick={() => actualizarEstado(cita.id, "en_proceso")}
+                  className="text-xs border border-midnight-outline rounded-full px-3 py-1 hover:border-midnight-secondary hover:text-midnight-secondary transition-colors"
+                >
+                  En proceso
+                </button>
+                <button
+                  onClick={() => setCitaCancelar(cita)}
+                  className="text-xs border border-midnight-outline rounded-full px-3 py-1 hover:border-midnight-error/50 hover:text-midnight-error transition-colors"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={() => setCitaReprogramar(cita)}
+                  className="text-xs border border-midnight-outline rounded-full px-3 py-1 hover:border-midnight-secondary hover:text-midnight-secondary transition-colors"
+                  title="Reprogramar cita"
+                >
+                  Reprogramar
+                </button>
+              </>
+            ) : cita.estado === "en_proceso" ? (
+              <>
+                <button
                   onClick={() => actualizarEstado(cita.id, "completada")}
                   className="text-xs border border-midnight-outline rounded-full px-3 py-1 hover:border-midnight-secondary hover:text-midnight-secondary transition-colors"
                 >
@@ -135,25 +179,10 @@ export default function PanelCitas({
                 >
                   Cancelar
                 </button>
-                {(cita.estado === "pendiente" || cita.estado === "confirmada") && (
-                  <button
-                    onClick={() => setCitaReprogramar(cita)}
-                    className="text-xs border border-midnight-outline rounded-full px-3 py-1 hover:border-midnight-secondary hover:text-midnight-secondary transition-colors"
-                    title="Reprogramar cita"
-                  >
-                    Reprogramar
-                  </button>
-                )}
               </>
             ) : (
-              <span
-                className={`text-xs capitalize px-3 py-1 rounded-full border ${
-                  cita.estado === "completada"
-                    ? "text-midnight-tertiary border-midnight-tertiary/30 bg-midnight-tertiary/20"
-                    : "text-midnight-error border-midnight-error/30 bg-midnight-error/20"
-                }`}
-              >
-                {cita.estado}
+              <span className={`text-xs capitalize px-3 py-1 rounded-full border ${badgeColor(cita.estado)}`}>
+                {cita.estado === "no_asistio" ? "No asistió" : cita.estado === "en_proceso" ? "En proceso" : cita.estado}
               </span>
             )}
             <button

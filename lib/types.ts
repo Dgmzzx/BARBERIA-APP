@@ -30,6 +30,8 @@ export type Horario = {
   orden: number;
 };
 
+export type CitaEstado = "pendiente" | "confirmada" | "en_proceso" | "completada" | "cancelada" | "no_asistio";
+
 export type Cita = {
   id: string;
   negocio_id: string;
@@ -41,5 +43,5 @@ export type Cita = {
   motivo_cancelacion: string | null;
   fecha: string;
   hora: string;
-  estado: "pendiente" | "completada" | "cancelada";
+  estado: CitaEstado;
 };

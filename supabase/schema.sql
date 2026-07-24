@@ -68,7 +68,7 @@ create table citas (
   motivo_cancelacion text,
   fecha date not null,
   hora time not null,
-  estado text not null default 'pendiente' check (estado in ('pendiente','completada','cancelada')),
+  estado text not null default 'pendiente' check (estado in ('pendiente','confirmada','en_proceso','completada','cancelada','no_asistio')),
   creado_en timestamptz not null default now()
 );
 
