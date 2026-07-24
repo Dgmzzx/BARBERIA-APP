@@ -6,6 +6,7 @@ import { formatearHora12h, normalizarTelefono } from "@/lib/helpers";
 import type { Horario } from "@/lib/types";
 import FichaCliente from "./FichaCliente";
 import ReprogramarCitaModal from "./ReprogramarCitaModal";
+import CancelarCitaModal from "./CancelarCitaModal";
 
 type CitaConServicio = {
   id: string;
@@ -14,6 +15,7 @@ type CitaConServicio = {
   telefono_cliente: string;
   correo_cliente: string | null;
   notas_cliente: string | null;
+  motivo_cancelacion: string | null;
   fecha: string;
   hora: string;
   estado: string;
@@ -30,6 +32,7 @@ export default function PanelCitas({
   const [citas, setCitas] = useState(citasIniciales);
   const [citaSeleccionada, setCitaSeleccionada] = useState<CitaConServicio | null>(null);
   const [citaReprogramar, setCitaReprogramar] = useState<CitaConServicio | null>(null);
+  const [citaCancelar, setCitaCancelar] = useState<CitaConServicio | null>(null);
 
   async function actualizarEstado(id: string, estado: string) {
     const supabase = crearClienteSupabase();
@@ -77,6 +80,27 @@ export default function PanelCitas({
     alert("Cita reprogramada correctamente.");
   }
 
+  async function confirmarCancelacion(id: string, motivo: string) {
+    const estado = motivo === "No asistió" ? "no_asistio" : "cancelada";
+    const supabase = crearClienteSupabase();
+    const { error } = await supabase
+      .from("citas")
+      .update({ estado, motivo_cancelacion: motivo })
+      .eq("id", id);
+
+    if (error) {
+      alert("No se pudo cancelar la cita. Intenta de nuevo.");
+      return;
+    }
+    setCitas((prev) =>
+      prev.map((c) =>
+        c.id === id ? { ...c, estado, motivo_cancelacion: motivo } : c
+      )
+    );
+    setCitaCancelar(null);
+    alert("Cita cancelada correctamente.");
+  }
+
   if (citas.length === 0) {
     return <p className="text-midnight-on-surface-variant">Todavía no hay citas reservadas.</p>;
   }
@@ -106,7 +130,7 @@ export default function PanelCitas({
                   Completar
                 </button>
                 <button
-                  onClick={() => actualizarEstado(cita.id, "cancelada")}
+                  onClick={() => setCitaCancelar(cita)}
                   className="text-xs border border-midnight-outline rounded-full px-3 py-1 hover:border-midnight-error/50 hover:text-midnight-error transition-colors"
                 >
                   Cancelar
@@ -192,6 +216,13 @@ export default function PanelCitas({
           horarios={horarios}
           onConfirm={(fecha, hora) => reprogramarCita(citaReprogramar.id, fecha, hora)}
           onClose={() => setCitaReprogramar(null)}
+        />
+      )}
+
+      {citaCancelar && (
+        <CancelarCitaModal
+          onConfirm={(motivo) => confirmarCancelacion(citaCancelar.id, motivo)}
+          onClose={() => setCitaCancelar(null)}
         />
       )}
     </div>

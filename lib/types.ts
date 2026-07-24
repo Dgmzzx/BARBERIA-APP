@@ -38,6 +38,7 @@ export type Cita = {
   telefono_cliente: string;
   correo_cliente: string | null;
   notas_cliente: string | null;
+  motivo_cancelacion: string | null;
   fecha: string;
   hora: string;
   estado: "pendiente" | "completada" | "cancelada";
