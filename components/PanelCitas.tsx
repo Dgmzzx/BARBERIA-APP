@@ -3,11 +3,15 @@
 import { useState } from "react";
 import { crearClienteSupabase } from "@/lib/supabase/client";
 import { formatearHora12h, normalizarTelefono } from "@/lib/helpers";
+import FichaCliente from "./FichaCliente";
 
 type CitaConServicio = {
   id: string;
+  negocio_id: string;
   nombre_cliente: string;
   telefono_cliente: string;
+  correo_cliente: string | null;
+  notas_cliente: string | null;
   fecha: string;
   hora: string;
   estado: string;
@@ -20,6 +24,7 @@ export default function PanelCitas({
   citasIniciales: CitaConServicio[];
 }) {
   const [citas, setCitas] = useState(citasIniciales);
+  const [citaSeleccionada, setCitaSeleccionada] = useState<CitaConServicio | null>(null);
 
   async function actualizarEstado(id: string, estado: string) {
     const supabase = crearClienteSupabase();
@@ -95,6 +100,27 @@ export default function PanelCitas({
                 {cita.estado}
               </span>
             )}
+            <button
+              onClick={() => setCitaSeleccionada(cita)}
+              className="border border-midnight-outline rounded-full p-1 hover:border-midnight-secondary hover:text-midnight-secondary transition-colors"
+              title="Ver detalles del cliente"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <circle cx="12" cy="12" r="10" />
+                <line x1="12" y1="16" x2="12" y2="12" />
+                <line x1="12" y1="8" x2="12.01" y2="8" />
+              </svg>
+            </button>
             {cita.telefono_cliente && (
               <button
                 onClick={() => abrirWhatsApp(cita.telefono_cliente)}
@@ -120,6 +146,13 @@ export default function PanelCitas({
           </div>
         </div>
       ))}
+
+      {citaSeleccionada && (
+        <FichaCliente
+          cita={citaSeleccionada}
+          onClose={() => setCitaSeleccionada(null)}
+        />
+      )}
     </div>
   );
 }
