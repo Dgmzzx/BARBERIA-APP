@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { Resend } from "resend";
-import { formatearHora12h } from "@/lib/helpers";
+import { formatearHora12h, normalizarTelefono, validarEmail } from "@/lib/helpers";
 
 // Se inicializa Supabase una sola vez afuera porque sus variables
 // no suelen causar el error del constructor durante el build.
@@ -24,7 +24,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const { negocio_id, servicio_id, nombre_cliente, telefono_cliente, fecha, hora } = body;
+    const { negocio_id, servicio_id, nombre_cliente, telefono_cliente, correo_cliente, notas_cliente, fecha, hora } = body;
 
     // 2. Validación estricta: Nos aseguramos de que no vengan campos vacíos o con solo espacios.
     if (
@@ -37,6 +37,23 @@ export async function POST(request: Request) {
     ) {
       return NextResponse.json(
         { error: "Faltan datos obligatorios para completar la cita" },
+        { status: 400 }
+      );
+    }
+
+    const telefonoNormalizado = normalizarTelefono(telefono_cliente);
+    const correoLimpio = correo_cliente?.toString().trim() || null;
+
+    if (telefonoNormalizado.length < 8 || telefonoNormalizado.length > 15) {
+      return NextResponse.json(
+        { error: "El teléfono debe tener entre 8 y 15 dígitos." },
+        { status: 400 }
+      );
+    }
+
+    if (correoLimpio && !validarEmail(correoLimpio)) {
+      return NextResponse.json(
+        { error: "El correo electrónico no tiene un formato válido." },
         { status: 400 }
       );
     }
@@ -93,7 +110,9 @@ export async function POST(request: Request) {
         negocio_id,
         servicio_id,
         nombre_cliente: nombre_cliente.toString().trim(),
-        telefono_cliente: telefono_cliente.toString().trim(),
+        telefono_cliente: telefonoNormalizado,
+        correo_cliente: correoLimpio,
+        notas_cliente: notas_cliente?.toString().trim() || null,
         fecha,
         hora,
       })
@@ -145,8 +164,16 @@ export async function POST(request: Request) {
               </tr>
               <tr>
                 <td style="padding: 8px 0; border-bottom: 1px solid #f0f0f0;"><strong>Teléfono:</strong></td>
-                <td style="padding: 8px 0; border-bottom: 1px solid #f0f0f0;"><a href="tel:${telefono_cliente}">${telefono_cliente}</a></td>
+                <td style="padding: 8px 0; border-bottom: 1px solid #f0f0f0;"><a href="tel:${telefonoNormalizado}">${telefonoNormalizado}</a></td>
               </tr>
+              ${correoLimpio ? `<tr>
+                <td style="padding: 8px 0; border-bottom: 1px solid #f0f0f0;"><strong>Correo:</strong></td>
+                <td style="padding: 8px 0; border-bottom: 1px solid #f0f0f0;"><a href="mailto:${correoLimpio}">${correoLimpio}</a></td>
+              </tr>` : ""}
+              ${notas_cliente?.toString().trim() ? `<tr>
+                <td style="padding: 8px 0; border-bottom: 1px solid #f0f0f0;"><strong>Notas:</strong></td>
+                <td style="padding: 8px 0; border-bottom: 1px solid #f0f0f0;">${notas_cliente.toString().trim()}</td>
+              </tr>` : ""}
               <tr>
                 <td style="padding: 8px 0; border-bottom: 1px solid #f0f0f0;"><strong>Servicio:</strong></td>
                 <td style="padding: 8px 0; border-bottom: 1px solid #f0f0f0;">${servicio?.nombre ?? "Servicio general"}</td>

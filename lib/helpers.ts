@@ -48,3 +48,16 @@ export function componerHora(h12: number, min: string, periodo: "AM" | "PM"): st
   if (periodo === "AM" && h12 === 12) h24 = 0;
   return `${String(h24).padStart(2, "0")}:${min}`;
 }
+
+export function normalizarTelefono(telefono: string): string {
+  return telefono.replace(/[\s\-\(\)\+]/g, "");
+}
+
+export function validarTelefono(telefono: string): boolean {
+  const normalizado = normalizarTelefono(telefono);
+  return normalizado.length >= 8 && normalizado.length <= 15;
+}
+
+export function validarEmail(email: string): boolean {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}

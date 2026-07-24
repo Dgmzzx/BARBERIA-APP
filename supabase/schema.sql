@@ -64,6 +64,7 @@ create table citas (
   nombre_cliente text not null,
   telefono_cliente text not null,
   correo_cliente text,
+  notas_cliente text,
   fecha date not null,
   hora time not null,
   estado text not null default 'pendiente' check (estado in ('pendiente','completada','cancelada')),

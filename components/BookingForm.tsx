@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { crearClienteSupabase } from "@/lib/supabase/client";
 import type { Negocio, Servicio, Horario } from "@/lib/types";
-import { formatearHora12h, obtenerRangosDelDia } from "@/lib/helpers";
+import { formatearHora12h, obtenerRangosDelDia, normalizarTelefono, validarTelefono, validarEmail } from "@/lib/helpers";
 
 type Paso = "servicio" | "horario" | "datos" | "confirmado";
 
@@ -22,6 +22,8 @@ export default function BookingForm({
   const [hora, setHora] = useState("");
   const [nombre, setNombre] = useState("");
   const [telefono, setTelefono] = useState("");
+  const [correo, setCorreo] = useState("");
+  const [notas, setNotas] = useState("");
   const [enviando, setEnviando] = useState(false);
   const [error, setError] = useState("");
   const [horasOcupadas, setHorasOcupadas] = useState<string[]>([]);
@@ -88,7 +90,26 @@ export default function BookingForm({
   }
 
   async function confirmarCita() {
-    if (!servicioElegido || !fecha || !hora || !nombre || !telefono) return;
+    const nombreLimpio = nombre.trim();
+    const telefonoNormalizado = normalizarTelefono(telefono);
+    const correoLimpio = correo.trim();
+
+    if (!servicioElegido || !fecha || !hora || !nombreLimpio) return;
+    if (!telefono) return;
+
+    if (nombreLimpio.length < 2) {
+      setError("El nombre debe tener al menos 2 caracteres.");
+      return;
+    }
+    if (!validarTelefono(telefonoNormalizado)) {
+      setError("El teléfono debe tener entre 8 y 15 dígitos.");
+      return;
+    }
+    if (correoLimpio && !validarEmail(correoLimpio)) {
+      setError("El correo electrónico no tiene un formato válido.");
+      return;
+    }
+
     setEnviando(true);
     setError("");
 
@@ -98,8 +119,10 @@ export default function BookingForm({
       body: JSON.stringify({
         negocio_id: negocio.id,
         servicio_id: servicioElegido.id,
-        nombre_cliente: nombre,
-        telefono_cliente: telefono,
+        nombre_cliente: nombreLimpio,
+        telefono_cliente: telefonoNormalizado,
+        correo_cliente: correoLimpio || null,
+        notas_cliente: notas.trim() || null,
         fecha,
         hora,
       }),
@@ -306,6 +329,27 @@ export default function BookingForm({
                          focus:outline-none focus:border-brass/50 focus:ring-1 focus:ring-brass/20
                          transition-all duration-150"
             />
+            <input
+              type="email"
+              placeholder="Correo electrónico (opcional)"
+              value={correo}
+              onChange={(e) => setCorreo(e.target.value)}
+              className="w-full bg-surface border border-line rounded-md px-4 py-3
+                         font-body text-sm text-cream placeholder:text-muted
+                         focus:outline-none focus:border-brass/50 focus:ring-1 focus:ring-brass/20
+                         transition-all duration-150"
+            />
+            <textarea
+              placeholder="Notas para el barbero (opcional)"
+              value={notas}
+              onChange={(e) => setNotas(e.target.value)}
+              maxLength={500}
+              rows={3}
+              className="w-full bg-surface border border-line rounded-md px-4 py-3
+                         font-body text-sm text-cream placeholder:text-muted resize-none
+                         focus:outline-none focus:border-brass/50 focus:ring-1 focus:ring-brass/20
+                         transition-all duration-150"
+            />
 
             {error && (
               <p className="font-mono text-xs text-signal">{error}</p>
@@ -313,7 +357,7 @@ export default function BookingForm({
 
             <button
               onClick={confirmarCita}
-              disabled={!nombre || !telefono || enviando}
+              disabled={!nombre.trim() || !telefono || enviando}
               className="w-full bg-signal text-cream text-sm font-semibold tracking-wide
                          rounded-md px-8 py-3.5
                          shadow-lg shadow-signal/20
