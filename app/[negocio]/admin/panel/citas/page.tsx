@@ -18,6 +18,11 @@ export default async function PaginaCitas({
     .order("fecha", { ascending: false })
     .order("hora", { ascending: true });
 
+  const { data: horarios } = await supabase
+    .from("horarios")
+    .select("*")
+    .eq("negocio_id", negocio.id);
+
   return (
     <div className="max-w-4xl">
       <div className="mb-8">
@@ -27,7 +32,7 @@ export default async function PaginaCitas({
           {(citas?.length ?? 0) !== 1 ? "s" : ""}
         </p>
       </div>
-      <PanelCitas citasIniciales={citas ?? []} />
+      <PanelCitas citasIniciales={citas ?? []} horarios={horarios ?? []} />
     </div>
   );
 }

@@ -3,7 +3,9 @@
 import { useState } from "react";
 import { crearClienteSupabase } from "@/lib/supabase/client";
 import { formatearHora12h, normalizarTelefono } from "@/lib/helpers";
+import type { Horario } from "@/lib/types";
 import FichaCliente from "./FichaCliente";
+import ReprogramarCitaModal from "./ReprogramarCitaModal";
 
 type CitaConServicio = {
   id: string;
@@ -20,11 +22,14 @@ type CitaConServicio = {
 
 export default function PanelCitas({
   citasIniciales,
+  horarios,
 }: {
   citasIniciales: CitaConServicio[];
+  horarios: Horario[];
 }) {
   const [citas, setCitas] = useState(citasIniciales);
   const [citaSeleccionada, setCitaSeleccionada] = useState<CitaConServicio | null>(null);
+  const [citaReprogramar, setCitaReprogramar] = useState<CitaConServicio | null>(null);
 
   async function actualizarEstado(id: string, estado: string) {
     const supabase = crearClienteSupabase();
@@ -52,6 +57,24 @@ export default function PanelCitas({
     } catch {
       alert("No se pudo abrir WhatsApp. Intenta de nuevo.");
     }
+  }
+
+  async function reprogramarCita(id: string, fecha: string, hora: string) {
+    const supabase = crearClienteSupabase();
+    const { error } = await supabase
+      .from("citas")
+      .update({ fecha, hora })
+      .eq("id", id);
+
+    if (error) {
+      alert("No se pudo reprogramar la cita. Intenta de nuevo.");
+      return;
+    }
+    setCitas((prev) =>
+      prev.map((c) => (c.id === id ? { ...c, fecha, hora } : c))
+    );
+    setCitaReprogramar(null);
+    alert("Cita reprogramada correctamente.");
   }
 
   if (citas.length === 0) {
@@ -88,6 +111,15 @@ export default function PanelCitas({
                 >
                   Cancelar
                 </button>
+                {(cita.estado === "pendiente" || cita.estado === "confirmada") && (
+                  <button
+                    onClick={() => setCitaReprogramar(cita)}
+                    className="text-xs border border-midnight-outline rounded-full px-3 py-1 hover:border-midnight-secondary hover:text-midnight-secondary transition-colors"
+                    title="Reprogramar cita"
+                  >
+                    Reprogramar
+                  </button>
+                )}
               </>
             ) : (
               <span
@@ -151,6 +183,15 @@ export default function PanelCitas({
         <FichaCliente
           cita={citaSeleccionada}
           onClose={() => setCitaSeleccionada(null)}
+        />
+      )}
+
+      {citaReprogramar && (
+        <ReprogramarCitaModal
+          cita={citaReprogramar}
+          horarios={horarios}
+          onConfirm={(fecha, hora) => reprogramarCita(citaReprogramar.id, fecha, hora)}
+          onClose={() => setCitaReprogramar(null)}
         />
       )}
     </div>
