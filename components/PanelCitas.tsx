@@ -129,7 +129,7 @@ export default function PanelCitas({
       {citas.map((cita) => (
         <div
           key={cita.id}
-          className="border border-midnight-outline rounded-lg p-4 bg-midnight-surface-container flex items-center justify-between"
+          className="border border-midnight-outline rounded-lg p-4 bg-midnight-surface-container flex flex-col sm:flex-row sm:items-center justify-between gap-3"
         >
           <div>
             <p className="font-medium text-midnight-on-surface">{cita.nombre_cliente}</p>
@@ -139,7 +139,7 @@ export default function PanelCitas({
             <p className="text-sm text-midnight-on-surface-variant/60">{cita.telefono_cliente}</p>
           </div>
 
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-1.5 justify-end sm:justify-start">
             {cita.estado === "pendiente" ? (
               <>
                 <button
@@ -206,7 +206,7 @@ export default function PanelCitas({
             )}
             <button
               onClick={() => setCitaSeleccionada(cita)}
-              className="border border-midnight-outline rounded-full p-1 hover:border-midnight-secondary hover:text-midnight-secondary transition-colors"
+              className="border border-midnight-outline rounded-full p-2 hover:border-midnight-secondary hover:text-midnight-secondary transition-colors"
               title="Ver detalles del cliente"
             >
               <svg
@@ -228,7 +228,7 @@ export default function PanelCitas({
             {cita.telefono_cliente && (
               <button
                 onClick={() => abrirWhatsApp(cita.telefono_cliente)}
-                className="border border-midnight-outline rounded-full p-1 hover:border-green-500 hover:text-green-500 transition-colors"
+                className="border border-midnight-outline rounded-full p-2 hover:border-green-500 hover:text-green-500 transition-colors"
                 title="Contactar por WhatsApp"
               >
                 <svg

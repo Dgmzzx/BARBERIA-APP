@@ -164,7 +164,7 @@ export default function ReprogramarCitaModal({
               <label className="block font-mono text-[11px] text-midnight-secondary uppercase tracking-[0.15em]">
                 Nueva hora
               </label>
-              <div className="grid grid-cols-4 gap-2">
+              <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
                 {horasDisponibles.map((h) => (
                   <button
                     key={h}

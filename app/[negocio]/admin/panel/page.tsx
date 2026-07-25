@@ -43,13 +43,13 @@ export default async function PanelAdmin({
     citasHoy?.filter((c) => c.estado === "completada").length ?? 0;
 
   return (
-    <div className="max-w-4xl mx-auto px-6 py-12">
+    <div className="max-w-4xl mx-auto py-4 md:py-8">
       <div className="mb-8">
         <h1 className="font-display text-2xl">Dashboard</h1>
         <p className="text-sm text-cream/40 mt-1 capitalize">{hoyFormateado}</p>
       </div>
 
-      <div className="grid grid-cols-3 gap-4 mb-10">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-10">
         <div className="border border-line rounded-lg p-5 bg-surface/50">
           <p className="text-xs text-cream/40 uppercase tracking-widest mb-2">
             Citas hoy

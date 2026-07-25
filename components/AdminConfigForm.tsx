@@ -268,7 +268,7 @@ export default function AdminConfigForm({
                 </div>
 
                 {expandido && activo && (
-                  <div className="space-y-2 ml-10 mt-2 mb-3">
+                  <div className="space-y-2 ml-4 md:ml-10 mt-2 mb-3">
                     {bloques.map((bloque) => (
                       <div key={bloque.orden} className="flex items-center gap-2 px-1">
                         <span className="text-[9px] text-brass/30 font-mono w-3">{bloque.orden + 1}</span>
@@ -351,7 +351,7 @@ export default function AdminConfigForm({
               value={nuevoBloqueoFecha}
               onChange={(e) => setNuevoBloqueoFecha(e.target.value)}
               min={new Date().toISOString().split("T")[0]}
-              className="bg-ink border border-line rounded-lg px-3 py-2 text-sm text-cream w-40"
+              className="bg-ink border border-line rounded-lg px-3 py-2 text-sm text-cream w-full sm:w-40"
             />
           </div>
           <div>
@@ -363,7 +363,7 @@ export default function AdminConfigForm({
               placeholder="Ej: Vacaciones"
               value={nuevoBloqueoMotivo}
               onChange={(e) => setNuevoBloqueoMotivo(e.target.value)}
-              className="bg-ink border border-line rounded-lg px-3 py-2 text-sm text-cream placeholder:text-cream/15 w-40"
+              className="bg-ink border border-line rounded-lg px-3 py-2 text-sm text-cream placeholder:text-cream/15 w-full sm:w-40"
             />
           </div>
           <button
@@ -421,7 +421,7 @@ function SelectorHora({
       <select
         value={h12}
         onChange={(e) => actualizar({ h12: Number(e.target.value) })}
-        className="bg-transparent text-cream text-sm font-mono appearance-none cursor-pointer outline-none w-6 text-center"
+        className="bg-transparent text-cream text-sm font-mono appearance-none cursor-pointer outline-none w-8 text-center"
       >
         {Array.from({ length: 12 }, (_, i) => i + 1).map((h) => (
           <option key={h} value={h} className="bg-ink">{h}</option>
@@ -431,7 +431,7 @@ function SelectorHora({
       <select
         value={min}
         onChange={(e) => actualizar({ min: e.target.value })}
-        className="bg-transparent text-cream text-sm font-mono appearance-none cursor-pointer outline-none w-6 text-center"
+        className="bg-transparent text-cream text-sm font-mono appearance-none cursor-pointer outline-none w-8 text-center"
       >
         <option value="00" className="bg-ink">00</option>
         <option value="30" className="bg-ink">30</option>
