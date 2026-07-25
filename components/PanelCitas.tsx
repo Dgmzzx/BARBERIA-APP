@@ -42,6 +42,11 @@ export default function PanelCitas({
       alert("No se pudo actualizar la cita. Intenta de nuevo.");
       return;
     }
+    await supabase.from("citas_historial").insert({
+      cita_id: id,
+      estado,
+      tipo_cambio: "estado",
+    });
     setCitas((prev) => prev.map((c) => (c.id === id ? { ...c, estado } : c)));
   }
 
@@ -73,6 +78,12 @@ export default function PanelCitas({
       alert("No se pudo reprogramar la cita. Intenta de nuevo.");
       return;
     }
+    const citaActual = citas.find((c) => c.id === id);
+    await supabase.from("citas_historial").insert({
+      cita_id: id,
+      estado: citaActual?.estado || "pendiente",
+      tipo_cambio: "reprogramacion",
+    });
     setCitas((prev) =>
       prev.map((c) => (c.id === id ? { ...c, fecha, hora } : c))
     );
@@ -92,6 +103,11 @@ export default function PanelCitas({
       alert("No se pudo cancelar la cita. Intenta de nuevo.");
       return;
     }
+    await supabase.from("citas_historial").insert({
+      cita_id: id,
+      estado,
+      tipo_cambio: "cancelacion",
+    });
     setCitas((prev) =>
       prev.map((c) =>
         c.id === id ? { ...c, estado, motivo_cancelacion: motivo } : c

@@ -76,6 +76,15 @@ create index idx_citas_negocio_fecha on citas(negocio_id, fecha);
 create index idx_servicios_negocio on servicios(negocio_id);
 create unique index idx_bloqueo_unico_dia on bloqueos(negocio_id, fecha) where hora_inicio is null;
 
+-- Historial de cambios de cada cita
+create table citas_historial (
+  id uuid primary key default uuid_generate_v4(),
+  cita_id uuid not null references citas(id) on delete cascade,
+  estado text not null,
+  tipo_cambio text not null check (tipo_cambio in ('estado', 'reprogramacion', 'cancelacion')),
+  creado_en timestamptz not null default now()
+);
+
 -- ============================================
 -- Datos iniciales: la barbería de tu padre
 -- ============================================

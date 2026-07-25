@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { crearClienteSupabase } from "@/lib/supabase/client";
-import { formatearHora12h, normalizarTelefono } from "@/lib/helpers";
+import { formatearHora12h, normalizarTelefono, badgeColor } from "@/lib/helpers";
+import type { CitaHistorial } from "@/lib/types";
 
 type CitaConServicio = {
   id: string;
@@ -26,6 +27,8 @@ export default function FichaCliente({
 }) {
   const [historial, setHistorial] = useState<CitaConServicio[]>([]);
   const [cargando, setCargando] = useState(true);
+  const [cambios, setCambios] = useState<CitaHistorial[]>([]);
+  const [cargandoCambios, setCargandoCambios] = useState(true);
 
   useEffect(() => {
     const supabase = crearClienteSupabase();
@@ -42,18 +45,23 @@ export default function FichaCliente({
       });
   }, [cita.negocio_id, cita.telefono_cliente]);
 
+  useEffect(() => {
+    const supabase = crearClienteSupabase();
+    supabase
+      .from("citas_historial")
+      .select("*")
+      .eq("cita_id", cita.id)
+      .order("creado_en", { ascending: false })
+      .then(({ data }) => {
+        setCambios(data ?? []);
+        setCargandoCambios(false);
+      });
+  }, [cita.id]);
+
   function abrirWhatsApp(telefono: string) {
     const normalizado = normalizarTelefono(telefono);
     if (!normalizado || normalizado.length < 8) return;
     window.open(`https://wa.me/${normalizado}`, "_blank", "noopener,noreferrer");
-  }
-
-  function badgeColor(estado: string) {
-    if (estado === "completada")
-      return "text-midnight-tertiary border-midnight-tertiary/30 bg-midnight-tertiary/20";
-    if (estado === "cancelada")
-      return "text-midnight-error border-midnight-error/30 bg-midnight-error/20";
-    return "text-midnight-secondary border-midnight-secondary/30 bg-midnight-secondary/20";
   }
 
   return (
@@ -157,6 +165,57 @@ export default function FichaCliente({
                 {cita.fecha} · {formatearHora12h(cita.hora)}
               </p>
             </div>
+          </section>
+
+          <section>
+            <h3 className="font-mono text-[11px] text-midnight-secondary uppercase tracking-[0.15em] mb-3">
+              Historial
+            </h3>
+            {cargandoCambios ? (
+              <p className="text-sm text-midnight-on-surface-variant/60">
+                Cargando...
+              </p>
+            ) : cambios.length === 0 ? (
+              <p className="text-sm text-midnight-on-surface-variant/60">
+                Sin registros.
+              </p>
+            ) : (
+              <div className="space-y-2">
+                {cambios.map((c) => (
+                  <div
+                    key={c.id}
+                    className="flex items-center justify-between border border-midnight-outline/20 rounded-md px-3 py-2.5"
+                  >
+                    <div>
+                      <p className="text-sm text-midnight-on-surface">
+                        {c.tipo_cambio === "estado"
+                          ? "Cambio de estado"
+                          : c.tipo_cambio === "reprogramacion"
+                            ? "Reprogramación"
+                            : "Cancelación"}
+                      </p>
+                      <p className="text-xs text-midnight-on-surface-variant/60">
+                        {new Date(c.creado_en).toLocaleDateString("es-MX", {
+                          day: "numeric",
+                          month: "short",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                      </p>
+                    </div>
+                    <span
+                      className={`text-xs capitalize px-2 py-0.5 rounded-full border shrink-0 ${badgeColor(c.estado)}`}
+                    >
+                      {c.estado === "no_asistio"
+                        ? "No asistió"
+                        : c.estado === "en_proceso"
+                          ? "En proceso"
+                          : c.estado}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
           </section>
 
           <section>

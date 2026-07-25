@@ -45,3 +45,11 @@ export type Cita = {
   hora: string;
   estado: CitaEstado;
 };
+
+export type CitaHistorial = {
+  id: string;
+  cita_id: string;
+  estado: string;
+  tipo_cambio: string;
+  creado_en: string;
+};
