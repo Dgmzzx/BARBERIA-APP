@@ -115,6 +115,7 @@ alter table servicios enable row level security;
 alter table citas enable row level security;
 alter table bloqueos enable row level security;
 alter table horarios enable row level security;
+alter table citas_historial enable row level security;
 
 -- Lectura pública de negocios activos y sus servicios (para la página de reserva)
 create policy "negocios visibles publicamente" on negocios
@@ -131,6 +132,14 @@ create policy "cualquiera puede reservar" on citas
 -- (se ajusta cuando se conecte auth.users con negocio_id)
 create policy "dueno ve sus citas" on citas
   for select using (true); -- placeholder: reemplazar con chequeo de auth cuando se implemente login
+
+-- Cualquiera puede insertar historial (desde el panel del dueño)
+create policy "cualquiera puede insertar historial" on citas_historial
+  for insert with check (true);
+
+-- El dueño ve el historial
+create policy "dueno ve historial" on citas_historial
+  for select using (true);
 
 -- Lectura pública de horarios (para el formulario de reserva)
 create policy "horarios visibles publicamente" on horarios

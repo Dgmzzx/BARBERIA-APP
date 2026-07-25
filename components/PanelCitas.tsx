@@ -42,11 +42,12 @@ export default function PanelCitas({
       alert("No se pudo actualizar la cita. Intenta de nuevo.");
       return;
     }
-    await supabase.from("citas_historial").insert({
+    const { error: histError } = await supabase.from("citas_historial").insert({
       cita_id: id,
       estado,
       tipo_cambio: "estado",
     });
+    if (histError) console.error("Error al registrar historial:", histError);
     setCitas((prev) => prev.map((c) => (c.id === id ? { ...c, estado } : c)));
   }
 
@@ -79,11 +80,12 @@ export default function PanelCitas({
       return;
     }
     const citaActual = citas.find((c) => c.id === id);
-    await supabase.from("citas_historial").insert({
+    const { error: histError } = await supabase.from("citas_historial").insert({
       cita_id: id,
       estado: citaActual?.estado || "pendiente",
       tipo_cambio: "reprogramacion",
     });
+    if (histError) console.error("Error al registrar historial:", histError);
     setCitas((prev) =>
       prev.map((c) => (c.id === id ? { ...c, fecha, hora } : c))
     );
@@ -103,11 +105,12 @@ export default function PanelCitas({
       alert("No se pudo cancelar la cita. Intenta de nuevo.");
       return;
     }
-    await supabase.from("citas_historial").insert({
+    const { error: histError } = await supabase.from("citas_historial").insert({
       cita_id: id,
       estado,
       tipo_cambio: "cancelacion",
     });
+    if (histError) console.error("Error al registrar historial:", histError);
     setCitas((prev) =>
       prev.map((c) =>
         c.id === id ? { ...c, estado, motivo_cancelacion: motivo } : c
