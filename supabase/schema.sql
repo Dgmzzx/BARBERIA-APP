@@ -69,6 +69,7 @@ create table citas (
   fecha date not null,
   hora time not null,
   estado text not null default 'pendiente' check (estado in ('pendiente','confirmada','en_proceso','completada','cancelada','no_asistio')),
+  notificado_recordatorio boolean not null default false,
   creado_en timestamptz not null default now()
 );
 
@@ -132,6 +133,10 @@ create policy "cualquiera puede reservar" on citas
 -- (se ajusta cuando se conecte auth.users con negocio_id)
 create policy "dueno ve sus citas" on citas
   for select using (true); -- placeholder: reemplazar con chequeo de auth cuando se implemente login
+
+-- El dueño actualiza citas (cambiar estado, reprogramar)
+create policy "dueno actualiza citas" on citas
+  for update using (true) with check (true);
 
 -- Cualquiera puede insertar historial (desde el panel del dueño)
 create policy "cualquiera puede insertar historial" on citas_historial

@@ -44,6 +44,7 @@ export type Cita = {
   fecha: string;
   hora: string;
   estado: CitaEstado;
+  notificado_recordatorio?: boolean;
 };
 
 export type CitaHistorial = {

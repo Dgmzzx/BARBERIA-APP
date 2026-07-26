@@ -71,7 +71,7 @@ export default async function PanelAdmin({
       </div>
 
       <h2 className="font-display text-lg mb-4">Citas</h2>
-      <PanelCitas citasIniciales={citasHoy ?? []} horarios={(horarios as Horario[]) ?? []} />
+      <PanelCitas negocioId={negocio.id} citasIniciales={citasHoy ?? []} horarios={(horarios as Horario[]) ?? []} />
     </div>
   );
 }

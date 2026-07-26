@@ -1,5 +1,6 @@
 import { obtenerNegocio, crearClienteSupabaseServidor } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";
+import type { Horario } from "@/lib/types";
 import PanelCitas from "@/components/PanelCitas";
 
 export default async function PaginaCitas({
@@ -32,7 +33,7 @@ export default async function PaginaCitas({
           {(citas?.length ?? 0) !== 1 ? "s" : ""}
         </p>
       </div>
-      <PanelCitas citasIniciales={citas ?? []} horarios={horarios ?? []} />
+      <PanelCitas negocioId={negocio.id} citasIniciales={citas ?? []} horarios={(horarios as Horario[]) ?? []} />
     </div>
   );
 }

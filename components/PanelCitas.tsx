@@ -1,9 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { crearClienteSupabase } from "@/lib/supabase/client";
 import { formatearHora12h, normalizarTelefono, badgeColor } from "@/lib/helpers";
 import type { Horario } from "@/lib/types";
+import { useEventosSSE } from "@/lib/hooks/useEventosSSE";
+import NotificacionToast from "./NotificacionToast";
 import FichaCliente from "./FichaCliente";
 import ReprogramarCitaModal from "./ReprogramarCitaModal";
 import CancelarCitaModal from "./CancelarCitaModal";
@@ -23,9 +25,11 @@ type CitaConServicio = {
 };
 
 export default function PanelCitas({
+  negocioId,
   citasIniciales,
   horarios,
 }: {
+  negocioId: string;
   citasIniciales: CitaConServicio[];
   horarios: Horario[];
 }) {
@@ -33,6 +37,46 @@ export default function PanelCitas({
   const [citaSeleccionada, setCitaSeleccionada] = useState<CitaConServicio | null>(null);
   const [citaReprogramar, setCitaReprogramar] = useState<CitaConServicio | null>(null);
   const [citaCancelar, setCitaCancelar] = useState<CitaConServicio | null>(null);
+  const [eventoSSE, setEventoSSE] = useState<any>(null);
+
+  const ultimoEvento = useEventosSSE(negocioId);
+
+  useEffect(() => {
+    if (!ultimoEvento || ultimoEvento.type === "connected") return;
+
+    if (ultimoEvento.type === "cita") {
+      const { event, new: nuevo, old: viejo } = ultimoEvento.data;
+
+      if (event === "INSERT" && nuevo) {
+        const nuevaCita: CitaConServicio = {
+          id: nuevo.id,
+          negocio_id: nuevo.negocio_id,
+          nombre_cliente: nuevo.nombre_cliente,
+          telefono_cliente: nuevo.telefono_cliente,
+          correo_cliente: nuevo.correo_cliente ?? null,
+          notas_cliente: nuevo.notas_cliente ?? null,
+          motivo_cancelacion: nuevo.motivo_cancelacion ?? null,
+          fecha: nuevo.fecha,
+          hora: nuevo.hora,
+          estado: nuevo.estado,
+          servicios: nuevo.servicios ?? null,
+        };
+        setCitas((prev) => [nuevaCita, ...prev]);
+      } else if (event === "UPDATE" && nuevo) {
+        setCitas((prev) =>
+          prev.map((c) =>
+            c.id === nuevo.id
+              ? { ...c, ...nuevo, servicios: nuevo.servicios ?? c.servicios }
+              : c
+          )
+        );
+      } else if (event === "DELETE" && viejo) {
+        setCitas((prev) => prev.filter((c) => c.id !== viejo.id));
+      }
+    }
+
+    setEventoSSE(ultimoEvento);
+  }, [ultimoEvento]);
 
   async function actualizarEstado(id: string, estado: string) {
     const supabase = crearClienteSupabase();
@@ -273,6 +317,8 @@ export default function PanelCitas({
           onClose={() => setCitaCancelar(null)}
         />
       )}
+
+      <NotificacionToast evento={eventoSSE} />
     </div>
   );
 }
