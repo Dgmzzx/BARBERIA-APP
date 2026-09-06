@@ -38,6 +38,9 @@ export default async function PaginaReserva({
             {negocio.direccion}
           </p>
         )}
+        <p className="font-body text-sm text-cream/50 mt-4">
+          Reserva tu cita en línea
+        </p>
       </header>
 
       <div className="flex items-center gap-3 my-10 text-line/40" role="separator">

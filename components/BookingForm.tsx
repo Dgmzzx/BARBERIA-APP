@@ -31,7 +31,17 @@ export default function BookingForm({
   const [cargandoHoras, setCargandoHoras] = useState(false);
   const [fechaInvalida, setFechaInvalida] = useState("");
 
-  const horasDisponibles = horasPosibles.filter((h) => !horasOcupadas.includes(h));
+  const fechaDeHoy = new Date().toISOString().split("T")[0];
+  const ahora = new Date();
+  const minutosActuales = ahora.getHours() * 60 + ahora.getMinutes();
+  const horasDisponibles = horasPosibles.filter((h) => {
+    if (horasOcupadas.includes(h)) return false;
+    if (fecha === fechaDeHoy) {
+      const [hh, mm] = h.split(":").map(Number);
+      if (hh * 60 + mm <= minutosActuales) return false;
+    }
+    return true;
+  });
   const horarios = horariosProp;
 
   function diaEsLaborable(fechaStr: string): boolean {
@@ -206,8 +216,11 @@ export default function BookingForm({
 
       {/* Paso 1: servicio */}
       <section className="motion-safe:animate-fade-up">
+        <p className="font-body text-sm text-cream/50 mb-4">
+          Selecciona el servicio, elige fecha y hora, y completa tus datos.
+        </p>
         <label className="block font-mono text-[11px] text-brass uppercase tracking-[0.15em] mb-4">
-          Servicio
+          Paso 1 — Servicio
         </label>
 
         {servicios.length === 0 && (
@@ -253,7 +266,7 @@ export default function BookingForm({
       {servicioElegido && (
         <section className="motion-safe:animate-fade-up">
           <label className="block font-mono text-[11px] text-brass uppercase tracking-[0.15em] mb-4">
-            Fecha y hora
+            Paso 2 — Fecha y hora
           </label>
           <div className="space-y-4">
             <input
@@ -306,7 +319,7 @@ export default function BookingForm({
       {servicioElegido && fecha && hora && !fechaInvalida && (
         <section className="motion-safe:animate-fade-up space-y-4">
           <label className="block font-mono text-[11px] text-brass uppercase tracking-[0.15em]">
-            Tus datos
+            Paso 3 — Tus datos
           </label>
           <div className="space-y-3">
             <input
