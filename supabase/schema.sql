@@ -27,6 +27,7 @@ create table servicios (
   id uuid primary key default uuid_generate_v4(),
   negocio_id uuid not null references negocios(id) on delete cascade,
   nombre text not null,
+  descripcion text,
   duracion_minutos int not null default 30,
   precio numeric(10,2) not null default 0,
   activo boolean not null default true,
@@ -99,11 +100,15 @@ from negocios cross join (select unnest(ARRAY[1,2,3,4,5,6]) as d) dias
 where slug = 'barberiapapa';
 
 -- Ejemplo de servicios (ajustar precios reales después)
-insert into servicios (negocio_id, nombre, duracion_minutos, precio)
-select id, 'Corte de cabello', 30, 300 from negocios where slug = 'barberiapapa';
+insert into servicios (negocio_id, nombre, descripcion, duracion_minutos, precio)
+select id, 'Corte de cabello',
+  'Corte a tijera o máquina, acabado y peinado a tu estilo.',
+  30, 300 from negocios where slug = 'barberiapapa';
 
-insert into servicios (negocio_id, nombre, duracion_minutos, precio)
-select id, 'Corte + Barba', 45, 450 from negocios where slug = 'barberiapapa';
+insert into servicios (negocio_id, nombre, descripcion, duracion_minutos, precio)
+select id, 'Corte + Barba',
+  'Corte completo más barba perfilada con toalla caliente y loción.',
+  45, 450 from negocios where slug = 'barberiapapa';
 
 -- ============================================
 -- Seguridad a nivel de fila (RLS)

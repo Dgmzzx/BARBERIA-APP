@@ -16,6 +16,7 @@ export type Servicio = {
   id: string;
   negocio_id: string;
   nombre: string;
+  descripcion?: string | null;
   duracion_minutos: number;
   precio: number;
   activo: boolean;

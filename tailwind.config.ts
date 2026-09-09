@@ -8,13 +8,15 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        ink: "#1A1A1A",
-        surface: "#2A2A2A",
-        cream: "#F5F5F0",
+        ink: "#141110",
+        surface: "#1c1917",
+        "surface-hover": "#241f1b",
+        cream: "#efe7dc",
+        paper: "#f2ead9",
         signal: "#C41E3A",
-        brass: "#B08D57",
-        line: "#3A3A3A",
-        muted: "#8A8A8A",
+        brass: "#c8752c",
+        line: "#2e2822",
+        muted: "#8a7f72",
         midnight: {
           surface: "#051424",
           "surface-dim": "#051424",

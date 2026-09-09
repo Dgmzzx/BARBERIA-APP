@@ -9,34 +9,72 @@
 }
 
 ::selection {
-  background-color: #B08D57;
-  color: #1A1A1A;
+  background-color: #c8752c;
+  color: #141110;
 }
 
 body {
-  background-color: #1A1A1A;
-  color: #F5F5F0;
+  background-color: #141110;
+  color: #efe7dc;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 input[type="date"]::-webkit-calendar-picker-indicator {
-  filter: invert(0.85) sepia(0.1) hue-rotate(0deg);
+  filter: invert(0.85) sepia(0.15) hue-rotate(-10deg);
   opacity: 0.5;
   cursor: pointer;
 }
 
+/* Listón de barbero: firma del tema. Usado como divisor grande y como
+   señalética de cada paso del flujo de reserva. */
 .barber-rule {
   background: repeating-linear-gradient(
     45deg,
     #C41E3A 0px, #C41E3A 4px,
-    #F5F5F0 4px, #F5F5F0 8px,
-    #B08D57 8px, #B08D57 12px
+    #efe7dc 4px, #efe7dc 8px,
+    #c8752c 8px, #c8752c 12px
   );
   height: 3px;
   width: 100%;
   border: 0;
   margin: 0;
+}
+
+.barber-strip {
+  background: repeating-linear-gradient(
+    45deg,
+    #C41E3A 0px, #C41E3A 3px,
+    #efe7dc 3px, #efe7dc 6px,
+    #c8752c 6px, #c8752c 9px
+  );
+  height: 2px;
+  width: 100%;
+} 
+
+/* Boleto: borde de perforación para el ticket de confirmación */
+.ticket-notch {
+  position: relative;
+}
+
+.ticket-notch::before,
+.ticket-notch::after {
+  content: "";
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  border-radius: 9999px;
+  background: #141110;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.ticket-notch::before {
+  left: -7px;
+}
+
+.ticket-notch::after {
+  right: -7px;
 }
 
 @media (prefers-reduced-motion: reduce) {

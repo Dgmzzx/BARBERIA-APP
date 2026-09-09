@@ -44,6 +44,15 @@ export default function BookingForm({
   });
   const horarios = horariosProp;
 
+  const fechaObj = fecha ? new Date(fecha + "T12:00:00") : null;
+  const fechaFormateada = fechaObj
+    ? fechaObj.toLocaleDateString("es-MX", {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+      })
+    : "";
+
   function diaEsLaborable(fechaStr: string): boolean {
     const d = new Date(fechaStr + "T12:00:00");
     const jsDay = d.getDay();
@@ -150,18 +159,15 @@ export default function BookingForm({
   }
 
   if (paso === "confirmado") {
-    const fechaObj = new Date(fecha + "T12:00:00");
-    const fechaFormateada = fechaObj.toLocaleDateString("es-MX", {
-      day: "numeric",
-      month: "long",
-      year: "numeric",
-    });
-
     return (
       <div className="motion-safe:animate-fade-up">
-        <div className="bg-cream text-ink rounded-md overflow-hidden shadow-lg">
+        <div className="bg-paper text-ink rounded-md overflow-hidden shadow-lg">
+          <div className="barber-rule" />
           <div className="p-6 sm:p-8">
-            <div className="flex justify-end mb-6">
+            <div className="flex justify-between items-center mb-6">
+              <p className="font-mono text-[10px] text-ink/40 uppercase tracking-widest">
+                Ticket de reserva
+              </p>
               <div
                 className="motion-safe:animate-stamp-in font-display text-sm text-signal border border-signal/60 px-3 py-1 tracking-[0.15em] select-none"
                 style={{ transform: "rotate(6deg)" }}
@@ -175,7 +181,7 @@ export default function BookingForm({
                 {servicioElegido?.nombre}
               </p>
               <p className="font-mono text-xs text-ink/40 mt-1.5">
-                {servicioElegido?.duracion_minutos} min
+                {servicioElegido?.duracion_minutos} min · ${servicioElegido?.precio}
               </p>
             </div>
 
@@ -200,7 +206,10 @@ export default function BookingForm({
 
             <div className="border-t border-dashed border-ink/20 pt-5">
               <p className="font-display text-lg text-ink">
-                {nombre}, te esperamos
+                {nombre}, te esperamos en la silla
+              </p>
+              <p className="font-mono text-[11px] text-ink/40 mt-2">
+                Guárdate esta página como tu ticket de reserva.
               </p>
             </div>
           </div>
@@ -219,13 +228,14 @@ export default function BookingForm({
         <p className="font-body text-sm text-cream/50 mb-4">
           Selecciona el servicio, elige fecha y hora, y completa tus datos.
         </p>
-        <label className="block font-mono text-[11px] text-brass uppercase tracking-[0.15em] mb-4">
-          Paso 1 — Servicio
+        <label className="block font-mono text-[11px] text-brass uppercase tracking-[0.15em]">
+          Paso 1 de 3 — Elige tu servicio
         </label>
+        <div className="barber-strip mt-4 mb-6" />
 
         {servicios.length === 0 && (
           <p className="font-mono text-xs text-cream/30">
-            No hay servicios disponibles por el momento.
+            No hay servicios disponibles por el momento. Vuelve más tarde.
           </p>
         )}
 
@@ -239,23 +249,28 @@ export default function BookingForm({
                   setServicioElegido(s);
                   setPaso("horario");
                 }}
-                className={`w-full text-left border rounded-md p-4 transition-all duration-150
+                className={`w-full text-left border rounded-md p-4 transition-all duration-150 active:scale-[0.99]
                   ${selected
-                    ? "border-signal/60 bg-signal/[0.06] border-l-2 border-l-signal"
-                    : "border-line hover:border-brass/30 hover:bg-surface/50 border-l-2 border-l-transparent"
+                    ? "border-brass/70 bg-brass/[0.07] border-l-2 border-l-brass"
+                    : "border-line hover:border-brass/40 hover:bg-surface-hover border-l-2 border-l-transparent"
                   }`}
               >
                 <div className="flex justify-between items-baseline">
-                  <span className={`font-display text-lg ${selected ? "text-cream" : "text-cream/90"}`}>
+                  <span className={`font-display text-lg ${selected ? "text-brass" : "text-cream"}`}>
                     {s.nombre}
                   </span>
                   <span className="font-mono text-sm text-brass tabular-nums shrink-0 ml-4">
                     ${s.precio}
                   </span>
                 </div>
-                <span className="font-mono text-[11px] text-cream/30 tracking-wide">
-                  {s.duracion_minutos} min
-                </span>
+                {s.descripcion && (
+                  <p className="font-body text-sm text-cream/50 mt-1.5">
+                    {s.descripcion}
+                  </p>
+                )}
+                <p className="font-mono text-[11px] text-cream/30 tracking-wide mt-2">
+                  ≈ {s.duracion_minutos} min
+                </p>
               </button>
             );
           })}
@@ -265,9 +280,10 @@ export default function BookingForm({
       {/* Paso 2: fecha y hora */}
       {servicioElegido && (
         <section className="motion-safe:animate-fade-up">
-          <label className="block font-mono text-[11px] text-brass uppercase tracking-[0.15em] mb-4">
-            Paso 2 — Fecha y hora
+          <label className="block font-mono text-[11px] text-brass uppercase tracking-[0.15em]">
+            Paso 2 de 3 — Fecha y hora
           </label>
+          <div className="barber-strip mt-4 mb-6" />
           <div className="space-y-4">
             <input
               type="date"
@@ -290,7 +306,7 @@ export default function BookingForm({
 
             {!cargandoHoras && !fechaInvalida && fecha && horasDisponibles.length === 0 && (
               <p className="font-mono text-xs text-cream/30">
-                No hay horarios disponibles ese día. Elige otra fecha.
+                No quedan horarios libres ese día. Prueba con otra fecha.
               </p>
             )}
 
@@ -317,14 +333,15 @@ export default function BookingForm({
 
       {/* Paso 3: datos del cliente */}
       {servicioElegido && fecha && hora && !fechaInvalida && (
-        <section className="motion-safe:animate-fade-up space-y-4">
+        <section className="motion-safe:animate-fade-up">
           <label className="block font-mono text-[11px] text-brass uppercase tracking-[0.15em]">
-            Paso 3 — Tus datos
+            Paso 3 de 3 — Tus datos
           </label>
+          <div className="barber-strip mt-4 mb-6" />
           <div className="space-y-3">
             <input
               type="text"
-              placeholder="Nombre completo"
+              placeholder="Tu nombre y apellido"
               value={nombre}
               onChange={(e) => setNombre(e.target.value)}
               className="w-full bg-surface border border-line rounded-md px-4 py-3
@@ -334,7 +351,7 @@ export default function BookingForm({
             />
             <input
               type="tel"
-              placeholder="Teléfono"
+              placeholder="Tu teléfono / WhatsApp"
               value={telefono}
               onChange={(e) => setTelefono(e.target.value)}
               className="w-full bg-surface border border-line rounded-md px-4 py-3
@@ -344,7 +361,7 @@ export default function BookingForm({
             />
             <input
               type="email"
-              placeholder="Correo electrónico (opcional)"
+              placeholder="Correo (opcional, para tu recordatorio)"
               value={correo}
               onChange={(e) => setCorreo(e.target.value)}
               className="w-full bg-surface border border-line rounded-md px-4 py-3
@@ -353,7 +370,7 @@ export default function BookingForm({
                          transition-all duration-150"
             />
             <textarea
-              placeholder="Notas para el barbero (opcional)"
+              placeholder="¿Algo que el barbero deba saber? (opcional)"
               value={notas}
               onChange={(e) => setNotas(e.target.value)}
               maxLength={500}
@@ -363,6 +380,46 @@ export default function BookingForm({
                          focus:outline-none focus:border-brass/50 focus:ring-1 focus:ring-brass/20
                          transition-all duration-150"
             />
+
+            {servicioElegido && (
+              <div className="bg-paper text-ink rounded-md border border-ink/10 overflow-hidden motion-safe:animate-fade-up">
+                <div className="flex justify-between items-center px-4 py-2.5 border-b border-dashed border-ink/25">
+                  <span className="font-mono text-[10px] uppercase tracking-widest text-ink/50">
+                    Tu cita
+                  </span>
+                  <span className="font-mono text-[10px] uppercase tracking-widest text-ink/50">
+                    {negocio.nombre}
+                  </span>
+                </div>
+                <div className="px-4 py-4">
+                  <div className="flex justify-between items-baseline gap-4">
+                    <span className="font-display text-lg text-ink leading-snug">
+                      {servicioElegido.nombre}
+                    </span>
+                    <span className="font-mono text-sm text-ink tabular-nums shrink-0">
+                      ${servicioElegido.precio}
+                    </span>
+                  </div>
+                  <div className="border-t border-dashed border-ink/25 my-4" />
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <p className="font-mono text-[10px] uppercase tracking-widest text-ink/40 mb-1">
+                        Fecha
+                      </p>
+                      <p className="font-body text-sm text-ink">{fechaFormateada}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="font-mono text-[10px] uppercase tracking-widest text-ink/40 mb-1">
+                        Hora
+                      </p>
+                      <p className="font-mono text-sm sm:text-base text-ink">
+                        {formatearHora12h(hora)}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {error && (
               <p className="font-mono text-xs text-signal">{error}</p>
@@ -378,7 +435,7 @@ export default function BookingForm({
                          hover:bg-signal/90 active:scale-[0.97]
                          disabled:opacity-30 disabled:cursor-not-allowed"
             >
-              {enviando ? "Reservando..." : "Confirmar cita"}
+              {enviando ? "Reservando tu cita…" : "Reservar mi cita"}
             </button>
           </div>
         </section>
