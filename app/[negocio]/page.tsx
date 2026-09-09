@@ -8,6 +8,12 @@ export const dynamic = "force-dynamic";
 
 const DIAS_NOMBRE = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"];
 
+const PASOS = [
+  { numero: "1", titulo: "Elige tu servicio" },
+  { numero: "2", titulo: "Escoge fecha y hora" },
+  { numero: "3", titulo: "Comparte tus datos" },
+];
+
 function formatearSemana(dias: number[]): string {
   const orden = [...dias].sort((a, b) => a - b);
   const rangos: string[] = [];
@@ -71,38 +77,66 @@ export default async function PaginaReserva({
   const textoHorario = formatearHorario(horarios);
 
   return (
-    <main className="min-h-screen px-4 sm:px-6 py-12 max-w-lg mx-auto">
-      <header className="text-center sm:text-left">
-        <h1 className="font-display text-5xl sm:text-6xl leading-[1.05] tracking-tight text-cream">
-          {negocio.nombre}
-        </h1>
+    <main className="min-h-dvh px-4 sm:px-6 py-10 sm:py-12 lg:py-16 max-w-6xl mx-auto">
+      <div className="grid gap-12 lg:grid-cols-[minmax(0,5fr)_minmax(0,6fr)] lg:gap-16">
+        {/* Escaparate */}
+        <aside className="text-center sm:text-left lg:sticky lg:top-8 lg:self-start">
+          <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl leading-[1.05] tracking-tight text-cream">
+            {negocio.nombre}
+          </h1>
 
-        {textoHorario && (
-          <p className="font-mono text-xs text-brass mt-4 tracking-[0.12em] uppercase">
-            {textoHorario}
+          {textoHorario && (
+            <p className="font-mono text-xs text-brass mt-4 tracking-[0.12em] uppercase">
+              {textoHorario}
+            </p>
+          )}
+          {negocio.direccion && (
+            <p className="font-mono text-xs text-cream/55 mt-1.5 tracking-wider uppercase">
+              {negocio.direccion}
+            </p>
+          )}
+
+          <p className="font-body text-sm text-cream/65 mt-5">
+            Agenda tu lugar en la silla. Sin llamadas ni esperas: elige el
+            servicio, escoge fecha y hora, y listo.
           </p>
-        )}
-        {negocio.direccion && (
-          <p className="font-mono text-xs text-cream/30 mt-1.5 tracking-wider uppercase">
-            {negocio.direccion}
-          </p>
-        )}
 
-        <p className="font-body text-sm text-cream/50 mt-5">
-          Agenda tu lugar en la silla. Sin llamadas ni esperas: elige el servicio,
-          escoge fecha y hora, y listo.
-        </p>
-      </header>
+          <div className="mt-8 sm:mt-10">
+            <p className="font-mono text-[11px] text-brass uppercase tracking-[0.15em] mb-4">
+              Así se reserva
+            </p>
+            <ol className="space-y-3">
+              {PASOS.map((p) => (
+                <li key={p.numero} className="flex items-center justify-center gap-3 sm:justify-start">
+                  <span className="font-mono text-xs text-brass w-6 h-6 shrink-0 flex items-center justify-center border border-brass/40 rounded-full">
+                    {p.numero}
+                  </span>
+                  <span className="font-body text-sm text-cream">{p.titulo}</span>
+                </li>
+              ))}
+            </ol>
+          </div>
 
-      <BookingForm negocio={negocio} servicios={servicios ?? []} horarios={horarios} />
+          {negocio.telefono && (
+            <p className="mt-8 font-mono text-xs text-cream/55">
+              ¿Dudas? Llámanos al <span className="text-brass">{negocio.telefono}</span>
+            </p>
+          )}
+        </aside>
 
-      <footer className="mt-16 text-center font-mono text-[11px] text-cream/15 tracking-wider">
-        {negocio.telefono && (
-          <p className="mb-1">{negocio.telefono}</p>
-        )}
-        {negocio.nombre && (
-          <p>{negocio.nombre}</p>
-        )}
+        {/* Mostrador */}
+        <div className="min-w-0">
+          <BookingForm
+            negocio={negocio}
+            servicios={servicios ?? []}
+            horarios={horarios}
+          />
+        </div>
+      </div>
+
+      <footer className="mt-16 lg:mt-20 text-center font-mono text-[11px] text-cream/55 tracking-wider">
+        {negocio.telefono && <p className="mb-1">{negocio.telefono}</p>}
+        {negocio.nombre && <p>{negocio.nombre}</p>}
       </footer>
     </main>
   );
