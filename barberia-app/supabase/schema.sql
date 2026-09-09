@@ -93,6 +93,7 @@ create policy "servicios visibles publicamente" on servicios
 create policy "cualquiera puede reservar" on citas
   for insert with check (true);
 
+
 -- Solo el dueño autenticado del negocio ve/edita sus citas
 -- (se ajusta cuando se conecte auth.users con negocio_id)
 create policy "dueno ve sus citas" on citas
