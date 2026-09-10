@@ -40,7 +40,7 @@ export async function POST(req: Request) {
 
 export async function PUT(req: Request) {
   const body = await req.json();
-  const { id, activo, descripcion } = body;
+  const { id, activo, nombre, precio, duracion_minutos, descripcion } = body;
 
   if (!id) {
     return NextResponse.json(
@@ -49,8 +49,37 @@ export async function PUT(req: Request) {
     );
   }
 
-  const actualizaciones: Record<string, boolean | string | null> = {};
+  const actualizaciones: Record<string, unknown> = {};
   if (activo != null) actualizaciones.activo = !!activo;
+  if (nombre !== undefined) {
+    if (typeof nombre !== "string" || !nombre.trim()) {
+      return NextResponse.json(
+        { error: "El nombre no puede estar vacío." },
+        { status: 400 }
+      );
+    }
+    actualizaciones.nombre = nombre.trim();
+  }
+  if (precio !== undefined) {
+    const p = parseFloat(precio);
+    if (!Number.isFinite(p) || p < 0) {
+      return NextResponse.json(
+        { error: "Precio inválido." },
+        { status: 400 }
+      );
+    }
+    actualizaciones.precio = p;
+  }
+  if (duracion_minutos !== undefined) {
+    const d = parseInt(duracion_minutos, 10);
+    if (!Number.isFinite(d) || d <= 0) {
+      return NextResponse.json(
+        { error: "Duración inválida." },
+        { status: 400 }
+      );
+    }
+    actualizaciones.duracion_minutos = d;
+  }
   if (descripcion !== undefined) {
     actualizaciones.descripcion =
       typeof descripcion === "string" ? descripcion.trim() || null : null;

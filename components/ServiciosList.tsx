@@ -18,7 +18,12 @@ export default function ServiciosList({
   const [descripcion, setDescripcion] = useState("");
   const [creando, setCreando] = useState(false);
   const [editandoId, setEditandoId] = useState<string | null>(null);
-  const [descripcionEditando, setDescripcionEditando] = useState("");
+  const [edicion, setEdicion] = useState({
+    nombre: "",
+    precio: "",
+    duracion: "30",
+    descripcion: "",
+  });
 
   async function toggleActivo(id: string, activo: boolean) {
     const res = await fetch("/api/servicios", {
@@ -69,33 +74,43 @@ export default function ServiciosList({
     setMostrandoForm(false);
   }
 
-  async function guardarDescripcion(id: string) {
+  async function guardarEdicion(id: string) {
+    if (!edicion.nombre.trim() || !edicion.precio) return;
+
     setCreando(true);
     const res = await fetch("/api/servicios", {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         id,
-        descripcion: descripcionEditando.trim() || null,
+        nombre: edicion.nombre.trim(),
+        precio: parseFloat(edicion.precio),
+        duracion_minutos: parseInt(edicion.duracion, 10),
+        descripcion: edicion.descripcion.trim() || null,
       }),
     });
 
     setCreando(false);
 
     if (!res.ok) {
-      alert("No se pudo guardar la descripción.");
+      alert("No se pudo guardar el servicio.");
       return;
     }
 
     setServicios((prev) =>
       prev.map((s) =>
         s.id === id
-          ? { ...s, descripcion: descripcionEditando.trim() || null }
+          ? {
+              ...s,
+              nombre: edicion.nombre.trim(),
+              precio: parseFloat(edicion.precio),
+              duracion_minutos: parseInt(edicion.duracion, 10),
+              descripcion: edicion.descripcion.trim() || null,
+            }
           : s
       )
     );
     setEditandoId(null);
-    setDescripcionEditando("");
   }
 
   return (
@@ -202,39 +217,82 @@ export default function ServiciosList({
               }`}
             >
               {editandoId === s.id ? (
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between gap-3">
-                    <p className="font-medium text-sm text-cream break-words min-w-0">
-                      {s.nombre}
-                    </p>
+                <div className="space-y-3">
+                  <p className="font-medium text-sm text-cream">
+                    Editar servicio
+                  </p>
+                  <input
+                    type="text"
+                    placeholder="Nombre del servicio"
+                    value={edicion.nombre}
+                    onChange={(e) =>
+                      setEdicion({ ...edicion, nombre: e.target.value })
+                    }
+                    className="w-full bg-ink border border-line rounded-md px-3 py-2 text-sm text-cream placeholder:text-cream/45"
+                  />
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="text-[10px] text-cream/55 uppercase tracking-wider block mb-1">
+                        Precio $
+                      </label>
+                      <input
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        placeholder="0"
+                        value={edicion.precio}
+                        onChange={(e) =>
+                          setEdicion({ ...edicion, precio: e.target.value })
+                        }
+                        className="w-full bg-ink border border-line rounded-md px-3 py-2 text-sm text-cream placeholder:text-cream/45"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-[10px] text-cream/55 uppercase tracking-wider block mb-1">
+                        Duraci&oacute;n (min)
+                      </label>
+                      <input
+                        type="number"
+                        min="5"
+                        step="5"
+                        value={edicion.duracion}
+                        onChange={(e) =>
+                          setEdicion({ ...edicion, duracion: e.target.value })
+                        }
+                        className="w-full bg-ink border border-line rounded-md px-3 py-2 text-sm text-cream placeholder:text-cream/45"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="text-[10px] text-cream/55 uppercase tracking-wider block mb-1">
+                      Descripci&oacute;n (opcional)
+                    </label>
+                    <textarea
+                      value={edicion.descripcion}
+                      onChange={(e) =>
+                        setEdicion({ ...edicion, descripcion: e.target.value })
+                      }
+                      maxLength={300}
+                      rows={2}
+                      placeholder="Sin descripción"
+                      className="w-full bg-ink border border-line rounded-md px-3 py-2 text-sm text-cream placeholder:text-cream/45 resize-none"
+                    />
+                  </div>
+                  <div className="flex justify-end gap-2 pt-1">
                     <button
-                      onClick={() => {
-                        setEditandoId(null);
-                        setDescripcionEditando("");
-                      }}
-                      className="text-xs text-cream/60 hover:text-cream/80 transition-colors shrink-0"
+                      onClick={() => setEditandoId(null)}
+                      className="text-xs px-3 py-1.5 rounded-md border border-line text-cream/60 hover:text-cream/80 transition-colors"
                     >
                       Cancelar
                     </button>
-                  </div>
-                  <textarea
-                    value={descripcionEditando}
-                    onChange={(e) => setDescripcionEditando(e.target.value)}
-                    maxLength={300}
-                    rows={3}
-                    placeholder="Sin descripción"
-                    className="w-full bg-ink border border-line rounded-md px-3 py-2 text-sm text-cream placeholder:text-cream/45 resize-none"
-                  />
-                  <div className="flex items-center justify-between gap-3">
-                    <p className="text-xs text-cream/55">
-                      ${s.precio} &middot; {s.duracion_minutos} min
-                    </p>
                     <button
-                      onClick={() => guardarDescripcion(s.id)}
-                      disabled={creando}
-                      className="text-xs px-4 py-1.5 rounded-md bg-brass text-ink font-medium disabled:opacity-40 transition-opacity shrink-0"
+                      onClick={() => guardarEdicion(s.id)}
+                      disabled={
+                        !edicion.nombre.trim() || !edicion.precio || creando
+                      }
+                      className="text-xs px-4 py-1.5 rounded-md bg-brass text-ink font-medium disabled:opacity-40 transition-opacity"
                     >
-                      {creando ? "Guardando..." : "Guardar descripción"}
+                      {creando ? "Guardando..." : "Guardar cambios"}
                     </button>
                   </div>
                 </div>
@@ -259,11 +317,16 @@ export default function ServiciosList({
                     <button
                       onClick={() => {
                         setEditandoId(s.id);
-                        setDescripcionEditando(s.descripcion ?? "");
+                        setEdicion({
+                          nombre: s.nombre,
+                          precio: String(s.precio),
+                          duracion: String(s.duracion_minutos),
+                          descripcion: s.descripcion ?? "",
+                        });
                       }}
                       className="p-2 rounded-md border border-line text-cream/60 hover:text-brass hover:border-brass/50 transition-colors"
-                      aria-label={`Editar descripción de ${s.nombre}`}
-                      title="Editar descripción"
+                      aria-label={`Editar servicio ${s.nombre}`}
+                      title="Editar servicio"
                     >
                       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                         <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />
