@@ -3,7 +3,7 @@ import { createClient } from "@supabase/supabase-js";
 
 export async function POST(req: Request) {
   const body = await req.json();
-  const { negocio_id, nombre, precio, duracion_minutos } = body;
+  const { negocio_id, nombre, precio, duracion_minutos, descripcion } = body;
 
   if (!negocio_id || !nombre || precio == null || !duracion_minutos) {
     return NextResponse.json(
@@ -22,6 +22,8 @@ export async function POST(req: Request) {
     .insert({
       negocio_id,
       nombre,
+      descripcion:
+        typeof descripcion === "string" ? descripcion.trim() || null : null,
       precio: parseFloat(precio),
       duracion_minutos: parseInt(duracion_minutos, 10),
       activo: true,
@@ -38,11 +40,25 @@ export async function POST(req: Request) {
 
 export async function PUT(req: Request) {
   const body = await req.json();
-  const { id, activo } = body;
+  const { id, activo, descripcion } = body;
 
-  if (!id || activo == null) {
+  if (!id) {
     return NextResponse.json(
       { error: "Faltan campos requeridos." },
+      { status: 400 }
+    );
+  }
+
+  const actualizaciones: Record<string, boolean | string | null> = {};
+  if (activo != null) actualizaciones.activo = !!activo;
+  if (descripcion !== undefined) {
+    actualizaciones.descripcion =
+      typeof descripcion === "string" ? descripcion.trim() || null : null;
+  }
+
+  if (Object.keys(actualizaciones).length === 0) {
+    return NextResponse.json(
+      { error: "No hay campos por actualizar." },
       { status: 400 }
     );
   }
@@ -54,7 +70,7 @@ export async function PUT(req: Request) {
 
   const { error } = await supabase
     .from("servicios")
-    .update({ activo: !!activo })
+    .update(actualizaciones)
     .eq("id", id);
 
   if (error) {

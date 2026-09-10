@@ -15,7 +15,10 @@ export default function ServiciosList({
   const [nombre, setNombre] = useState("");
   const [precio, setPrecio] = useState("");
   const [duracion, setDuracion] = useState("30");
+  const [descripcion, setDescripcion] = useState("");
   const [creando, setCreando] = useState(false);
+  const [editandoId, setEditandoId] = useState<string | null>(null);
+  const [descripcionEditando, setDescripcionEditando] = useState("");
 
   async function toggleActivo(id: string, activo: boolean) {
     const res = await fetch("/api/servicios", {
@@ -43,6 +46,7 @@ export default function ServiciosList({
       body: JSON.stringify({
         negocio_id: negocioId,
         nombre: nombre.trim(),
+        descripcion: descripcion.trim() || null,
         precio: parseFloat(precio),
         duracion_minutos: parseInt(duracion, 10),
       }),
@@ -61,7 +65,37 @@ export default function ServiciosList({
     setNombre("");
     setPrecio("");
     setDuracion("30");
+    setDescripcion("");
     setMostrandoForm(false);
+  }
+
+  async function guardarDescripcion(id: string) {
+    setCreando(true);
+    const res = await fetch("/api/servicios", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        id,
+        descripcion: descripcionEditando.trim() || null,
+      }),
+    });
+
+    setCreando(false);
+
+    if (!res.ok) {
+      alert("No se pudo guardar la descripción.");
+      return;
+    }
+
+    setServicios((prev) =>
+      prev.map((s) =>
+        s.id === id
+          ? { ...s, descripcion: descripcionEditando.trim() || null }
+          : s
+      )
+    );
+    setEditandoId(null);
+    setDescripcionEditando("");
   }
 
   return (
@@ -76,6 +110,7 @@ export default function ServiciosList({
             setNombre("");
             setPrecio("");
             setDuracion("30");
+            setDescripcion("");
           }}
           className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-md border border-line text-cream/60 hover:text-brass hover:border-brass/50 transition-colors"
         >
@@ -122,6 +157,19 @@ export default function ServiciosList({
               />
             </div>
           </div>
+          <div>
+            <label className="text-[10px] text-cream/55 uppercase tracking-wider block mb-1">
+              Descripci&oacute;n (opcional)
+            </label>
+            <textarea
+              placeholder="Ej: Corte a tijera o máquina, acabado y peinado a tu estilo."
+              value={descripcion}
+              onChange={(e) => setDescripcion(e.target.value)}
+              maxLength={300}
+              rows={2}
+              className="w-full bg-ink border border-line rounded-md px-3 py-2 text-sm text-cream placeholder:text-cream/45 resize-none"
+            />
+          </div>
           <div className="flex justify-end gap-2 pt-1">
             <button
               onClick={() => setMostrandoForm(false)}
@@ -149,28 +197,91 @@ export default function ServiciosList({
           {servicios.map((s) => (
             <div
               key={s.id}
-              className="border border-line rounded-lg p-4 bg-surface/30 flex items-center justify-between"
+              className={`border border-line rounded-lg p-4 bg-surface/30 transition-colors ${
+                editandoId === s.id ? "border-brass/40" : ""
+              }`}
             >
-              <div>
-                <p
-                  className={`font-medium text-sm ${!s.activo ? "text-cream/55" : ""}`}
-                >
-                  {s.nombre}
-                </p>
-                <p className="text-xs text-cream/55">
-                  ${s.precio} &middot; {s.duracion_minutos} min
-                </p>
-              </div>
-              <button
-                onClick={() => toggleActivo(s.id, s.activo)}
-                className={`text-xs px-3 py-1.5 rounded-md border transition-colors ${
-                  s.activo
-                    ? "border-green-700/40 text-green-400 bg-green-900/10"
-                    : "border-line text-cream/55"
-                }`}
-              >
-                {s.activo ? "Activo" : "Inactivo"}
-              </button>
+              {editandoId === s.id ? (
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between gap-3">
+                    <p className="font-medium text-sm text-cream break-words min-w-0">
+                      {s.nombre}
+                    </p>
+                    <button
+                      onClick={() => {
+                        setEditandoId(null);
+                        setDescripcionEditando("");
+                      }}
+                      className="text-xs text-cream/60 hover:text-cream/80 transition-colors shrink-0"
+                    >
+                      Cancelar
+                    </button>
+                  </div>
+                  <textarea
+                    value={descripcionEditando}
+                    onChange={(e) => setDescripcionEditando(e.target.value)}
+                    maxLength={300}
+                    rows={3}
+                    placeholder="Sin descripción"
+                    className="w-full bg-ink border border-line rounded-md px-3 py-2 text-sm text-cream placeholder:text-cream/45 resize-none"
+                  />
+                  <div className="flex items-center justify-between gap-3">
+                    <p className="text-xs text-cream/55">
+                      ${s.precio} &middot; {s.duracion_minutos} min
+                    </p>
+                    <button
+                      onClick={() => guardarDescripcion(s.id)}
+                      disabled={creando}
+                      className="text-xs px-4 py-1.5 rounded-md bg-brass text-ink font-medium disabled:opacity-40 transition-opacity shrink-0"
+                    >
+                      {creando ? "Guardando..." : "Guardar descripción"}
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <p
+                      className={`font-medium text-sm ${!s.activo ? "text-cream/55" : ""}`}
+                    >
+                      {s.nombre}
+                    </p>
+                    <p className="text-xs text-cream/55">
+                      ${s.precio} &middot; {s.duracion_minutos} min
+                    </p>
+                    {s.descripcion && (
+                      <p className="text-xs text-cream/60 mt-1 leading-relaxed">
+                        {s.descripcion}
+                      </p>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <button
+                      onClick={() => {
+                        setEditandoId(s.id);
+                        setDescripcionEditando(s.descripcion ?? "");
+                      }}
+                      className="p-2 rounded-md border border-line text-cream/60 hover:text-brass hover:border-brass/50 transition-colors"
+                      aria-label={`Editar descripción de ${s.nombre}`}
+                      title="Editar descripción"
+                    >
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />
+                      </svg>
+                    </button>
+                    <button
+                      onClick={() => toggleActivo(s.id, s.activo)}
+                      className={`text-xs px-3 py-1.5 rounded-md border transition-colors ${
+                        s.activo
+                          ? "border-green-700/40 text-green-400 bg-green-900/10"
+                          : "border-line text-cream/55"
+                      }`}
+                    >
+                      {s.activo ? "Activo" : "Inactivo"}
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           ))}
         </div>
