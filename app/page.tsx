@@ -28,7 +28,7 @@ export default async function PaginaInicio() {
           {negocio.nombre}
         </h1>
         {negocio.direccion && (
-          <p className="font-mono text-xs text-cream/30 mt-3 tracking-wider uppercase">
+          <p className="font-mono text-xs text-cream/55 mt-3 tracking-wider uppercase">
             {negocio.direccion}
           </p>
         )}
@@ -42,7 +42,7 @@ export default async function PaginaInicio() {
 
       <BookingForm negocio={negocio} servicios={servicios ?? []} horarios={negocio.horarios ?? []} />
 
-      <footer className="mt-16 text-center font-mono text-[11px] text-cream/15 tracking-wider">
+      <footer className="mt-16 text-center font-mono text-[11px] text-cream/55 tracking-wider">
         {negocio.telefono && (
           <p className="mb-1">{negocio.telefono}</p>
         )}

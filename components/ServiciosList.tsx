@@ -67,7 +67,7 @@ export default function ServiciosList({
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <p className="text-xs text-cream/40">
+        <p className="text-xs text-cream/55">
           {servicios.length} servicio{servicios.length !== 1 ? "s" : ""}
         </p>
         <button
@@ -91,11 +91,11 @@ export default function ServiciosList({
             placeholder="Nombre del servicio"
             value={nombre}
             onChange={(e) => setNombre(e.target.value)}
-            className="w-full bg-ink border border-line rounded-md px-3 py-2 text-sm text-cream placeholder:text-cream/20"
+            className="w-full bg-ink border border-line rounded-md px-3 py-2 text-sm text-cream placeholder:text-cream/45"
           />
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="text-[10px] text-cream/30 uppercase tracking-wider block mb-1">
+              <label className="text-[10px] text-cream/55 uppercase tracking-wider block mb-1">
                 Precio $
               </label>
               <input
@@ -105,11 +105,11 @@ export default function ServiciosList({
                 placeholder="0"
                 value={precio}
                 onChange={(e) => setPrecio(e.target.value)}
-                className="w-full bg-ink border border-line rounded-md px-3 py-2 text-sm text-cream placeholder:text-cream/20"
+                className="w-full bg-ink border border-line rounded-md px-3 py-2 text-sm text-cream placeholder:text-cream/45"
               />
             </div>
             <div>
-              <label className="text-[10px] text-cream/30 uppercase tracking-wider block mb-1">
+              <label className="text-[10px] text-cream/55 uppercase tracking-wider block mb-1">
                 Duraci&oacute;n (min)
               </label>
               <input
@@ -118,14 +118,14 @@ export default function ServiciosList({
                 step="5"
                 value={duracion}
                 onChange={(e) => setDuracion(e.target.value)}
-                className="w-full bg-ink border border-line rounded-md px-3 py-2 text-sm text-cream placeholder:text-cream/20"
+                className="w-full bg-ink border border-line rounded-md px-3 py-2 text-sm text-cream placeholder:text-cream/45"
               />
             </div>
           </div>
           <div className="flex justify-end gap-2 pt-1">
             <button
               onClick={() => setMostrandoForm(false)}
-              className="text-xs px-3 py-1.5 rounded-md border border-line text-cream/40 hover:text-cream/60 transition-colors"
+              className="text-xs px-3 py-1.5 rounded-md border border-line text-cream/60 hover:text-cream/80 transition-colors"
             >
               Cancelar
             </button>
@@ -141,7 +141,7 @@ export default function ServiciosList({
       )}
 
       {servicios.length === 0 && !mostrandoForm ? (
-        <p className="text-cream/40 text-sm pt-2">
+        <p className="text-cream/60 text-sm pt-2">
           No hay servicios registrados.
         </p>
       ) : (
@@ -153,11 +153,11 @@ export default function ServiciosList({
             >
               <div>
                 <p
-                  className={`font-medium text-sm ${!s.activo ? "text-cream/40" : ""}`}
+                  className={`font-medium text-sm ${!s.activo ? "text-cream/55" : ""}`}
                 >
                   {s.nombre}
                 </p>
-                <p className="text-xs text-cream/40">
+                <p className="text-xs text-cream/55">
                   ${s.precio} &middot; {s.duracion_minutos} min
                 </p>
               </div>
@@ -166,7 +166,7 @@ export default function ServiciosList({
                 className={`text-xs px-3 py-1.5 rounded-md border transition-colors ${
                   s.activo
                     ? "border-green-700/40 text-green-400 bg-green-900/10"
-                    : "border-line text-cream/30"
+                    : "border-line text-cream/55"
                 }`}
               >
                 {s.activo ? "Activo" : "Inactivo"}

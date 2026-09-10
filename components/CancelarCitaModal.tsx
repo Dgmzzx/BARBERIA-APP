@@ -40,7 +40,7 @@ export default function CancelarCitaModal({
           </h2>
           <button
             onClick={onClose}
-            className="text-midnight-on-surface-variant/60 hover:text-midnight-on-surface transition-colors"
+            className="text-midnight-on-surface-variant/80 hover:text-midnight-on-surface transition-colors"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -97,7 +97,7 @@ export default function CancelarCitaModal({
               maxLength={300}
               rows={3}
               className="w-full bg-midnight-surface border border-midnight-outline rounded-md px-4 py-3
-                         font-body text-sm text-midnight-on-surface placeholder:text-midnight-on-surface-variant/60 resize-none
+                         font-body text-sm text-midnight-on-surface placeholder:text-midnight-on-surface-variant/70 resize-none
                          focus:outline-none focus:border-midnight-error/50 focus:ring-1 focus:ring-midnight-error/20
                          transition-all duration-150"
             />

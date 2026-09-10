@@ -180,7 +180,7 @@ export default function PanelCitas({
             <p className="text-sm text-midnight-on-surface-variant">
               {cita.servicios?.nombre} · {cita.fecha} {formatearHora12h(cita.hora)}
             </p>
-            <p className="text-sm text-midnight-on-surface-variant/60">{cita.telefono_cliente}</p>
+            <p className="text-sm text-midnight-on-surface-variant/80">{cita.telefono_cliente}</p>
           </div>
 
           <div className="flex flex-wrap gap-1.5 justify-end sm:justify-start">

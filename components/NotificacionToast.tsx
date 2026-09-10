@@ -115,7 +115,7 @@ export default function NotificacionToast({
             </div>
             <button
               onClick={() => remover(toast.id)}
-              className="text-cream/30 hover:text-cream/70 transition-colors shrink-0"
+              className="text-cream/55 hover:text-cream/80 transition-colors shrink-0"
             >
               <svg
                 width="16"

@@ -74,7 +74,7 @@ export default function FichaCliente({
           </h2>
           <button
             onClick={onClose}
-            className="text-midnight-on-surface-variant/60 hover:text-midnight-on-surface transition-colors"
+            className="text-midnight-on-surface-variant/80 hover:text-midnight-on-surface transition-colors"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -100,22 +100,22 @@ export default function FichaCliente({
             </h3>
             <div className="space-y-2 text-sm text-midnight-on-surface">
               <p>
-                <span className="text-midnight-on-surface-variant/60">Nombre:</span>{" "}
+                <span className="text-midnight-on-surface-variant/80">Nombre:</span>{" "}
                 {cita.nombre_cliente}
               </p>
               <p>
-                <span className="text-midnight-on-surface-variant/60">Teléfono:</span>{" "}
+                <span className="text-midnight-on-surface-variant/80">Teléfono:</span>{" "}
                 {cita.telefono_cliente}
               </p>
               {cita.correo_cliente && (
                 <p>
-                  <span className="text-midnight-on-surface-variant/60">Correo:</span>{" "}
+                  <span className="text-midnight-on-surface-variant/80">Correo:</span>{" "}
                   {cita.correo_cliente}
                 </p>
               )}
               {cita.notas_cliente && (
                 <p>
-                  <span className="text-midnight-on-surface-variant/60">Notas:</span>{" "}
+                  <span className="text-midnight-on-surface-variant/80">Notas:</span>{" "}
                   {cita.notas_cliente}
                 </p>
               )}
@@ -172,11 +172,11 @@ export default function FichaCliente({
               Historial
             </h3>
             {cargandoCambios ? (
-              <p className="text-sm text-midnight-on-surface-variant/60">
+              <p className="text-sm text-midnight-on-surface-variant/80">
                 Cargando...
               </p>
             ) : cambios.length === 0 ? (
-              <p className="text-sm text-midnight-on-surface-variant/60">
+              <p className="text-sm text-midnight-on-surface-variant/80">
                 Sin registros.
               </p>
             ) : (
@@ -194,7 +194,7 @@ export default function FichaCliente({
                             ? "Reprogramación"
                             : "Cancelación"}
                       </p>
-                      <p className="text-xs text-midnight-on-surface-variant/60">
+                      <p className="text-xs text-midnight-on-surface-variant/80">
                         {new Date(c.creado_en).toLocaleDateString("es-MX", {
                           day: "numeric",
                           month: "short",
@@ -223,11 +223,11 @@ export default function FichaCliente({
               Historial de citas
             </h3>
             {cargando ? (
-              <p className="text-sm text-midnight-on-surface-variant/60">
+              <p className="text-sm text-midnight-on-surface-variant/80">
                 Cargando historial...
               </p>
             ) : historial.length === 0 ? (
-              <p className="text-sm text-midnight-on-surface-variant/60">
+              <p className="text-sm text-midnight-on-surface-variant/80">
                 Sin citas anteriores.
               </p>
             ) : (
@@ -241,7 +241,7 @@ export default function FichaCliente({
                       <p className="text-sm text-midnight-on-surface">
                         {h.servicios?.nombre ?? "Sin servicio"}
                       </p>
-                      <p className="text-xs text-midnight-on-surface-variant/60">
+                      <p className="text-xs text-midnight-on-surface-variant/80">
                         {h.fecha} · {formatearHora12h(h.hora)}
                       </p>
                     </div>

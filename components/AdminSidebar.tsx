@@ -67,13 +67,13 @@ export default function AdminSidebar({
         <div className="flex items-center justify-between px-6 pt-8 pb-6 border-b border-line/50 lg:justify-start">
           <div>
             <h1 className="font-display text-xl">{negocioNombre}</h1>
-            <p className="text-[10px] text-cream/30 uppercase tracking-[0.2em] mt-1.5">
+            <p className="text-[10px] text-cream/55 uppercase tracking-[0.2em] mt-1.5">
               Administración
             </p>
           </div>
           <button
             onClick={() => setMobileOpen(false)}
-            className="lg:hidden text-cream/40 hover:text-cream transition-colors"
+            className="lg:hidden text-cream/60 hover:text-cream transition-colors"
             aria-label="Cerrar menú"
           >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
@@ -94,7 +94,7 @@ export default function AdminSidebar({
                 className={`block relative px-4 py-2.5 text-sm rounded-md transition-colors ${
                   esActivo
                     ? "bg-signal/10 text-signal font-medium"
-                    : "text-cream/50 hover:text-cream hover:bg-ink/40"
+                    : "text-cream/65 hover:text-cream hover:bg-ink/40"
                 }`}
               >
                 {esActivo && (
@@ -109,7 +109,7 @@ export default function AdminSidebar({
         <div className="px-3 pb-6 pt-4 border-t border-line/50">
           <button
             onClick={cerrarSesion}
-            className="w-full text-left px-4 py-2.5 text-sm text-cream/30 hover:text-cream/60 hover:bg-ink/40 rounded-md transition-colors"
+            className="w-full text-left px-4 py-2.5 text-sm text-cream/55 hover:text-cream/80 hover:bg-ink/40 rounded-md transition-colors"
           >
             Cerrar sesión
           </button>

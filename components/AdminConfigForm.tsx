@@ -186,7 +186,7 @@ export default function AdminConfigForm({
     <div className="max-w-2xl space-y-8">
       <div>
         <h1 className="font-display text-2xl text-cream">Configuraci&oacute;n</h1>
-        <p className="text-sm text-cream/40 mt-1">Horarios y bloqueos del negocio</p>
+        <p className="text-sm text-cream/60 mt-1">Horarios y bloqueos del negocio</p>
       </div>
 
       {/* Horarios */}
@@ -198,7 +198,7 @@ export default function AdminConfigForm({
           </p>
         </div>
 
-        <p className="text-xs text-cream/25 leading-relaxed mb-5">
+        <p className="text-xs text-cream/55 leading-relaxed mb-5">
           Activa o desactiva d&iacute;as y ajusta los bloques de horario.
         </p>
 
@@ -220,19 +220,19 @@ export default function AdminConfigForm({
                   onClick={() => setDiaExpandido(expandido ? null : n)}
                 >
                   <div className="flex items-center gap-3">
-                    <span className={`transition-colors text-xs font-mono ${activo ? "text-brass" : "text-cream/15"}`}>
+                    <span className={`transition-colors text-xs font-mono ${activo ? "text-brass" : "text-cream/45"}`}>
                       <span className="inline-block w-4 text-center">{expandido ? "▾" : "▸"}</span>
                     </span>
-                    <span className={`font-mono text-xs uppercase tracking-wider transition-colors ${activo ? "text-cream/80" : "text-cream/20"}`}>
+                    <span className={`font-mono text-xs uppercase tracking-wider transition-colors ${activo ? "text-cream/80" : "text-cream/55"}`}>
                       {label}
                     </span>
                     {activo && (
-                      <span className="text-[9px] text-cream/20 font-mono tracking-wider">
+                      <span className="text-[9px] text-cream/55 font-mono tracking-wider">
                         {bloques.length} bloque{bloques.length !== 1 ? "s" : ""}
                       </span>
                     )}
                     {!activo && (
-                      <span className="text-[9px] text-cream/15 font-mono tracking-wider">Inactivo</span>
+                      <span className="text-[9px] text-cream/45 font-mono tracking-wider">Inactivo</span>
                     )}
                   </div>
                   <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
@@ -248,7 +248,7 @@ export default function AdminConfigForm({
                       onClick={() => toggleDia(n)}
                       className={`text-xs transition-colors ${
                         activo
-                          ? "text-signal/50 hover:text-signal"
+                          ? "text-red-400/80 hover:text-red-400"
                           : "text-brass/40 hover:text-brass"
                       }`}
                     >
@@ -285,7 +285,7 @@ export default function AdminConfigForm({
                         </div>
                         <button
                           onClick={() => eliminarBloque(n, bloque.orden)}
-                          className="text-cream/15 hover:text-signal/70 transition-colors"
+                          className="text-cream/45 hover:text-red-400 transition-colors"
                         >
                           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
                             <path d="M3 6h18" />
@@ -309,13 +309,13 @@ export default function AdminConfigForm({
       <section className="border border-line rounded-xl p-6 bg-surface/20">
         <div className="flex items-center gap-2 mb-5">
           <span className="w-1.5 h-1.5 rounded-full bg-signal" />
-          <p className="text-xs text-signal/70 uppercase tracking-[0.15em] font-medium">
+          <p className="text-xs text-red-400 uppercase tracking-[0.15em] font-medium">
             D&iacute;as bloqueados
           </p>
         </div>
 
         {bloqueos.length === 0 ? (
-          <p className="text-sm text-cream/25 mb-5">No hay d&iacute;as bloqueados</p>
+          <p className="text-sm text-cream/55 mb-5">No hay d&iacute;as bloqueados</p>
         ) : (
           <div className="space-y-2 mb-5">
             {bloqueos.map((b) => (
@@ -327,12 +327,12 @@ export default function AdminConfigForm({
                   <span className="w-1.5 h-1.5 rounded-full bg-signal/60" />
                   <span className="font-mono text-sm text-brass/80">{b.fecha}</span>
                   {b.motivo && (
-                    <span className="text-cream/30 text-xs ml-1">— {b.motivo}</span>
+                    <span className="text-cream/55 text-xs ml-1">— {b.motivo}</span>
                   )}
                 </div>
                 <button
                   onClick={() => eliminarBloqueo(b.id)}
-                  className="text-[10px] text-cream/20 hover:text-signal/60 transition-colors uppercase tracking-wider"
+                  className="text-[10px] text-cream/45 hover:text-red-400 transition-colors uppercase tracking-wider"
                 >
                   Eliminar
                 </button>
@@ -343,7 +343,7 @@ export default function AdminConfigForm({
 
         <div className="flex flex-wrap gap-3 items-end">
           <div>
-            <label className="text-[9px] text-cream/20 uppercase tracking-[0.12em] block mb-1.5">
+            <label className="text-[9px] text-cream/55 uppercase tracking-[0.12em] block mb-1.5">
               Fecha
             </label>
             <input
@@ -355,7 +355,7 @@ export default function AdminConfigForm({
             />
           </div>
           <div>
-            <label className="text-[9px] text-cream/20 uppercase tracking-[0.12em] block mb-1.5">
+            <label className="text-[9px] text-cream/55 uppercase tracking-[0.12em] block mb-1.5">
               Motivo (opcional)
             </label>
             <input
@@ -363,7 +363,7 @@ export default function AdminConfigForm({
               placeholder="Ej: Vacaciones"
               value={nuevoBloqueoMotivo}
               onChange={(e) => setNuevoBloqueoMotivo(e.target.value)}
-              className="bg-ink border border-line rounded-lg px-3 py-2 text-sm text-cream placeholder:text-cream/15 w-full sm:w-40"
+              className="bg-ink border border-line rounded-lg px-3 py-2 text-sm text-cream placeholder:text-cream/45 w-full sm:w-40"
             />
           </div>
           <button
@@ -392,7 +392,7 @@ export default function AdminConfigForm({
           {guardando ? "Guardando..." : "Guardar horario y d&iacute;as"}
         </button>
         {exito && <p className="text-xs text-brass/70">{exito}</p>}
-        {error && <p className="text-xs text-signal/80">{error}</p>}
+        {error && <p className="text-xs text-red-400">{error}</p>}
       </div>
     </div>
   );
@@ -440,7 +440,7 @@ function SelectorHora({
         <button
           onClick={() => actualizar({ periodo: "AM" })}
           className={`text-[9px] px-1.5 py-0.5 font-mono uppercase tracking-widest transition-colors ${
-            periodo === "AM" ? "bg-brass text-ink font-semibold" : "bg-transparent text-cream/25 hover:text-cream/60"
+            periodo === "AM" ? "bg-brass text-ink font-semibold" : "bg-transparent text-cream/55 hover:text-cream/80"
           }`}
         >
           AM
@@ -448,7 +448,7 @@ function SelectorHora({
         <button
           onClick={() => actualizar({ periodo: "PM" })}
           className={`text-[9px] px-1.5 py-0.5 font-mono uppercase tracking-widest transition-colors ${
-            periodo === "PM" ? "bg-brass text-ink font-semibold" : "bg-transparent text-cream/25 hover:text-cream/60"
+            periodo === "PM" ? "bg-brass text-ink font-semibold" : "bg-transparent text-cream/55 hover:text-cream/80"
           }`}
         >
           PM

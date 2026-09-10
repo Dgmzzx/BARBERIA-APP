@@ -250,7 +250,7 @@ export default function BookingForm({
                 <span className={`w-2 h-2 rounded-full shrink-0 transition-colors duration-200 ${puntoClase}`} />
                 <span
                   className={`hidden sm:block font-mono text-[11px] uppercase tracking-[0.12em] whitespace-nowrap ${
-                    p.actual ? "text-brass" : p.hecho ? "text-cream/65" : "text-cream/40"
+                    p.actual ? "text-brass" : p.hecho ? "text-cream/65" : "text-cream/55"
                   }`}
                 >
                   {p.label}
@@ -441,7 +441,7 @@ className="w-full bg-surface border border-line rounded-md px-4 py-3
               maxLength={500}
               rows={3}
               className="w-full bg-surface border border-line rounded-md px-4 py-3
-                         font-body text-sm text-cream placeholder:text-muted resize-none
+                         font-body text-base text-cream placeholder:text-muted resize-none
                          focus:outline-none focus:border-brass/50 focus:ring-1 focus:ring-brass/20
                          transition-all duration-150"
             />
@@ -487,7 +487,7 @@ className="w-full bg-surface border border-line rounded-md px-4 py-3
             )}
 
             {error && (
-              <p className="font-mono text-xs text-signal">{error}</p>
+              <p className="font-mono text-xs text-red-400">{error}</p>
             )}
 
             <button

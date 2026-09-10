@@ -96,7 +96,7 @@ export default function ReprogramarCitaModal({
           </h2>
           <button
             onClick={onClose}
-            className="text-midnight-on-surface-variant/60 hover:text-midnight-on-surface transition-colors"
+            className="text-midnight-on-surface-variant/80 hover:text-midnight-on-surface transition-colors"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -117,7 +117,7 @@ export default function ReprogramarCitaModal({
 
         <div className="px-6 py-5 space-y-5">
           <div className="bg-midnight-surface-container-high/50 border border-midnight-outline/30 rounded-md p-3 space-y-1">
-            <p className="text-xs text-midnight-on-surface-variant/60">
+            <p className="text-xs text-midnight-on-surface-variant/80">
               Cita actual
             </p>
             <p className="text-sm text-midnight-on-surface">
@@ -138,7 +138,7 @@ export default function ReprogramarCitaModal({
               min={hoy}
               onChange={(e) => alElegirFecha(e.target.value)}
               className="w-full bg-midnight-surface border border-midnight-outline rounded-md px-4 py-3
-                         font-body text-sm text-midnight-on-surface placeholder:text-midnight-on-surface-variant/60
+                         font-body text-sm text-midnight-on-surface placeholder:text-midnight-on-surface-variant/70
                          focus:outline-none focus:border-midnight-secondary/50 focus:ring-1 focus:ring-midnight-secondary/20
                          transition-all duration-150"
             />
@@ -148,13 +148,13 @@ export default function ReprogramarCitaModal({
           </div>
 
           {cargandoHoras && (
-            <p className="font-mono text-xs text-midnight-on-surface-variant/60">
+            <p className="font-mono text-xs text-midnight-on-surface-variant/80">
               Buscando horarios disponibles...
             </p>
           )}
 
           {!cargandoHoras && !fechaInvalida && nuevaFecha && horasDisponibles.length === 0 && (
-            <p className="font-mono text-xs text-midnight-on-surface-variant/60">
+            <p className="font-mono text-xs text-midnight-on-surface-variant/80">
               No hay horarios disponibles ese día. Elige otra fecha.
             </p>
           )}
@@ -172,7 +172,7 @@ export default function ReprogramarCitaModal({
                     className={`font-mono text-sm border rounded-md py-2.5 px-2 transition-all duration-150
                       ${nuevaHora === h
                         ? "bg-midnight-secondary text-midnight-on-secondary border-midnight-secondary font-medium"
-                        : "border-midnight-outline text-midnight-on-surface-variant/70 hover:border-midnight-secondary/30 hover:text-midnight-on-surface/90"
+                        : "border-midnight-outline text-midnight-on-surface-variant/80 hover:border-midnight-secondary/30 hover:text-midnight-on-surface/90"
                       }`}
                   >
                     {formatearHora12h(h)}
