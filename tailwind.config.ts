@@ -5,6 +5,9 @@ const config: Config = {
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
   ],
+  future: {
+    hoverOnlyWhenSupported: true,
+  },
   theme: {
     extend: {
       colors: {
@@ -55,20 +58,12 @@ const config: Config = {
           "0%": { opacity: "0", transform: "translateY(8px)" },
           "100%": { opacity: "1", transform: "translateY(0)" },
         },
-        "stamp-in": {
-          "0%": { opacity: "0", transform: "translateX(24px) rotate(-12deg)" },
-          "100%": { opacity: "1", transform: "translateX(0) rotate(6deg)" },
-        },
-        "press-in": {
-          "0%": { transform: "scale(1)" },
-          "50%": { transform: "scale(0.97)" },
-          "100%": { transform: "scale(1)" },
-        },
+      },
+      transitionTimingFunction: {
+        ui: "cubic-bezier(0.23, 1, 0.32, 1)",
       },
       animation: {
-        "fade-up": "fade-up 0.4s ease both",
-        "stamp-in": "stamp-in 0.5s ease both",
-        "press-in": "press-in 0.2s ease",
+        "fade-up": "fade-up 0.5s cubic-bezier(0.16, 1, 0.3, 1) both",
       },
     },
   },

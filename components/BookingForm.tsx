@@ -7,6 +7,18 @@ import { formatearHora12h, obtenerRangosDelDia, normalizarTelefono, validarTelef
 
 type Paso = "servicio" | "horario" | "datos" | "confirmado";
 
+const TITULOS_PASO: Record<1 | 2 | 3, string> = {
+  1: "Servicio",
+  2: "Fecha y hora",
+  3: "Tus datos",
+};
+
+const claseCampo =
+  "w-full rounded-xl border border-white/10 bg-white/[0.06] px-4 py-3 text-base text-cream caret-brass outline-none transition-[background-color,border-color,color,box-shadow] duration-200 ease-ui placeholder:text-white/50 focus:border-brass/60 focus:bg-white/[0.08] focus:ring-2 focus:ring-brass/20";
+
+const claseFoco =
+  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brass/60";
+
 export default function BookingForm({
   negocio,
   servicios,
@@ -44,6 +56,8 @@ export default function BookingForm({
   });
   const horarios = horariosProp;
 
+  const pasoActual: 1 | 2 | 3 = !servicioElegido ? 1 : !fecha || !hora ? 2 : 3;
+
   const fechaObj = fecha ? new Date(fecha + "T12:00:00") : null;
   const fechaFormateada = fechaObj
     ? fechaObj.toLocaleDateString("es-MX", {
@@ -52,17 +66,6 @@ export default function BookingForm({
         year: "numeric",
       })
     : "";
-
-  const pasosProgreso = [
-    { id: 1, label: "Servicio", hecho: !!servicioElegido, actual: !servicioElegido },
-    {
-      id: 2,
-      label: "Fecha y hora",
-      hecho: !!fecha && !!hora,
-      actual: !!servicioElegido && (!fecha || !hora),
-    },
-    { id: 3, label: "Tus datos", hecho: false, actual: !!servicioElegido && !!fecha && !!hora },
-  ];
 
   function diaEsLaborable(fechaStr: string): boolean {
     const d = new Date(fechaStr + "T12:00:00");
@@ -171,340 +174,320 @@ export default function BookingForm({
 
   if (paso === "confirmado") {
     return (
-      <div className="motion-safe:animate-fade-up">
-        <div className="bg-paper text-ink rounded-md overflow-hidden shadow-lg">
-          <div className="barber-rule" />
-          <div className="p-6 sm:p-8">
-            <div className="flex justify-between items-center mb-6">
-              <p className="font-mono text-[10px] text-ink/40 uppercase tracking-widest">
-                Ticket de reserva
-              </p>
-              <div
-                className="motion-safe:animate-stamp-in font-display text-sm text-signal border border-signal/60 px-3 py-1 tracking-[0.15em] select-none"
-                style={{ transform: "rotate(6deg)" }}
-              >
-                CONFIRMADO
-              </div>
-            </div>
+      <div
+        role="status"
+        aria-label="Reserva confirmada"
+        className="overflow-hidden rounded-3xl border border-white/10 bg-white/5 shadow-2xl shadow-black/40 backdrop-blur-md motion-safe:animate-fade-up"
+      >
+        <div className="p-6 text-center sm:p-8">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full border border-brass/30 bg-brass/15">
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="text-brass"
+              aria-hidden="true"
+            >
+              <polyline points="20 6 9 17 4 12" />
+            </svg>
+          </div>
 
-            <div className="mb-6">
-              <p className="font-display text-2xl sm:text-3xl text-ink leading-tight">
-                {servicioElegido?.nombre}
-              </p>
-              <p className="font-mono text-xs text-ink/40 mt-1.5">
-                {servicioElegido?.duracion_minutos} min · ${servicioElegido?.precio}
-              </p>
-            </div>
+          <h2 className="mt-5 text-balance font-display text-2xl leading-tight text-cream sm:text-3xl">
+            {nombre}, te esperamos en la silla
+          </h2>
 
-            <div className="flex justify-between items-end gap-4 mb-6">
-              <div className="min-w-0">
-                <p className="font-mono text-[10px] text-ink/30 uppercase tracking-widest mb-1">
-                  Fecha
-                </p>
-                <p className="font-body text-sm sm:text-base text-ink leading-snug">
-                  {fechaFormateada}
-                </p>
-              </div>
-              <div className="text-right shrink-0 whitespace-nowrap">
-                <p className="font-mono text-[10px] text-ink/30 uppercase tracking-widest mb-1">
-                  Hora
-                </p>
-                <p className="font-mono text-2xl sm:text-3xl text-ink leading-none tracking-tight">
-                  {formatearHora12h(hora)}
-                </p>
-              </div>
+          <div className="mt-7 rounded-2xl bg-white/[0.04] px-4 text-left sm:px-5">
+            <div className="flex items-start justify-between gap-4 border-b border-white/10 py-3.5">
+              <span className="pt-0.5 text-[13px] text-white/50">Servicio</span>
+              <span className="text-right">
+                <span className="block text-[15px] font-medium text-cream">
+                  {servicioElegido?.nombre}
+                </span>
+                <span className="mt-0.5 block text-[13px] text-white/50">
+                  ≈ {servicioElegido?.duracion_minutos} min
+                </span>
+              </span>
             </div>
-
-            <div className="border-t border-dashed border-ink/20 pt-5">
-              <p className="font-display text-lg text-ink">
-                {nombre}, te esperamos en la silla
-              </p>
-              <p className="font-mono text-[11px] text-ink/40 mt-2">
-                Guárdate esta página como tu ticket de reserva.
-              </p>
+            <div className="flex items-baseline justify-between gap-4 border-b border-white/10 py-3.5">
+              <span className="text-[13px] text-white/50">Fecha</span>
+              <span className="text-[15px] text-cream">{fechaFormateada}</span>
+            </div>
+            <div className="flex items-baseline justify-between gap-4 border-b border-white/10 py-3.5">
+              <span className="text-[13px] text-white/50">Hora</span>
+              <span className="text-[15px] font-medium tabular-nums text-cream">
+                {formatearHora12h(hora)}
+              </span>
+            </div>
+            <div className="flex items-baseline justify-between gap-4 py-3.5">
+              <span className="text-[13px] text-white/50">Total</span>
+              <span className="text-[15px] font-semibold tabular-nums text-brass">
+                ${servicioElegido?.precio}
+              </span>
             </div>
           </div>
+
+          <p className="mt-6 text-[13px] text-white/50">
+            Guárdate esta página como tu ticket de reserva.
+          </p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="bg-surface/60 border border-line rounded-2xl overflow-hidden">
-      <div className="barber-rule" />
-      <div className="p-5 sm:p-8">
+    <div className="overflow-hidden rounded-3xl border border-white/10 bg-white/5 shadow-2xl shadow-black/40 backdrop-blur-md">
+      <div className="p-5 sm:p-7 lg:p-8">
         <div
-          className="flex items-center gap-2 sm:gap-4 mb-8"
+          className="mb-8 sm:mb-10"
           role="status"
-          aria-label={`Paso ${pasosProgreso.findIndex((p) => p.actual) + 1} de 3`}
+          aria-label={`Paso ${pasoActual} de 3: ${TITULOS_PASO[pasoActual]}`}
         >
-          {pasosProgreso.map((p, i) => {
-            const esUltimo = i === pasosProgreso.length - 1;
-            const puntoClase = p.hecho
-              ? "bg-brass"
-              : p.actual
-                ? "bg-signal ring-4 ring-signal/20"
-                : "bg-line";
-            return (
-              <div key={p.id} className={`flex items-center gap-2 ${esUltimo ? "" : "flex-1"}`}>
-                <span className={`w-2 h-2 rounded-full shrink-0 transition-colors duration-200 ${puntoClase}`} />
-                <span
-                  className={`hidden sm:block font-mono text-[11px] uppercase tracking-[0.12em] whitespace-nowrap ${
-                    p.actual ? "text-brass" : p.hecho ? "text-cream/65" : "text-cream/55"
-                  }`}
-                >
-                  {p.label}
-                </span>
-                {!esUltimo && <span className={`flex-1 h-px ${p.hecho ? "bg-brass/50" : "bg-line"}`} />}
-              </div>
-            );
-          })}
-        </div>
-
-        <div className="space-y-10">
-
-      {/* Paso 1: servicio */}
-      <section className="motion-safe:animate-fade-up">
-        <label className="block font-mono text-[11px] text-brass uppercase tracking-[0.15em]">
-          Paso 1 de 3 — Elige tu servicio
-        </label>
-        <div className="barber-strip mt-4 mb-6" />
-
-        {servicios.length === 0 && (
-          <p className="font-mono text-xs text-cream/55">
-            No hay servicios disponibles por el momento. Vuelve más tarde.
-          </p>
-        )}
-
-        <div className="space-y-2">
-          {servicios.map((s) => {
-            const selected = servicioElegido?.id === s.id;
-            return (
-              <button
-                key={s.id}
-                onClick={() => {
-                  setServicioElegido(s);
-                  setPaso("horario");
-                }}
-                className={`group relative w-full text-left border rounded-xl p-4 sm:p-5 transition-all duration-200 active:scale-[0.99]
-                  ${selected
-                    ? "border-brass/60 bg-brass/[0.08] ring-1 ring-brass/25 shadow-lg shadow-black/20"
-                    : "border-line hover:border-brass/40 hover:bg-surface-hover hover:shadow-lg hover:shadow-black/15 hover:-translate-y-0.5"
-                  }`}
-              >
-                <span
-                  aria-hidden="true"
-                  className={`absolute left-0 inset-y-0 w-[3px] rounded-l-xl bg-brass transition-opacity duration-200 ${
-                    selected ? "opacity-100" : "opacity-0 group-hover:opacity-50"
-                  }`}
-                />
-                <div className="flex justify-between items-start gap-4">
-                  <div className="min-w-0">
-                    <span className={`font-display text-lg leading-snug ${selected ? "text-brass" : "text-cream"}`}>
-                      {s.nombre}
-                    </span>
-                    {s.descripcion && (
-                      <p className="font-body text-sm text-cream/65 mt-1.5">
-                        {s.descripcion}
-                      </p>
-                    )}
-                    <p className="font-mono text-[11px] text-cream/55 tracking-wide mt-2">
-                      ≈ {s.duracion_minutos} min
-                    </p>
-                  </div>
-                  <div className="shrink-0 flex flex-col items-end gap-2">
-                    <span className="font-mono text-base text-brass tabular-nums">
-                      ${s.precio}
-                    </span>
-                    <span
-                      className={`flex items-center justify-center w-5 h-5 rounded-full border transition-all duration-200 ${
-                        selected ? "bg-brass border-brass text-ink" : "border-line text-transparent"
-                      }`}
-                    >
-                      <svg
-                        width="11"
-                        height="11"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="3.5"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <polyline points="20 6 9 17 4 12" />
-                      </svg>
-                    </span>
-                  </div>
-                </div>
-              </button>
-            );
-          })}
-        </div>
-      </section>
-
-      {/* Paso 2: fecha y hora */}
-      {servicioElegido && (
-        <section className="motion-safe:animate-fade-up">
-          <label className="block font-mono text-[11px] text-brass uppercase tracking-[0.15em]">
-            Paso 2 de 3 — Fecha y hora
-          </label>
-          <div className="barber-strip mt-4 mb-6" />
-          <div className="space-y-4">
-            <input
-              type="date"
-              value={fecha}
-              min={new Date().toISOString().split("T")[0]}
-              onChange={(e) => alElegirFecha(e.target.value)}
-className="w-full bg-surface border border-line rounded-md px-4 py-3
-                         font-body text-base text-cream placeholder:text-muted resize-none
-                         focus:outline-none focus:border-brass/50 focus:ring-1 focus:ring-brass/20
-                         transition-all duration-150"
+          <div className="mb-3 flex items-baseline justify-between gap-4">
+            <span className="text-sm font-medium text-cream">
+              {TITULOS_PASO[pasoActual]}
+            </span>
+            <span className="shrink-0 text-xs tabular-nums text-white/50">
+              Paso {pasoActual} de 3
+            </span>
+          </div>
+          <div className="h-1 overflow-hidden rounded-full bg-white/10" aria-hidden="true">
+            <div
+              className="h-full origin-left transform-gpu rounded-full bg-brass transition-transform duration-[400ms] ease-ui"
+              style={{ transform: `scaleX(${pasoActual / 3})` }}
             />
+          </div>
+        </div>
 
-            {error && (
-              <p className="font-mono text-xs text-red-400">{error}</p>
-            )}
+        <div className="space-y-10 sm:space-y-12">
+          {/* Paso 1: servicio */}
+          <section className="motion-safe:animate-fade-up">
+            <h2 className="text-lg font-semibold tracking-[-0.01em] text-cream">
+              Elige tu servicio
+            </h2>
 
-            {cargandoHoras && (
-              <p className="font-mono text-xs text-cream/55">Buscando horarios disponibles...</p>
-            )}
-
-            {!cargandoHoras && !fechaInvalida && fecha && horasDisponibles.length === 0 && (
-              <p className="font-mono text-xs text-cream/55">
-                No quedan horarios libres ese día. Prueba con otra fecha.
+            {servicios.length === 0 && (
+              <p className="mt-4 text-sm text-white/60">
+                No hay servicios disponibles por el momento. Vuelve más tarde.
               </p>
             )}
 
-            {!cargandoHoras && !fechaInvalida && horasDisponibles.length > 0 && (
-              <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-5 gap-2">
-                {horasDisponibles.map((h) => (
+            <div className="mt-4 space-y-2.5">
+              {servicios.map((s) => {
+                const selected = servicioElegido?.id === s.id;
+                return (
                   <button
-                    key={h}
-                    onClick={() => setHora(h)}
-                    className={`font-mono text-sm border rounded-md py-3 px-2 transition-all duration-150 active:scale-[0.97]
-                      ${hora === h
-                        ? "bg-brass text-ink border-brass font-medium"
-                        : "border-line text-cream/70 hover:border-brass/30 hover:text-cream/90"
-                      }`}
+                    key={s.id}
+                    type="button"
+                    aria-pressed={selected}
+                    onClick={() => {
+                      setServicioElegido(s);
+                      setPaso("horario");
+                    }}
+                    className={`group w-full rounded-2xl border p-4 text-left transition-[background-color,border-color,box-shadow,transform] duration-200 ease-ui active:scale-[0.98] sm:p-5 ${claseFoco} ${
+                      selected
+                        ? "border-brass/60 bg-brass/[0.12] shadow-lg shadow-black/25"
+                        : "border-white/10 bg-white/[0.04] hover:border-brass/40 hover:bg-white/[0.07]"
+                    }`}
                   >
-                    {formatearHora12h(h)}
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="min-w-0">
+                        <span
+                          className={`block text-[17px] font-medium leading-snug tracking-[-0.01em] ${
+                            selected ? "text-cream" : "text-cream/90"
+                          }`}
+                        >
+                          {s.nombre}
+                        </span>
+                        {s.descripcion && (
+                          <p className="mt-1 text-sm leading-relaxed text-white/60">
+                            {s.descripcion}
+                          </p>
+                        )}
+                        <p className="mt-2 text-[13px] text-white/50">
+                          ≈ {s.duracion_minutos} min
+                        </p>
+                      </div>
+                      <div className="flex shrink-0 flex-col items-end gap-2.5">
+                        <span className="text-[15px] font-medium tabular-nums text-brass">
+                          ${s.precio}
+                        </span>
+                        <span
+                          className={`flex h-5 w-5 items-center justify-center rounded-full border transition-colors duration-200 ease-ui ${
+                            selected
+                              ? "border-brass bg-brass text-ink"
+                              : "border-white/15 text-transparent"
+                          }`}
+                        >
+                          <svg
+                            width="11"
+                            height="11"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="3"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            aria-hidden="true"
+                          >
+                            <polyline points="20 6 9 17 4 12" />
+                          </svg>
+                        </span>
+                      </div>
+                    </div>
                   </button>
-                ))}
-              </div>
-            )}
-          </div>
-        </section>
-      )}
+                );
+              })}
+            </div>
+          </section>
 
-      {/* Paso 3: datos del cliente */}
-      {servicioElegido && fecha && hora && !fechaInvalida && (
-        <section className="motion-safe:animate-fade-up">
-          <label className="block font-mono text-[11px] text-brass uppercase tracking-[0.15em]">
-            Paso 3 de 3 — Tus datos
-          </label>
-          <div className="barber-strip mt-4 mb-6" />
-          <div className="space-y-3">
-            <input
-              type="text"
-              placeholder="Tu nombre y apellido"
-              value={nombre}
-              onChange={(e) => setNombre(e.target.value)}
-              className="w-full bg-surface border border-line rounded-md px-4 py-3
-                         font-body text-base text-cream placeholder:text-muted
-                         focus:outline-none focus:border-brass/50 focus:ring-1 focus:ring-brass/20
-                         transition-all duration-150"
-            />
-            <input
-              type="tel"
-              placeholder="Tu teléfono / WhatsApp"
-              value={telefono}
-              onChange={(e) => setTelefono(e.target.value)}
-              className="w-full bg-surface border border-line rounded-md px-4 py-3
-                         font-body text-base text-cream placeholder:text-muted
-                         focus:outline-none focus:border-brass/50 focus:ring-1 focus:ring-brass/20
-                         transition-all duration-150"
-            />
-            <input
-              type="email"
-              placeholder="Correo (opcional, para tu recordatorio)"
-              value={correo}
-              onChange={(e) => setCorreo(e.target.value)}
-              className="w-full bg-surface border border-line rounded-md px-4 py-3
-                         font-body text-base text-cream placeholder:text-muted
-                         focus:outline-none focus:border-brass/50 focus:ring-1 focus:ring-brass/20
-                         transition-all duration-150"
-            />
-            <textarea
-              placeholder="¿Algo que el barbero deba saber? (opcional)"
-              value={notas}
-              onChange={(e) => setNotas(e.target.value)}
-              maxLength={500}
-              rows={3}
-              className="w-full bg-surface border border-line rounded-md px-4 py-3
-                         font-body text-base text-cream placeholder:text-muted resize-none
-                         focus:outline-none focus:border-brass/50 focus:ring-1 focus:ring-brass/20
-                         transition-all duration-150"
-            />
+          {/* Paso 2: fecha y hora */}
+          {servicioElegido && (
+            <section className="motion-safe:animate-fade-up">
+              <h2 className="text-lg font-semibold tracking-[-0.01em] text-cream">
+                Fecha y hora
+              </h2>
+              <div className="mt-4 space-y-4">
+                <input
+                  type="date"
+                  aria-label="Elige la fecha"
+                  value={fecha}
+                  min={new Date().toISOString().split("T")[0]}
+                  onChange={(e) => alElegirFecha(e.target.value)}
+                  className={claseCampo}
+                />
 
-            {servicioElegido && (
-              <div className="bg-paper text-ink rounded-md border border-ink/10 overflow-hidden motion-safe:animate-fade-up">
-                <div className="flex justify-between items-center px-4 py-2.5 border-b border-dashed border-ink/25">
-                  <span className="font-mono text-[10px] uppercase tracking-widest text-ink/50">
-                    Tu cita
-                  </span>
-                  <span className="font-mono text-[10px] uppercase tracking-widest text-ink/50">
-                    {negocio.nombre}
-                  </span>
-                </div>
-                <div className="px-4 py-4">
-                  <div className="flex justify-between items-baseline gap-4">
-                    <span className="font-display text-lg text-ink leading-snug min-w-0 break-words">
-                      {servicioElegido.nombre}
-                    </span>
-                    <span className="font-mono text-sm text-ink tabular-nums shrink-0">
-                      ${servicioElegido.precio}
-                    </span>
+                {error && (
+                  <p className="text-[13px] font-medium text-red-400">{error}</p>
+                )}
+
+                {cargandoHoras && (
+                  <p className="text-[13px] text-white/50">
+                    Buscando horarios disponibles...
+                  </p>
+                )}
+
+                {!cargandoHoras && !fechaInvalida && fecha && horasDisponibles.length === 0 && (
+                  <p className="text-[13px] text-white/50">
+                    No quedan horarios libres ese día. Prueba con otra fecha.
+                  </p>
+                )}
+
+                {!cargandoHoras && !fechaInvalida && horasDisponibles.length > 0 && (
+                  <div className="grid grid-cols-3 gap-2 sm:grid-cols-4 lg:grid-cols-5">
+                    {horasDisponibles.map((h) => (
+                      <button
+                        key={h}
+                        type="button"
+                        aria-pressed={hora === h}
+                        onClick={() => setHora(h)}
+                        className={`rounded-xl border px-2 py-3 text-sm font-medium tabular-nums transition-[background-color,border-color,color,box-shadow,transform] duration-150 ease-ui active:scale-[0.97] ${claseFoco} ${
+                          hora === h
+                            ? "border-brass bg-brass text-ink shadow-lg shadow-brass/20"
+                            : "border-white/10 bg-white/[0.04] text-cream/85 hover:border-brass/40 hover:bg-white/[0.08] hover:text-cream"
+                        }`}
+                      >
+                        {formatearHora12h(h)}
+                      </button>
+                    ))}
                   </div>
-                  <div className="border-t border-dashed border-ink/25 my-4" />
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="min-w-0">
-                      <p className="font-mono text-[10px] uppercase tracking-widest text-ink/40 mb-1">
-                        Fecha
-                      </p>
-                      <p className="font-body text-sm text-ink leading-snug">{fechaFormateada}</p>
+                )}
+              </div>
+            </section>
+          )}
+
+          {/* Paso 3: datos del cliente */}
+          {servicioElegido && fecha && hora && !fechaInvalida && (
+            <section className="motion-safe:animate-fade-up">
+              <h2 className="text-lg font-semibold tracking-[-0.01em] text-cream">
+                Tus datos
+              </h2>
+              <div className="mt-4 space-y-3">
+                <input
+                  type="text"
+                  aria-label="Tu nombre y apellido"
+                  placeholder="Tu nombre y apellido"
+                  value={nombre}
+                  onChange={(e) => setNombre(e.target.value)}
+                  className={claseCampo}
+                />
+                <input
+                  type="tel"
+                  aria-label="Tu teléfono o WhatsApp"
+                  placeholder="Tu teléfono / WhatsApp"
+                  value={telefono}
+                  onChange={(e) => setTelefono(e.target.value)}
+                  className={claseCampo}
+                />
+                <input
+                  type="email"
+                  aria-label="Tu correo, opcional"
+                  placeholder="Correo (opcional, para tu recordatorio)"
+                  value={correo}
+                  onChange={(e) => setCorreo(e.target.value)}
+                  className={claseCampo}
+                />
+                <textarea
+                  aria-label="Notas para el barbero, opcional"
+                  placeholder="¿Algo que el barbero deba saber? (opcional)"
+                  value={notas}
+                  onChange={(e) => setNotas(e.target.value)}
+                  maxLength={500}
+                  rows={3}
+                  className={`${claseCampo} resize-none`}
+                />
+
+                {servicioElegido && (
+                  <div className="rounded-2xl bg-white/[0.04] px-4">
+                    <div className="flex items-start justify-between gap-4 border-b border-white/10 py-3.5">
+                      <span className="pt-0.5 text-[13px] text-white/50">Servicio</span>
+                      <span className="text-right">
+                        <span className="block text-[15px] font-medium text-cream">
+                          {servicioElegido.nombre}
+                        </span>
+                        <span className="mt-0.5 block text-[13px] text-white/50">
+                          ≈ {servicioElegido.duracion_minutos} min
+                        </span>
+                      </span>
                     </div>
-                    <div className="text-right shrink-0 whitespace-nowrap">
-                      <p className="font-mono text-[10px] uppercase tracking-widest text-ink/40 mb-1">
-                        Hora
-                      </p>
-                      <p className="font-mono text-sm sm:text-base text-ink">
+                    <div className="flex items-baseline justify-between gap-4 border-b border-white/10 py-3.5">
+                      <span className="text-[13px] text-white/50">Fecha</span>
+                      <span className="text-[15px] text-cream">{fechaFormateada}</span>
+                    </div>
+                    <div className="flex items-baseline justify-between gap-4 border-b border-white/10 py-3.5">
+                      <span className="text-[13px] text-white/50">Hora</span>
+                      <span className="text-[15px] font-medium tabular-nums text-cream">
                         {formatearHora12h(hora)}
-                      </p>
+                      </span>
+                    </div>
+                    <div className="flex items-baseline justify-between gap-4 py-3.5">
+                      <span className="text-[13px] text-white/50">Total</span>
+                      <span className="text-[15px] font-semibold tabular-nums text-brass">
+                        ${servicioElegido.precio}
+                      </span>
                     </div>
                   </div>
-                </div>
+                )}
+
+                {error && (
+                  <p className="text-[13px] font-medium text-red-400">{error}</p>
+                )}
+
+                <button
+                  type="button"
+                  onClick={confirmarCita}
+                  disabled={!nombre.trim() || !telefono || enviando}
+                  className={`w-full rounded-xl bg-brass px-6 py-3.5 text-[15px] font-semibold text-ink shadow-lg shadow-brass/25 transition-[filter,transform,opacity,box-shadow] duration-150 ease-ui hover:brightness-110 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 disabled:shadow-none ${claseFoco}`}
+                >
+                  {enviando ? "Reservando tu cita…" : "Reservar mi cita"}
+                </button>
               </div>
-            )}
-
-            {error && (
-              <p className="font-mono text-xs text-red-400">{error}</p>
-            )}
-
-            <button
-              onClick={confirmarCita}
-              disabled={!nombre.trim() || !telefono || enviando}
-              className="w-full bg-signal text-cream text-sm font-semibold tracking-wide
-                         rounded-md px-8 py-3.5
-                         shadow-lg shadow-signal/20
-                         transition-all duration-150
-                         hover:bg-signal/90 active:scale-[0.97]
-                         disabled:opacity-30 disabled:cursor-not-allowed"
-            >
-              {enviando ? "Reservando tu cita…" : "Reservar mi cita"}
-            </button>
-          </div>
-        </section>
-      )}
+            </section>
+          )}
         </div>
       </div>
     </div>

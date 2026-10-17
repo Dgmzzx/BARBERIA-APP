@@ -77,49 +77,58 @@ export default async function PaginaReserva({
   const textoHorario = formatearHorario(horarios);
 
   return (
-    <main className="min-h-dvh px-4 sm:px-6 py-10 sm:py-12 lg:py-16 max-w-6xl mx-auto">
-      <div className="grid gap-12 lg:grid-cols-[minmax(0,5fr)_minmax(0,6fr)] lg:gap-16">
+    <main className="relative mx-auto min-h-dvh w-full max-w-5xl px-4 py-10 sm:px-6 sm:py-12 lg:py-16">
+      <div
+        aria-hidden="true"
+        className="ambient-glow pointer-events-none absolute inset-x-0 top-0 h-[420px]"
+      />
+
+      <div className="relative grid gap-10 lg:grid-cols-[minmax(0,5fr)_minmax(0,6fr)] lg:gap-14 xl:gap-16">
         {/* Escaparate */}
-        <aside className="text-center sm:text-left lg:sticky lg:top-8 lg:self-start">
-          <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl leading-[1.05] tracking-tight text-cream">
+        <aside className="text-center sm:text-left lg:sticky lg:top-10 lg:self-start">
+          <h1 className="text-balance font-display text-4xl leading-[1.05] tracking-[-0.01em] text-cream sm:text-5xl">
             {negocio.nombre}
           </h1>
 
           {textoHorario && (
-            <p className="font-mono text-xs text-brass mt-4 tracking-[0.12em] uppercase">
+            <p className="mt-4 text-[13px] font-medium tracking-wide text-brass">
               {textoHorario}
             </p>
           )}
           {negocio.direccion && (
-            <p className="font-mono text-xs text-cream/55 mt-1.5 tracking-wider uppercase">
-              {negocio.direccion}
-            </p>
+            <p className="mt-1.5 text-[13px] text-white/50">{negocio.direccion}</p>
           )}
 
-          <p className="font-body text-sm text-cream/65 mt-5">
+          <p className="mx-auto mt-5 max-w-prose text-[15px] leading-relaxed text-white/60 sm:mx-0">
             Agenda tu lugar en la silla. Sin llamadas ni esperas: elige el
             servicio, escoge fecha y hora, y listo.
           </p>
 
-          <div className="mt-8 sm:mt-10">
-            <p className="font-mono text-[11px] text-brass uppercase tracking-[0.15em] mb-4">
+          <div className="mt-10">
+            <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-white/50">
               Así se reserva
             </p>
-            <ol className="space-y-3">
+            <ol className="mt-5 space-y-3.5">
               {PASOS.map((p) => (
-                <li key={p.numero} className="flex items-center justify-center gap-3 sm:justify-start">
-                  <span className="font-mono text-xs text-brass w-6 h-6 shrink-0 flex items-center justify-center border border-brass/40 rounded-full">
+                <li
+                  key={p.numero}
+                  className="flex items-center justify-center gap-3.5 sm:justify-start"
+                >
+                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-white/10 bg-white/[0.04] text-[12px] font-medium tabular-nums text-brass">
                     {p.numero}
                   </span>
-                  <span className="font-body text-sm text-cream">{p.titulo}</span>
+                  <span className="text-[15px] text-cream/90">{p.titulo}</span>
                 </li>
               ))}
             </ol>
           </div>
 
           {negocio.telefono && (
-            <p className="mt-8 font-mono text-xs text-cream/55">
-              ¿Dudas? Llámanos al <span className="text-brass">{negocio.telefono}</span>
+            <p className="mt-8 text-[13px] text-white/50">
+              ¿Dudas? Llámanos al{" "}
+              <span className="whitespace-nowrap font-medium text-brass">
+                {negocio.telefono}
+              </span>
             </p>
           )}
         </aside>
@@ -134,7 +143,7 @@ export default async function PaginaReserva({
         </div>
       </div>
 
-      <footer className="mt-16 lg:mt-20 text-center font-mono text-[11px] text-cream/55 tracking-wider">
+      <footer className="mt-16 text-center text-xs text-white/50 lg:mt-20">
         {negocio.telefono && <p className="mb-1">{negocio.telefono}</p>}
         {negocio.nombre && <p>{negocio.nombre}</p>}
       </footer>

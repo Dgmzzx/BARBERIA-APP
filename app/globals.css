@@ -6,6 +6,7 @@
   --font-display: "Fraunces", serif;
   --font-body: "Inter", sans-serif;
   --font-mono: "JetBrains Mono", monospace;
+  color-scheme: dark;
 }
 
 ::selection {
@@ -16,71 +17,40 @@
 body {
   background-color: #141110;
   color: #efe7dc;
+  font-family: var(--font-body), system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-input[type="date"]::-webkit-calendar-picker-indicator {
-  filter: invert(0.85) sepia(0.15) hue-rotate(-10deg);
-  opacity: 0.5;
-  cursor: pointer;
-}
-
-/* Listón de barbero: firma del tema. Usado como divisor grande y como
-   señalética de cada paso del flujo de reserva. */
-.barber-rule {
-  background: repeating-linear-gradient(
-    45deg,
-    #C41E3A 0px, #C41E3A 4px,
-    #efe7dc 4px, #efe7dc 8px,
-    #c8752c 8px, #c8752c 12px
+.ambient-glow {
+  background: radial-gradient(
+    640px 300px at 50% 0%,
+    rgba(200, 117, 44, 0.12),
+    transparent 70%
   );
-  height: 3px;
-  width: 100%;
-  border: 0;
-  margin: 0;
 }
 
-.barber-strip {
-  background: repeating-linear-gradient(
-    45deg,
-    #C41E3A 0px, #C41E3A 3px,
-    #efe7dc 3px, #efe7dc 6px,
-    #c8752c 6px, #c8752c 9px
-  );
-  height: 2px;
-  width: 100%;
-} 
+@media (prefers-reduced-transparency: reduce) {
+  .backdrop-blur-md,
+  .backdrop-blur-sm {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
 
-/* Boleto: borde de perforación para el ticket de confirmación */
-.ticket-notch {
-  position: relative;
+  .bg-white\/5,
+  .bg-white\/\[0\.04\],
+  .bg-white\/\[0\.06\],
+  .bg-white\/\[0\.07\],
+  .bg-white\/\[0\.08\] {
+    background-color: rgb(28 25 23 / 0.95) !important;
+  }
 }
 
-.ticket-notch::before,
-.ticket-notch::after {
-  content: "";
-  position: absolute;
-  width: 14px;
-  height: 14px;
-  border-radius: 9999px;
-  background: #141110;
-  top: 50%;
-  transform: translateY(-50%);
-}
-
-.ticket-notch::before {
-  left: -7px;
-}
-
-.ticket-notch::after {
-  right: -7px;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .motion-safe\:animate-fade-up,
-  .motion-safe\:animate-stamp-in,
-  .motion-safe\:animate-press-in {
-    animation: none !important;
+@media (prefers-contrast: more) {
+  .bg-white\/5,
+  .bg-white\/\[0\.04\],
+  .bg-white\/\[0\.06\] {
+    background-color: rgb(20 17 16 / 0.98) !important;
+    border-color: rgb(255 255 255 / 0.35) !important;
   }
 }
