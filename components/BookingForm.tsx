@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { crearClienteSupabase } from "@/lib/supabase/client";
 import type { Negocio, Servicio, Horario } from "@/lib/types";
 import { formatearHora12h, obtenerRangosDelDia, normalizarTelefono, validarTelefono, validarEmail } from "@/lib/helpers";
@@ -18,6 +18,12 @@ const claseCampo =
 
 const claseFoco =
   "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brass/60";
+
+const claseBotonPrimario =
+  "w-full rounded-xl bg-brass px-6 py-3.5 text-[15px] font-semibold text-ink shadow-lg shadow-brass/25 transition-[filter,transform,opacity,box-shadow] duration-150 ease-ui hover:brightness-110 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 disabled:shadow-none";
+
+const claseBotonSecundario =
+  "shrink-0 rounded-xl border border-white/10 bg-white/[0.04] px-5 py-3.5 text-[15px] font-medium text-cream/85 transition-[background-color,border-color,color,transform] duration-150 ease-ui hover:border-white/20 hover:bg-white/[0.07] hover:text-cream active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40";
 
 export default function BookingForm({
   negocio,
@@ -56,7 +62,39 @@ export default function BookingForm({
   });
   const horarios = horariosProp;
 
-  const pasoActual: 1 | 2 | 3 = !servicioElegido ? 1 : !fecha || !hora ? 2 : 3;
+  const contenedorRef = useRef<HTMLDivElement>(null);
+  const tituloPasoRef = useRef<HTMLHeadingElement>(null);
+  const tituloConfirmadoRef = useRef<HTMLHeadingElement>(null);
+  const pasoAnterior = useRef<Paso>(paso);
+
+  const pasoMostrado: "servicio" | "horario" | "datos" =
+    paso === "datos" && servicioElegido && fecha && hora && !fechaInvalida
+      ? "datos"
+      : paso !== "servicio" && servicioElegido
+        ? "horario"
+        : "servicio";
+
+  const pasoActual: 1 | 2 | 3 =
+    pasoMostrado === "datos" ? 3 : pasoMostrado === "horario" ? 2 : 1;
+
+  useEffect(() => {
+    if (pasoAnterior.current === paso) return;
+    pasoAnterior.current = paso;
+
+    if (paso === "confirmado") {
+      tituloConfirmadoRef.current?.focus();
+      return;
+    }
+
+    const reducirMovimiento = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+    contenedorRef.current?.scrollIntoView({
+      behavior: reducirMovimiento ? "auto" : "smooth",
+      block: "start",
+    });
+    tituloPasoRef.current?.focus({ preventScroll: true });
+  }, [paso]);
 
   const fechaObj = fecha ? new Date(fecha + "T12:00:00") : null;
   const fechaFormateada = fechaObj
@@ -165,8 +203,13 @@ export default function BookingForm({
 
     if (!respuesta.ok) {
       const data = await respuesta.json().catch(() => null);
-      setError(data?.error ?? "No se pudo reservar la cita. Intenta de nuevo.");
-      if (respuesta.status === 409) alElegirFecha(fecha);
+      const mensaje =
+        data?.error ?? "No se pudo reservar la cita. Intenta de nuevo.";
+      if (respuesta.status === 409) {
+        setPaso("horario");
+        await alElegirFecha(fecha);
+      }
+      setError(mensaje);
       return;
     }
     setPaso("confirmado");
@@ -197,41 +240,45 @@ export default function BookingForm({
             </svg>
           </div>
 
-          <h2 className="mt-5 text-balance font-display text-2xl leading-tight text-cream sm:text-3xl">
+          <h2
+            ref={tituloConfirmadoRef}
+            tabIndex={-1}
+            className="mt-5 text-balance font-display text-2xl leading-tight text-cream outline-none sm:text-3xl"
+          >
             {nombre}, te esperamos en la silla
           </h2>
 
           <div className="mt-7 rounded-2xl bg-white/[0.04] px-4 text-left sm:px-5">
             <div className="flex items-start justify-between gap-4 border-b border-white/10 py-3.5">
-              <span className="pt-0.5 text-[13px] text-white/50">Servicio</span>
+              <span className="pt-0.5 text-[13px] text-white/60">Servicio</span>
               <span className="text-right">
                 <span className="block text-[15px] font-medium text-cream">
                   {servicioElegido?.nombre}
                 </span>
-                <span className="mt-0.5 block text-[13px] text-white/50">
+                <span className="mt-0.5 block text-[13px] text-white/60">
                   ≈ {servicioElegido?.duracion_minutos} min
                 </span>
               </span>
             </div>
             <div className="flex items-baseline justify-between gap-4 border-b border-white/10 py-3.5">
-              <span className="text-[13px] text-white/50">Fecha</span>
+              <span className="text-[13px] text-white/60">Fecha</span>
               <span className="text-[15px] text-cream">{fechaFormateada}</span>
             </div>
             <div className="flex items-baseline justify-between gap-4 border-b border-white/10 py-3.5">
-              <span className="text-[13px] text-white/50">Hora</span>
+              <span className="text-[13px] text-white/60">Hora</span>
               <span className="text-[15px] font-medium tabular-nums text-cream">
                 {formatearHora12h(hora)}
               </span>
             </div>
             <div className="flex items-baseline justify-between gap-4 py-3.5">
-              <span className="text-[13px] text-white/50">Total</span>
+              <span className="text-[13px] text-white/60">Total</span>
               <span className="text-[15px] font-semibold tabular-nums text-brass">
                 ${servicioElegido?.precio}
               </span>
             </div>
           </div>
 
-          <p className="mt-6 text-[13px] text-white/50">
+          <p className="mt-6 text-[13px] text-white/60">
             Guárdate esta página como tu ticket de reserva.
           </p>
         </div>
@@ -240,7 +287,10 @@ export default function BookingForm({
   }
 
   return (
-    <div className="overflow-hidden rounded-3xl border border-white/10 bg-white/5 shadow-2xl shadow-black/40 backdrop-blur-md">
+    <div
+      ref={contenedorRef}
+      className="scroll-mt-6 overflow-hidden rounded-3xl border border-white/10 bg-white/5 shadow-2xl shadow-black/40 backdrop-blur-md sm:scroll-mt-10"
+    >
       <div className="p-5 sm:p-7 lg:p-8">
         <div
           className="mb-8 sm:mb-10"
@@ -251,7 +301,7 @@ export default function BookingForm({
             <span className="text-sm font-medium text-cream">
               {TITULOS_PASO[pasoActual]}
             </span>
-            <span className="shrink-0 text-xs tabular-nums text-white/50">
+            <span className="shrink-0 text-xs tabular-nums text-white/60">
               Paso {pasoActual} de 3
             </span>
           </div>
@@ -263,10 +313,14 @@ export default function BookingForm({
           </div>
         </div>
 
-        <div className="space-y-10 sm:space-y-12">
-          {/* Paso 1: servicio */}
+        {/* Paso 1: servicio */}
+        {pasoMostrado === "servicio" && (
           <section className="motion-safe:animate-fade-up">
-            <h2 className="text-lg font-semibold tracking-[-0.01em] text-cream">
+            <h2
+              ref={tituloPasoRef}
+              tabIndex={-1}
+              className="text-lg font-semibold tracking-[-0.01em] text-cream outline-none"
+            >
               Elige tu servicio
             </h2>
 
@@ -284,10 +338,7 @@ export default function BookingForm({
                     key={s.id}
                     type="button"
                     aria-pressed={selected}
-                    onClick={() => {
-                      setServicioElegido(s);
-                      setPaso("horario");
-                    }}
+                    onClick={() => setServicioElegido(s)}
                     className={`group w-full rounded-2xl border p-4 text-left transition-[background-color,border-color,box-shadow,transform] duration-200 ease-ui active:scale-[0.98] sm:p-5 ${claseFoco} ${
                       selected
                         ? "border-brass/60 bg-brass/[0.12] shadow-lg shadow-black/25"
@@ -308,7 +359,7 @@ export default function BookingForm({
                             {s.descripcion}
                           </p>
                         )}
-                        <p className="mt-2 text-[13px] text-white/50">
+                        <p className="mt-2 text-[13px] text-white/60">
                           ≈ {s.duracion_minutos} min
                         </p>
                       </div>
@@ -343,152 +394,204 @@ export default function BookingForm({
                 );
               })}
             </div>
+
+            <button
+              type="button"
+              onClick={() => setPaso("horario")}
+              disabled={!servicioElegido}
+              className={`mt-5 ${claseBotonPrimario} ${claseFoco}`}
+            >
+              Continuar
+            </button>
           </section>
+        )}
 
-          {/* Paso 2: fecha y hora */}
-          {servicioElegido && (
-            <section className="motion-safe:animate-fade-up">
-              <h2 className="text-lg font-semibold tracking-[-0.01em] text-cream">
-                Fecha y hora
-              </h2>
-              <div className="mt-4 space-y-4">
-                <input
-                  type="date"
-                  aria-label="Elige la fecha"
-                  value={fecha}
-                  min={new Date().toISOString().split("T")[0]}
-                  onChange={(e) => alElegirFecha(e.target.value)}
-                  className={claseCampo}
-                />
+        {/* Paso 2: fecha y hora */}
+        {pasoMostrado === "horario" && (
+          <section className="motion-safe:animate-fade-up">
+            <h2
+              ref={tituloPasoRef}
+              tabIndex={-1}
+              className="text-lg font-semibold tracking-[-0.01em] text-cream outline-none"
+            >
+              Fecha y hora
+            </h2>
+            <p className="mt-1.5 text-[13px] text-white/60">
+              {servicioElegido?.nombre} · ≈ {servicioElegido?.duracion_minutos} min{" "}
+              <button
+                type="button"
+                onClick={() => setPaso("servicio")}
+                className={`rounded font-medium text-brass underline-offset-2 transition-colors duration-150 ease-ui hover:underline ${claseFoco}`}
+              >
+                Cambiar
+              </button>
+            </p>
+            <div className="mt-4 space-y-4">
+              <input
+                type="date"
+                aria-label="Elige la fecha"
+                value={fecha}
+                min={new Date().toISOString().split("T")[0]}
+                onChange={(e) => alElegirFecha(e.target.value)}
+                className={claseCampo}
+              />
 
-                {error && (
-                  <p className="text-[13px] font-medium text-red-400">{error}</p>
-                )}
+              {error && (
+                <p className="text-[13px] font-medium text-red-400">{error}</p>
+              )}
 
-                {cargandoHoras && (
-                  <p className="text-[13px] text-white/50">
-                    Buscando horarios disponibles...
-                  </p>
-                )}
+              {cargandoHoras && (
+                <p className="text-[13px] text-white/60">
+                  Buscando horarios disponibles...
+                </p>
+              )}
 
-                {!cargandoHoras && !fechaInvalida && fecha && horasDisponibles.length === 0 && (
-                  <p className="text-[13px] text-white/50">
-                    No quedan horarios libres ese día. Prueba con otra fecha.
-                  </p>
-                )}
+              {!cargandoHoras && !fechaInvalida && fecha && horasDisponibles.length === 0 && (
+                <p className="text-[13px] text-white/60">
+                  No quedan horarios libres ese día. Prueba con otra fecha.
+                </p>
+              )}
 
-                {!cargandoHoras && !fechaInvalida && horasDisponibles.length > 0 && (
-                  <div className="grid grid-cols-3 gap-2 sm:grid-cols-4 lg:grid-cols-5">
-                    {horasDisponibles.map((h) => (
-                      <button
-                        key={h}
-                        type="button"
-                        aria-pressed={hora === h}
-                        onClick={() => setHora(h)}
-                        className={`rounded-xl border px-2 py-3 text-sm font-medium tabular-nums transition-[background-color,border-color,color,box-shadow,transform] duration-150 ease-ui active:scale-[0.97] ${claseFoco} ${
-                          hora === h
-                            ? "border-brass bg-brass text-ink shadow-lg shadow-brass/20"
-                            : "border-white/10 bg-white/[0.04] text-cream/85 hover:border-brass/40 hover:bg-white/[0.08] hover:text-cream"
-                        }`}
-                      >
-                        {formatearHora12h(h)}
-                      </button>
-                    ))}
-                  </div>
-                )}
+              {!cargandoHoras && !fechaInvalida && horasDisponibles.length > 0 && (
+                <div className="grid grid-cols-3 gap-2 sm:grid-cols-4 lg:grid-cols-5">
+                  {horasDisponibles.map((h) => (
+                    <button
+                      key={h}
+                      type="button"
+                      aria-pressed={hora === h}
+                      onClick={() => setHora(h)}
+                      className={`rounded-xl border px-2 py-3 text-sm font-medium tabular-nums transition-[background-color,border-color,color,box-shadow,transform] duration-150 ease-ui active:scale-[0.97] ${claseFoco} ${
+                        hora === h
+                          ? "border-brass bg-brass text-ink shadow-lg shadow-brass/20"
+                          : "border-white/10 bg-white/[0.04] text-cream/85 hover:border-brass/40 hover:bg-white/[0.08] hover:text-cream"
+                      }`}
+                    >
+                      {formatearHora12h(h)}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+            <div className="mt-6 flex gap-2.5">
+              <button
+                type="button"
+                onClick={() => setPaso("servicio")}
+                className={`${claseBotonSecundario} ${claseFoco}`}
+              >
+                Atrás
+              </button>
+              <button
+                type="button"
+                onClick={() => setPaso("datos")}
+                disabled={!hora || !!fechaInvalida || cargandoHoras}
+                className={`${claseBotonPrimario} flex-1 ${claseFoco}`}
+              >
+                Continuar
+              </button>
+            </div>
+          </section>
+        )}
+
+        {/* Paso 3: datos del cliente */}
+        {pasoMostrado === "datos" && (
+          <section className="motion-safe:animate-fade-up">
+            <h2
+              ref={tituloPasoRef}
+              tabIndex={-1}
+              className="text-lg font-semibold tracking-[-0.01em] text-cream outline-none"
+            >
+              Tus datos
+            </h2>
+            <div className="mt-4 space-y-3">
+              <input
+                type="text"
+                aria-label="Tu nombre y apellido"
+                placeholder="Tu nombre y apellido"
+                value={nombre}
+                onChange={(e) => setNombre(e.target.value)}
+                className={claseCampo}
+              />
+              <input
+                type="tel"
+                aria-label="Tu teléfono o WhatsApp"
+                placeholder="Tu teléfono / WhatsApp"
+                value={telefono}
+                onChange={(e) => setTelefono(e.target.value)}
+                className={claseCampo}
+              />
+              <input
+                type="email"
+                aria-label="Tu correo, opcional"
+                placeholder="Correo (opcional, para tu recordatorio)"
+                value={correo}
+                onChange={(e) => setCorreo(e.target.value)}
+                className={claseCampo}
+              />
+              <textarea
+                aria-label="Notas para el barbero, opcional"
+                placeholder="¿Algo que el barbero deba saber? (opcional)"
+                value={notas}
+                onChange={(e) => setNotas(e.target.value)}
+                maxLength={500}
+                rows={3}
+                className={`${claseCampo} resize-none`}
+              />
+
+              <div className="rounded-2xl bg-white/[0.04] px-4">
+                <div className="flex items-start justify-between gap-4 border-b border-white/10 py-3.5">
+                  <span className="pt-0.5 text-[13px] text-white/60">Servicio</span>
+                  <span className="text-right">
+                    <span className="block text-[15px] font-medium text-cream">
+                      {servicioElegido?.nombre}
+                    </span>
+                    <span className="mt-0.5 block text-[13px] text-white/60">
+                      ≈ {servicioElegido?.duracion_minutos} min
+                    </span>
+                  </span>
+                </div>
+                <div className="flex items-baseline justify-between gap-4 border-b border-white/10 py-3.5">
+                  <span className="text-[13px] text-white/60">Fecha</span>
+                  <span className="text-[15px] text-cream">{fechaFormateada}</span>
+                </div>
+                <div className="flex items-baseline justify-between gap-4 border-b border-white/10 py-3.5">
+                  <span className="text-[13px] text-white/60">Hora</span>
+                  <span className="text-[15px] font-medium tabular-nums text-cream">
+                    {formatearHora12h(hora)}
+                  </span>
+                </div>
+                <div className="flex items-baseline justify-between gap-4 py-3.5">
+                  <span className="text-[13px] text-white/60">Total</span>
+                  <span className="text-[15px] font-semibold tabular-nums text-brass">
+                    ${servicioElegido?.precio}
+                  </span>
+                </div>
               </div>
-            </section>
-          )}
 
-          {/* Paso 3: datos del cliente */}
-          {servicioElegido && fecha && hora && !fechaInvalida && (
-            <section className="motion-safe:animate-fade-up">
-              <h2 className="text-lg font-semibold tracking-[-0.01em] text-cream">
-                Tus datos
-              </h2>
-              <div className="mt-4 space-y-3">
-                <input
-                  type="text"
-                  aria-label="Tu nombre y apellido"
-                  placeholder="Tu nombre y apellido"
-                  value={nombre}
-                  onChange={(e) => setNombre(e.target.value)}
-                  className={claseCampo}
-                />
-                <input
-                  type="tel"
-                  aria-label="Tu teléfono o WhatsApp"
-                  placeholder="Tu teléfono / WhatsApp"
-                  value={telefono}
-                  onChange={(e) => setTelefono(e.target.value)}
-                  className={claseCampo}
-                />
-                <input
-                  type="email"
-                  aria-label="Tu correo, opcional"
-                  placeholder="Correo (opcional, para tu recordatorio)"
-                  value={correo}
-                  onChange={(e) => setCorreo(e.target.value)}
-                  className={claseCampo}
-                />
-                <textarea
-                  aria-label="Notas para el barbero, opcional"
-                  placeholder="¿Algo que el barbero deba saber? (opcional)"
-                  value={notas}
-                  onChange={(e) => setNotas(e.target.value)}
-                  maxLength={500}
-                  rows={3}
-                  className={`${claseCampo} resize-none`}
-                />
+              {error && (
+                <p className="text-[13px] font-medium text-red-400">{error}</p>
+              )}
 
-                {servicioElegido && (
-                  <div className="rounded-2xl bg-white/[0.04] px-4">
-                    <div className="flex items-start justify-between gap-4 border-b border-white/10 py-3.5">
-                      <span className="pt-0.5 text-[13px] text-white/50">Servicio</span>
-                      <span className="text-right">
-                        <span className="block text-[15px] font-medium text-cream">
-                          {servicioElegido.nombre}
-                        </span>
-                        <span className="mt-0.5 block text-[13px] text-white/50">
-                          ≈ {servicioElegido.duracion_minutos} min
-                        </span>
-                      </span>
-                    </div>
-                    <div className="flex items-baseline justify-between gap-4 border-b border-white/10 py-3.5">
-                      <span className="text-[13px] text-white/50">Fecha</span>
-                      <span className="text-[15px] text-cream">{fechaFormateada}</span>
-                    </div>
-                    <div className="flex items-baseline justify-between gap-4 border-b border-white/10 py-3.5">
-                      <span className="text-[13px] text-white/50">Hora</span>
-                      <span className="text-[15px] font-medium tabular-nums text-cream">
-                        {formatearHora12h(hora)}
-                      </span>
-                    </div>
-                    <div className="flex items-baseline justify-between gap-4 py-3.5">
-                      <span className="text-[13px] text-white/50">Total</span>
-                      <span className="text-[15px] font-semibold tabular-nums text-brass">
-                        ${servicioElegido.precio}
-                      </span>
-                    </div>
-                  </div>
-                )}
-
-                {error && (
-                  <p className="text-[13px] font-medium text-red-400">{error}</p>
-                )}
-
+              <div className="flex gap-2.5">
+                <button
+                  type="button"
+                  onClick={() => setPaso("horario")}
+                  disabled={enviando}
+                  className={`${claseBotonSecundario} ${claseFoco}`}
+                >
+                  Atrás
+                </button>
                 <button
                   type="button"
                   onClick={confirmarCita}
                   disabled={!nombre.trim() || !telefono || enviando}
-                  className={`w-full rounded-xl bg-brass px-6 py-3.5 text-[15px] font-semibold text-ink shadow-lg shadow-brass/25 transition-[filter,transform,opacity,box-shadow] duration-150 ease-ui hover:brightness-110 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 disabled:shadow-none ${claseFoco}`}
+                  className={`${claseBotonPrimario} flex-1 ${claseFoco}`}
                 >
                   {enviando ? "Reservando tu cita…" : "Reservar mi cita"}
                 </button>
               </div>
-            </section>
-          )}
-        </div>
+            </div>
+          </section>
+        )}
       </div>
     </div>
   );
