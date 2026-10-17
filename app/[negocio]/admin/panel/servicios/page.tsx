@@ -18,18 +18,21 @@ export default async function PaginaServicios({
     .order("precio");
 
   return (
-    <div className="max-w-4xl">
-      <div className="mb-8">
-        <h1 className="font-display text-2xl">Servicios</h1>
-        <p className="text-sm text-cream/60 mt-1">
-          {servicios?.length ?? 0} servicio
-          {(servicios?.length ?? 0) !== 1 ? "s" : ""}
+    <div>
+      <header>
+        <h1 className="font-display text-2xl leading-tight text-cream md:text-3xl">
+          Servicios
+        </h1>
+        <p className="mt-1.5 text-sm text-cream/55">
+          Lo que tus clientes ven y reservan en la página pública.
         </p>
+      </header>
+      <div className="mt-8">
+        <ServiciosList
+          serviciosIniciales={servicios ?? []}
+          negocioId={negocio.id}
+        />
       </div>
-      <ServiciosList
-        serviciosIniciales={servicios ?? []}
-        negocioId={negocio.id}
-      />
     </div>
   );
 }

@@ -13,12 +13,16 @@ export default async function PanelLayout({
   if (!negocio) notFound();
 
   return (
-    <div className="flex flex-col lg:flex-row min-h-screen bg-ink">
+    <div className="flex min-h-dvh flex-col bg-ink lg:flex-row">
       <AdminSidebar
         negocioSlug={params.negocio}
         negocioNombre={negocio?.nombre ?? "Admin"}
       />
-      <main className="flex-1 overflow-y-auto p-4 md:p-8 lg:pt-8">{children}</main>
+      <main className="min-w-0 flex-1">
+        <div className="mx-auto w-full max-w-5xl px-4 py-6 sm:px-6 md:py-10 lg:px-8">
+          {children}
+        </div>
+      </main>
     </div>
   );
 }

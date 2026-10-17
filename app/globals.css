@@ -14,6 +14,30 @@
   color: #141110;
 }
 
+html {
+  scrollbar-width: thin;
+  scrollbar-color: #2e2822 transparent;
+}
+
+input,
+textarea,
+select {
+  caret-color: #c8752c;
+}
+
+:where(a, button, input, textarea, select):focus-visible {
+  outline-color: rgb(200 117 44 / 0.55);
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  opacity: 0.55;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator:hover {
+  opacity: 0.9;
+}
+
 body {
   background-color: #141110;
   color: #efe7dc;

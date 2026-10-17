@@ -24,16 +24,25 @@ export default async function PaginaCitas({
     .select("*")
     .eq("negocio_id", negocio.id);
 
+  const total = citas?.length ?? 0;
+
   return (
-    <div className="max-w-4xl">
-      <div className="mb-8">
-        <h1 className="font-display text-2xl text-midnight-on-surface">Citas</h1>
-        <p className="text-sm text-midnight-on-surface-variant mt-1">
-          {citas?.length ?? 0} registro
-          {(citas?.length ?? 0) !== 1 ? "s" : ""}
+    <div>
+      <header>
+        <h1 className="font-display text-2xl leading-tight text-cream md:text-3xl">
+          Citas
+        </h1>
+        <p className="mt-1.5 text-sm text-cream/55">
+          {total === 1 ? "1 cita en total" : `${total} citas en total`}
         </p>
+      </header>
+      <div className="mt-8">
+        <PanelCitas
+          negocioId={negocio.id}
+          citasIniciales={citas ?? []}
+          horarios={(horarios as Horario[]) ?? []}
+        />
       </div>
-      <PanelCitas negocioId={negocio.id} citasIniciales={citas ?? []} horarios={(horarios as Horario[]) ?? []} />
     </div>
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const MOTIVOS = [
   "Cliente canceló",
@@ -23,6 +23,14 @@ export default function CancelarCitaModal({
     motivoSeleccionado &&
     (motivoSeleccionado !== "Otro" || otroTexto.trim().length > 0);
 
+  useEffect(() => {
+    function alPresionarTecla(e: KeyboardEvent) {
+      if (e.key === "Escape") onClose();
+    }
+    document.addEventListener("keydown", alPresionarTecla);
+    return () => document.removeEventListener("keydown", alPresionarTecla);
+  }, [onClose]);
+
   function handleConfirmar() {
     if (!motivoValido) return;
     const motivo =
@@ -31,36 +39,44 @@ export default function CancelarCitaModal({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div className="fixed inset-0 bg-black/60" onClick={onClose} />
-      <div className="relative bg-midnight-surface-container border border-midnight-outline rounded-lg w-full max-w-sm motion-safe:animate-fade-up">
-        <div className="sticky top-0 bg-midnight-surface-container border-b border-midnight-outline/50 px-6 py-4 flex items-center justify-between">
-          <h2 className="font-display text-lg text-midnight-on-surface">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="cancelar-titulo"
+    >
+      <div className="fixed inset-0 bg-ink/70" onClick={onClose} aria-hidden="true" />
+      <div className="relative flex max-h-[85dvh] w-full max-w-sm flex-col overflow-hidden rounded-2xl border border-line bg-surface shadow-[0_32px_80px_-32px_rgba(0,0,0,0.9)] motion-safe:animate-fade-up">
+        <header className="flex items-center justify-between gap-3 border-b border-line/60 px-5 py-4">
+          <h2
+            id="cancelar-titulo"
+            className="font-display text-lg text-cream"
+          >
             Cancelar cita
           </h2>
           <button
             onClick={onClose}
-            className="text-midnight-on-surface-variant/80 hover:text-midnight-on-surface transition-colors"
+            aria-label="Cerrar"
+            className="-mr-1 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-cream/55 transition-colors hover:bg-white/[0.05] hover:text-cream focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brass/40"
           >
             <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="20"
-              height="20"
+              width="18"
+              height="18"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
-              strokeWidth="2"
+              strokeWidth="1.75"
               strokeLinecap="round"
-              strokeLinejoin="round"
+              aria-hidden="true"
             >
               <line x1="18" y1="6" x2="6" y2="18" />
               <line x1="6" y1="6" x2="18" y2="18" />
             </svg>
           </button>
-        </div>
+        </header>
 
-        <div className="px-6 py-5 space-y-4">
-          <p className="text-sm text-midnight-on-surface-variant">
+        <div className="space-y-4 overflow-y-auto px-5 py-5">
+          <p className="text-sm text-cream/55">
             Selecciona el motivo de cancelación:
           </p>
 
@@ -68,10 +84,10 @@ export default function CancelarCitaModal({
             {MOTIVOS.map((motivo) => (
               <label
                 key={motivo}
-                className={`flex items-center gap-3 border rounded-md px-4 py-3 cursor-pointer transition-colors ${
+                className={`flex cursor-pointer items-center gap-3 rounded-xl border px-4 py-3 transition-colors ${
                   motivoSeleccionado === motivo
-                    ? "border-midnight-error/50 bg-midnight-error/10"
-                    : "border-midnight-outline/30 hover:border-midnight-outline"
+                    ? "border-red-400/50 bg-red-400/10"
+                    : "border-line hover:border-cream/25"
                 }`}
               >
                 <input
@@ -80,42 +96,35 @@ export default function CancelarCitaModal({
                   value={motivo}
                   checked={motivoSeleccionado === motivo}
                   onChange={() => setMotivoSeleccionado(motivo)}
-                  className="accent-midnight-error"
+                  className="accent-red-400"
                 />
-                <span className="text-sm text-midnight-on-surface">
-                  {motivo}
-                </span>
+                <span className="text-sm text-cream/90">{motivo}</span>
               </label>
             ))}
           </div>
 
           {motivoSeleccionado === "Otro" && (
             <textarea
-              placeholder="Describe el motivo..."
+              placeholder="Describe el motivo…"
               value={otroTexto}
               onChange={(e) => setOtroTexto(e.target.value)}
               maxLength={300}
               rows={3}
-              className="w-full bg-midnight-surface border border-midnight-outline rounded-md px-4 py-3
-                         font-body text-sm text-midnight-on-surface placeholder:text-midnight-on-surface-variant/70 resize-none
-                         focus:outline-none focus:border-midnight-error/50 focus:ring-1 focus:ring-midnight-error/20
-                         transition-all duration-150"
+              className="w-full resize-none rounded-xl border border-white/10 bg-white/[0.06] px-4 py-3 text-sm text-cream caret-brass outline-none transition-[background-color,border-color,box-shadow] duration-200 ease-ui placeholder:text-white/50 focus:border-red-400/50 focus:bg-white/[0.08] focus:ring-2 focus:ring-red-400/20"
             />
           )}
 
-          <div className="flex gap-2 pt-2">
+          <div className="flex gap-2 pt-1">
             <button
               onClick={onClose}
-              className="flex-1 text-xs border border-midnight-outline rounded-full px-4 py-2.5 text-midnight-on-surface-variant hover:border-midnight-on-surface-variant/50 transition-colors"
+              className="flex-1 rounded-xl border border-line px-4 py-3 text-sm text-cream/70 transition-colors hover:border-cream/25 hover:text-cream focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brass/40"
             >
               Volver
             </button>
             <button
               onClick={handleConfirmar}
               disabled={!motivoValido}
-              className="flex-1 text-xs bg-midnight-error text-midnight-on-error rounded-full px-4 py-2.5 font-semibold
-                         transition-all duration-150 hover:bg-midnight-error/90 active:scale-[0.97]
-                         disabled:opacity-30 disabled:cursor-not-allowed"
+              className="flex-1 rounded-xl bg-red-400/90 px-4 py-3 text-sm font-semibold text-ink transition-[filter,transform,opacity] duration-150 ease-ui hover:brightness-110 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400/50 disabled:cursor-not-allowed disabled:opacity-30"
             >
               Cancelar cita
             </button>

@@ -18,9 +18,11 @@ export default async function PaginaConfig({
     .order("fecha", { ascending: false });
 
   return (
-    <AdminConfigForm
-      negocio={negocio}
-      bloqueosIniciales={bloqueos ?? []}
-    />
+    <div className="max-w-3xl">
+      <AdminConfigForm
+        negocio={negocio}
+        bloqueosIniciales={bloqueos ?? []}
+      />
+    </div>
   );
 }

@@ -1,3 +1,15 @@
+import { format } from "date-fns";
+import { es } from "date-fns/locale";
+
+export function formatearFechaLarga(fecha: string): string {
+  const texto = format(
+    new Date(`${fecha}T12:00:00`),
+    "EEEE d 'de' MMMM",
+    { locale: es },
+  );
+  return texto.charAt(0).toUpperCase() + texto.slice(1);
+}
+
 export function formatearHora12h(hora: string): string {
   const [hStr, m] = hora.split(":");
   const h = parseInt(hStr, 10);
@@ -64,17 +76,31 @@ export function validarEmail(email: string): boolean {
 
 export function badgeColor(estado: string): string {
   switch (estado) {
-    case "completada":
-      return "text-midnight-tertiary border-midnight-tertiary/30 bg-midnight-tertiary/20";
-    case "cancelada":
-      return "text-midnight-error border-midnight-error/30 bg-midnight-error/20";
-    case "no_asistio":
-      return "text-midnight-on-surface-variant border-midnight-outline/30 bg-midnight-surface-container-high";
-    case "en_proceso":
-      return "text-midnight-secondary border-midnight-secondary/40 bg-midnight-secondary/20";
+    case "pendiente":
+      return "border-brass/40 bg-brass/10 text-brass";
     case "confirmada":
-      return "text-midnight-tertiary border-midnight-tertiary/30 bg-midnight-tertiary/20";
+      return "border-cream/25 bg-white/[0.06] text-cream";
+    case "en_proceso":
+      return "border-brass bg-brass text-ink";
+    case "completada":
+      return "border-line text-cream/55";
+    case "cancelada":
+      return "border-red-400/30 bg-red-400/10 text-red-300";
+    case "no_asistio":
+      return "border-line text-cream/55";
     default:
-      return "text-midnight-secondary border-midnight-secondary/30 bg-midnight-secondary/20";
+      return "border-line text-cream/60";
   }
+}
+
+export function etiquetaEstado(estado: string): string {
+  const etiquetas: Record<string, string> = {
+    pendiente: "Pendiente",
+    confirmada: "Confirmada",
+    en_proceso: "En proceso",
+    completada: "Completada",
+    cancelada: "Cancelada",
+    no_asistio: "No asistió",
+  };
+  return etiquetas[estado] ?? estado;
 }

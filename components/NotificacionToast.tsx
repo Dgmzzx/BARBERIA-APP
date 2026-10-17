@@ -9,7 +9,7 @@ type Toast = {
   eventType?: string;
   titulo: string;
   descripcion: string;
-  color: string;
+  punto: string;
   timestamp: number;
 };
 
@@ -23,9 +23,9 @@ function crearToast(evento: EventoSSE): Toast | null {
     return {
       id: String(++toastId),
       type: "recordatorio",
-      titulo: "⏰ Recordatorio",
+      titulo: "Recordatorio",
       descripcion: `${d.cliente} — ${d.servicio ?? "Sin servicio"} a las ${d.hora}`,
-      color: "border-l-yellow-500 bg-yellow-500/10",
+      punto: "bg-amber-400",
       timestamp: Date.now(),
     };
   }
@@ -41,9 +41,9 @@ function crearToast(evento: EventoSSE): Toast | null {
           id: String(++toastId),
           type: "cita",
           eventType: "INSERT",
-          titulo: "🆕 Nueva cita",
+          titulo: "Nueva cita",
           descripcion: `${nombre} — ${servicio}`,
-          color: "border-l-green-500 bg-green-500/10",
+          punto: "bg-brass",
           timestamp: Date.now(),
         };
       case "UPDATE":
@@ -51,9 +51,9 @@ function crearToast(evento: EventoSSE): Toast | null {
           id: String(++toastId),
           type: "cita",
           eventType: "UPDATE",
-          titulo: "✏️ Cita actualizada",
+          titulo: "Cita actualizada",
           descripcion: `${nombre}`,
-          color: "border-l-blue-500 bg-blue-500/10",
+          punto: "bg-cream/60",
           timestamp: Date.now(),
         };
       case "DELETE":
@@ -61,9 +61,9 @@ function crearToast(evento: EventoSSE): Toast | null {
           id: String(++toastId),
           type: "cita",
           eventType: "DELETE",
-          titulo: "🗑️ Cita eliminada",
+          titulo: "Cita eliminada",
           descripcion: nombre,
-          color: "border-l-red-500 bg-red-500/10",
+          punto: "bg-red-400",
           timestamp: Date.now(),
         };
     }
@@ -100,40 +100,46 @@ export default function NotificacionToast({
   if (toasts.length === 0) return null;
 
   return (
-    <div className="fixed bottom-4 right-4 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-none">
+    <div className="pointer-events-none fixed bottom-4 right-4 z-50 flex w-full max-w-sm flex-col gap-2">
       {toasts.map((toast) => (
         <div
           key={toast.id}
-          className={`pointer-events-auto border border-line rounded-lg p-4 shadow-lg bg-surface border-l-4 ${toast.color} motion-safe:animate-fade-up`}
+          className="pointer-events-auto rounded-xl border border-line bg-surface/95 p-4 shadow-[0_16px_40px_-16px_rgba(0,0,0,0.8)] motion-safe:animate-fade-up"
         >
-          <div className="flex items-start justify-between gap-3">
-            <div className="min-w-0">
+          <div className="flex items-start gap-3">
+            <span
+              aria-hidden="true"
+              className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${toast.punto}`}
+            />
+            <div className="min-w-0 flex-1">
               <p className="text-sm font-medium text-cream">{toast.titulo}</p>
-              <p className="text-xs text-cream/60 mt-0.5 truncate">
+              <p className="mt-0.5 truncate text-xs text-cream/55">
                 {toast.descripcion}
               </p>
             </div>
             <button
               onClick={() => remover(toast.id)}
-              className="text-cream/55 hover:text-cream/80 transition-colors shrink-0"
+              aria-label="Descartar notificación"
+              className="-mr-1 -mt-1 flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-cream/55 transition-colors hover:bg-white/[0.05] hover:text-cream focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brass/40"
             >
               <svg
-                width="16"
-                height="16"
+                width="14"
+                height="14"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
-                strokeWidth="2"
+                strokeWidth="1.75"
                 strokeLinecap="round"
+                aria-hidden="true"
               >
                 <line x1="18" y1="6" x2="6" y2="18" />
                 <line x1="6" y1="6" x2="18" y2="18" />
               </svg>
             </button>
           </div>
-          <div className="mt-2 h-0.5 bg-line/30 rounded-full overflow-hidden">
+          <div className="mt-3 h-0.5 overflow-hidden rounded-full bg-line/50">
             <div
-              className="h-full bg-brass/50 rounded-full animate-shrink"
+              className="h-full rounded-full bg-brass/60"
               style={{
                 animation: `shrink 6s linear forwards`,
               }}

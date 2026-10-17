@@ -2,7 +2,13 @@
 
 import { useState, useEffect } from "react";
 import { crearClienteSupabase } from "@/lib/supabase/client";
-import { formatearHora12h, normalizarTelefono, badgeColor } from "@/lib/helpers";
+import {
+  formatearHora12h,
+  formatearFechaLarga,
+  normalizarTelefono,
+  badgeColor,
+  etiquetaEstado,
+} from "@/lib/helpers";
 import type { Horario } from "@/lib/types";
 import { useEventosSSE } from "@/lib/hooks/useEventosSSE";
 import NotificacionToast from "./NotificacionToast";
@@ -23,6 +29,18 @@ type CitaConServicio = {
   estado: string;
   servicios: { nombre: string } | null;
 };
+
+const claseAccionPrimaria =
+  "rounded-lg bg-brass px-3 py-2 text-xs font-semibold text-ink transition-[filter,transform] duration-150 ease-ui hover:brightness-110 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brass/60";
+
+const claseAccion =
+  "rounded-lg border border-line px-3 py-2 text-xs text-cream/70 transition-colors hover:border-cream/25 hover:text-cream focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brass/40";
+
+const claseAccionPeligro =
+  "rounded-lg border border-line px-3 py-2 text-xs text-cream/70 transition-colors hover:border-red-400/40 hover:text-red-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400/40";
+
+const claseIcono =
+  "flex h-8 w-8 items-center justify-center rounded-lg border border-line text-cream/55 transition-colors hover:border-cream/25 hover:text-cream focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brass/40";
 
 export default function PanelCitas({
   negocioId,
@@ -165,134 +183,221 @@ export default function PanelCitas({
   }
 
   if (citas.length === 0) {
-    return <p className="text-midnight-on-surface-variant">Todavía no hay citas reservadas.</p>;
+    return (
+      <div className="flex flex-col items-center rounded-2xl border border-dashed border-line px-6 py-14 text-center">
+        <span className="flex h-12 w-12 items-center justify-center rounded-full border border-line bg-white/[0.04] text-brass">
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+          >
+            <rect x="3" y="4" width="18" height="18" rx="2" />
+            <line x1="16" y1="2" x2="16" y2="6" />
+            <line x1="8" y1="2" x2="8" y2="6" />
+            <line x1="3" y1="10" x2="21" y2="10" />
+            <path d="m9 16 2 2 4-4" />
+          </svg>
+        </span>
+        <p className="mt-4 font-display text-lg text-cream">
+          No hay citas por ahora
+        </p>
+        <p className="mt-1 max-w-xs text-sm leading-relaxed text-cream/55">
+          Cuando un cliente reserve, la cita aparecerá aquí al instante.
+        </p>
+        <NotificacionToast evento={eventoSSE} />
+      </div>
+    );
+  }
+
+  const grupos: [string, CitaConServicio[]][] = [];
+  for (const cita of citas) {
+    const grupo = grupos.find(([fecha]) => fecha === cita.fecha);
+    if (grupo) grupo[1].push(cita);
+    else grupos.push([cita.fecha, [cita]]);
   }
 
   return (
-    <div className="space-y-3">
-      {citas.map((cita) => (
-        <div
-          key={cita.id}
-          className="border border-midnight-outline rounded-lg p-4 bg-midnight-surface-container flex flex-col sm:flex-row sm:items-center justify-between gap-3"
-        >
-          <div>
-            <p className="font-medium text-midnight-on-surface">{cita.nombre_cliente}</p>
-            <p className="text-sm text-midnight-on-surface-variant">
-              {cita.servicios?.nombre} · {cita.fecha} {formatearHora12h(cita.hora)}
-            </p>
-            <p className="text-sm text-midnight-on-surface-variant/80">{cita.telefono_cliente}</p>
-          </div>
-
-          <div className="flex flex-wrap gap-1.5 justify-end sm:justify-start">
-            {cita.estado === "pendiente" ? (
-              <>
-                <button
-                  onClick={() => actualizarEstado(cita.id, "confirmada")}
-                  className="text-xs border border-midnight-outline rounded-full px-3 py-1 hover:border-midnight-secondary hover:text-midnight-secondary transition-colors"
-                >
-                  Confirmar
-                </button>
-                <button
-                  onClick={() => setCitaCancelar(cita)}
-                  className="text-xs border border-midnight-outline rounded-full px-3 py-1 hover:border-midnight-error/50 hover:text-midnight-error transition-colors"
-                >
-                  Cancelar
-                </button>
-                <button
-                  onClick={() => setCitaReprogramar(cita)}
-                  className="text-xs border border-midnight-outline rounded-full px-3 py-1 hover:border-midnight-secondary hover:text-midnight-secondary transition-colors"
-                  title="Reprogramar cita"
-                >
-                  Reprogramar
-                </button>
-              </>
-            ) : cita.estado === "confirmada" ? (
-              <>
-                <button
-                  onClick={() => actualizarEstado(cita.id, "en_proceso")}
-                  className="text-xs border border-midnight-outline rounded-full px-3 py-1 hover:border-midnight-secondary hover:text-midnight-secondary transition-colors"
-                >
-                  En proceso
-                </button>
-                <button
-                  onClick={() => setCitaCancelar(cita)}
-                  className="text-xs border border-midnight-outline rounded-full px-3 py-1 hover:border-midnight-error/50 hover:text-midnight-error transition-colors"
-                >
-                  Cancelar
-                </button>
-                <button
-                  onClick={() => setCitaReprogramar(cita)}
-                  className="text-xs border border-midnight-outline rounded-full px-3 py-1 hover:border-midnight-secondary hover:text-midnight-secondary transition-colors"
-                  title="Reprogramar cita"
-                >
-                  Reprogramar
-                </button>
-              </>
-            ) : cita.estado === "en_proceso" ? (
-              <>
-                <button
-                  onClick={() => actualizarEstado(cita.id, "completada")}
-                  className="text-xs border border-midnight-outline rounded-full px-3 py-1 hover:border-midnight-secondary hover:text-midnight-secondary transition-colors"
-                >
-                  Completar
-                </button>
-                <button
-                  onClick={() => setCitaCancelar(cita)}
-                  className="text-xs border border-midnight-outline rounded-full px-3 py-1 hover:border-midnight-error/50 hover:text-midnight-error transition-colors"
-                >
-                  Cancelar
-                </button>
-              </>
-            ) : (
-              <span className={`text-xs capitalize px-3 py-1 rounded-full border ${badgeColor(cita.estado)}`}>
-                {cita.estado === "no_asistio" ? "No asistió" : cita.estado === "en_proceso" ? "En proceso" : cita.estado}
+    <div className="space-y-8">
+      {grupos.map(([fecha, delDia]) => (
+        <section key={fecha}>
+          {grupos.length > 1 && (
+            <div className="mb-3 flex items-center gap-3">
+              <h3 className="text-sm font-medium text-cream/80">
+                {formatearFechaLarga(fecha)}
+              </h3>
+              <span className="font-mono text-[11px] tabular-nums text-cream/55">
+                {delDia.length === 1 ? "1 cita" : `${delDia.length} citas`}
               </span>
-            )}
-            <button
-              onClick={() => setCitaSeleccionada(cita)}
-              className="border border-midnight-outline rounded-full p-2 hover:border-midnight-secondary hover:text-midnight-secondary transition-colors"
-              title="Ver detalles del cliente"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <circle cx="12" cy="12" r="10" />
-                <line x1="12" y1="16" x2="12" y2="12" />
-                <line x1="12" y1="8" x2="12.01" y2="8" />
-              </svg>
-            </button>
-            {cita.telefono_cliente && (
-              <button
-                onClick={() => abrirWhatsApp(cita.telefono_cliente)}
-                className="border border-midnight-outline rounded-full p-2 hover:border-green-500 hover:text-green-500 transition-colors"
-                title="Contactar por WhatsApp"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
+              <span aria-hidden="true" className="h-px flex-1 bg-line/70" />
+            </div>
+          )}
+
+          <div className="space-y-2.5">
+            {delDia.map((cita) => {
+              const [horaTexto, periodo] = formatearHora12h(cita.hora).split(" ");
+              return (
+                <article
+                  key={cita.id}
+                  className="rounded-2xl border border-line bg-surface/50 p-4 transition-colors hover:border-cream/15 sm:px-5"
                 >
-                  <path d="M3 21l1.65-3.8a9 9 0 1 1 3.4 2.9L3 21" />
-                  <path d="M9 10a.5.5 0 0 0 1 0V9a.5.5 0 0 0-1 0v1a5 5 0 0 0 5 5h1a.5.5 0 0 0 0-1h-1a.5.5 0 0 0 0 1" />
-                </svg>
-              </button>
-            )}
+                  <div className="flex gap-4">
+                    <div className="w-14 shrink-0 pt-0.5 text-right">
+                      <p className="font-mono text-[15px] leading-none tabular-nums text-brass">
+                        {horaTexto}
+                      </p>
+                      <p className="mt-1 font-mono text-[10px] uppercase tracking-wider text-cream/55">
+                        {periodo}
+                      </p>
+                    </div>
+
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="min-w-0">
+                          <p className="truncate text-[15px] font-medium text-cream">
+                            {cita.nombre_cliente}
+                          </p>
+                          <p className="mt-0.5 truncate text-[13px] text-cream/55">
+                            {cita.servicios?.nombre ?? "Sin servicio"}
+                            <span className="text-cream/30"> · </span>
+                            <span className="font-mono text-xs tabular-nums">
+                              {cita.telefono_cliente}
+                            </span>
+                          </p>
+                          {cita.motivo_cancelacion && (
+                            <p className="mt-1 text-xs text-red-300/90">
+                              Motivo: {cita.motivo_cancelacion}
+                            </p>
+                          )}
+                        </div>
+                        <span
+                          className={`inline-flex shrink-0 items-center rounded-full border px-2.5 py-1 text-[11px] font-medium ${badgeColor(cita.estado)}`}
+                        >
+                          {etiquetaEstado(cita.estado)}
+                        </span>
+                      </div>
+
+                      <div className="mt-3 flex flex-wrap items-center gap-1.5">
+                        {cita.estado === "pendiente" && (
+                          <>
+                            <button
+                              onClick={() => actualizarEstado(cita.id, "confirmada")}
+                              className={claseAccionPrimaria}
+                            >
+                              Confirmar
+                            </button>
+                            <button
+                              onClick={() => setCitaReprogramar(cita)}
+                              className={claseAccion}
+                            >
+                              Reprogramar
+                            </button>
+                            <button
+                              onClick={() => setCitaCancelar(cita)}
+                              className={claseAccionPeligro}
+                            >
+                              Cancelar
+                            </button>
+                          </>
+                        )}
+                        {cita.estado === "confirmada" && (
+                          <>
+                            <button
+                              onClick={() => actualizarEstado(cita.id, "en_proceso")}
+                              className={claseAccionPrimaria}
+                            >
+                              En proceso
+                            </button>
+                            <button
+                              onClick={() => setCitaReprogramar(cita)}
+                              className={claseAccion}
+                            >
+                              Reprogramar
+                            </button>
+                            <button
+                              onClick={() => setCitaCancelar(cita)}
+                              className={claseAccionPeligro}
+                            >
+                              Cancelar
+                            </button>
+                          </>
+                        )}
+                        {cita.estado === "en_proceso" && (
+                          <>
+                            <button
+                              onClick={() => actualizarEstado(cita.id, "completada")}
+                              className={claseAccionPrimaria}
+                            >
+                              Completar
+                            </button>
+                            <button
+                              onClick={() => setCitaCancelar(cita)}
+                              className={claseAccionPeligro}
+                            >
+                              Cancelar
+                            </button>
+                          </>
+                        )}
+
+                        <div className="ml-auto flex items-center gap-1.5">
+                          <button
+                            onClick={() => setCitaSeleccionada(cita)}
+                            className={claseIcono}
+                            aria-label={`Ver ficha de ${cita.nombre_cliente}`}
+                            title="Ver detalles del cliente"
+                          >
+                            <svg
+                              width="16"
+                              height="16"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="1.75"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              aria-hidden="true"
+                            >
+                              <circle cx="12" cy="12" r="10" />
+                              <line x1="12" y1="16" x2="12" y2="12" />
+                              <line x1="12" y1="8" x2="12.01" y2="8" />
+                            </svg>
+                          </button>
+                          {cita.telefono_cliente && (
+                            <button
+                              onClick={() => abrirWhatsApp(cita.telefono_cliente)}
+                              className={`${claseIcono} hover:border-green-400/40 hover:text-green-400`}
+                              aria-label={`Escribir por WhatsApp a ${cita.nombre_cliente}`}
+                              title="Contactar por WhatsApp"
+                            >
+                              <svg
+                                width="16"
+                                height="16"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="1.75"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                aria-hidden="true"
+                              >
+                                <path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z" />
+                              </svg>
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </article>
+              );
+            })}
           </div>
-        </div>
+        </section>
       ))}
 
       {citaSeleccionada && (
