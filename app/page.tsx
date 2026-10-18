@@ -1,52 +1,25 @@
-import { crearClienteSupabaseServidor } from "@/lib/supabase/server";
-import { notFound } from "next/navigation";
-import BookingForm from "@/components/BookingForm";
+import type { Metadata } from "next";
+import PaginaReserva, {
+  obtenerNegocioConHorarios,
+} from "@/components/PaginaReserva";
 
-export default async function PaginaInicio() {
-  const supabase = crearClienteSupabaseServidor();
+export const dynamic = "force-dynamic";
 
-  const { data: negocio } = await supabase
-    .from("negocios")
-    .select("*, horarios(*)")
-    .eq("slug", "barberiawady")
-    .eq("activo", true)
-    .single();
+const SLUG = "barberiawady";
 
-  if (!negocio) notFound();
+export async function generateMetadata(): Promise<Metadata> {
+  const negocio = await obtenerNegocioConHorarios(SLUG);
 
-  const { data: servicios } = await supabase
-    .from("servicios")
-    .select("*")
-    .eq("negocio_id", negocio.id)
-    .eq("activo", true)
-    .order("precio");
+  if (!negocio) return {};
 
-  return (
-    <main className="min-h-screen px-4 sm:px-6 py-12 max-w-lg mx-auto">
-      <header className="text-center sm:text-left">
-        <h1 className="font-display text-4xl sm:text-5xl leading-tight text-cream">
-          {negocio.nombre}
-        </h1>
-        {negocio.direccion && (
-          <p className="font-mono text-xs text-cream/55 mt-3 tracking-wider uppercase">
-            {negocio.direccion}
-          </p>
-        )}
-      </header>
+  return {
+    title: `${negocio.nombre} — Reserva tu cita`,
+    description: negocio.direccion
+      ? `Reserva tu cita en ${negocio.nombre}, ${negocio.direccion}.`
+      : `Reserva tu cita en ${negocio.nombre}.`,
+  };
+}
 
-      <div className="flex items-center gap-3 my-10 text-line/40" role="separator">
-        <span className="flex-1 h-px bg-current" />
-        <span className="font-mono text-[10px] select-none" aria-hidden="true">◆</span>
-        <span className="flex-1 h-px bg-current" />
-      </div>
-
-      <BookingForm negocio={negocio} servicios={servicios ?? []} horarios={negocio.horarios ?? []} />
-
-      <footer className="mt-16 text-center font-mono text-[11px] text-cream/55 tracking-wider">
-        {negocio.telefono && (
-          <p className="mb-1">{negocio.telefono}</p>
-        )}
-      </footer>
-    </main>
-  );
+export default function PaginaInicio() {
+  return <PaginaReserva slug={SLUG} />;
 }
