@@ -78,6 +78,38 @@ export function telefonoInternacional(telefono: string): string {
   return normalizado.length === 10 ? `1${normalizado}` : normalizado;
 }
 
+export type TipoMensajeCita = "confirmada" | "reprogramada" | "cancelada";
+
+export function mensajeWhatsApp(
+  tipo: TipoMensajeCita,
+  datos: {
+    nombre: string;
+    negocio: string;
+    servicio: string | null;
+    fecha: string;
+    hora: string;
+  },
+): string {
+  const servicio = datos.servicio ? ` de ${datos.servicio}` : "";
+  const fechaLarga = formatearFechaLarga(datos.fecha);
+  const fecha = fechaLarga.charAt(0).toLowerCase() + fechaLarga.slice(1);
+  const hora = formatearHora12h(datos.hora);
+  const saludo = `¡Hola ${datos.nombre}! Te escribimos de ${datos.negocio}.`;
+
+  switch (tipo) {
+    case "confirmada":
+      return `${saludo} Tu cita${servicio} fue confirmada para el ${fecha} a las ${hora}. ¡Te esperamos!`;
+    case "reprogramada":
+      return `${saludo} Tu cita${servicio} fue reprogramada para el ${fecha} a las ${hora}.`;
+    case "cancelada":
+      return `${saludo} Lamentamos informarte que tu cita${servicio} del ${fecha} a las ${hora} fue cancelada.`;
+  }
+}
+
+export function urlWhatsApp(telefono: string, mensaje: string): string {
+  return `https://wa.me/${telefonoInternacional(telefono)}?text=${encodeURIComponent(mensaje)}`;
+}
+
 export function validarTelefono(telefono: string): boolean {
   const normalizado = normalizarTelefono(telefono);
   return /^\d{10}$/.test(normalizado);

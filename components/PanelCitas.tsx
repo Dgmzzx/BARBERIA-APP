@@ -6,8 +6,11 @@ import {
   formatearHora12h,
   formatearFechaLarga,
   telefonoInternacional,
+  mensajeWhatsApp,
+  urlWhatsApp,
   badgeColor,
   etiquetaEstado,
+  type TipoMensajeCita,
 } from "@/lib/helpers";
 import type { Horario } from "@/lib/types";
 import { useEventosSSE } from "@/lib/hooks/useEventosSSE";
@@ -44,10 +47,12 @@ const claseIcono =
 
 export default function PanelCitas({
   negocioId,
+  negocioNombre,
   citasIniciales,
   horarios,
 }: {
   negocioId: string;
+  negocioNombre: string;
   citasIniciales: CitaConServicio[];
   horarios: Horario[];
 }) {
@@ -96,13 +101,13 @@ export default function PanelCitas({
     setEventoSSE(ultimoEvento);
   }, [ultimoEvento]);
 
-  async function actualizarEstado(id: string, estado: string) {
+  async function actualizarEstado(id: string, estado: string): Promise<boolean> {
     const supabase = crearClienteSupabase();
     const { error } = await supabase.from("citas").update({ estado }).eq("id", id);
 
     if (error) {
       alert("No se pudo actualizar la cita. Intenta de nuevo.");
-      return;
+      return false;
     }
     const { error: histError } = await supabase.from("citas_historial").insert({
       cita_id: id,
@@ -111,6 +116,54 @@ export default function PanelCitas({
     });
     if (histError) console.error("Error al registrar historial:", histError);
     setCitas((prev) => prev.map((c) => (c.id === id ? { ...c, estado } : c)));
+    return true;
+  }
+
+  function abrirVentanaWhatsApp(): Window | null {
+    return window.open("", "_blank");
+  }
+
+  function avisarPorWhatsApp(
+    ventana: Window | null,
+    cita: CitaConServicio,
+    tipo: TipoMensajeCita,
+    fecha = cita.fecha,
+    hora = cita.hora,
+  ) {
+    if (!cita.telefono_cliente) {
+      ventana?.close();
+      return;
+    }
+
+    const mensaje = mensajeWhatsApp(tipo, {
+      nombre: cita.nombre_cliente,
+      negocio: negocioNombre,
+      servicio: cita.servicios?.nombre ?? null,
+      fecha,
+      hora,
+    });
+    const url = urlWhatsApp(cita.telefono_cliente, mensaje);
+
+    if (ventana) {
+      ventana.location.href = url;
+      return;
+    }
+
+    if (!window.open(url, "_blank")) {
+      alert(
+        "El navegador bloqueó la ventana de WhatsApp. Permite las ventanas emergentes para avisar al cliente.",
+      );
+    }
+  }
+
+  async function confirmarCita(cita: CitaConServicio) {
+    const ventana = cita.telefono_cliente ? abrirVentanaWhatsApp() : null;
+    const ok = await actualizarEstado(cita.id, "confirmada");
+    if (!ok) {
+      ventana?.close();
+      return;
+    }
+    avisarPorWhatsApp(ventana, cita, "confirmada");
   }
 
   function abrirWhatsApp(telefono: string) {
@@ -131,6 +184,8 @@ export default function PanelCitas({
   }
 
   async function reprogramarCita(id: string, fecha: string, hora: string) {
+    const citaActual = citas.find((c) => c.id === id);
+    const ventana = citaActual?.telefono_cliente ? abrirVentanaWhatsApp() : null;
     const supabase = crearClienteSupabase();
     const { error } = await supabase
       .from("citas")
@@ -138,10 +193,10 @@ export default function PanelCitas({
       .eq("id", id);
 
     if (error) {
+      ventana?.close();
       alert("No se pudo reprogramar la cita. Intenta de nuevo.");
       return;
     }
-    const citaActual = citas.find((c) => c.id === id);
     const { error: histError } = await supabase.from("citas_historial").insert({
       cita_id: id,
       estado: citaActual?.estado || "pendiente",
@@ -152,11 +207,21 @@ export default function PanelCitas({
       prev.map((c) => (c.id === id ? { ...c, fecha, hora } : c))
     );
     setCitaReprogramar(null);
+    if (citaActual) {
+      avisarPorWhatsApp(ventana, citaActual, "reprogramada", fecha, hora);
+    } else {
+      ventana?.close();
+    }
     alert("Cita reprogramada correctamente.");
   }
 
   async function confirmarCancelacion(id: string, motivo: string) {
     const estado = motivo === "No asistió" ? "no_asistio" : "cancelada";
+    const citaActual = citas.find((c) => c.id === id);
+    const ventana =
+      estado === "cancelada" && citaActual?.telefono_cliente
+        ? abrirVentanaWhatsApp()
+        : null;
     const supabase = crearClienteSupabase();
     const { error } = await supabase
       .from("citas")
@@ -164,6 +229,7 @@ export default function PanelCitas({
       .eq("id", id);
 
     if (error) {
+      ventana?.close();
       alert("No se pudo cancelar la cita. Intenta de nuevo.");
       return;
     }
@@ -179,6 +245,10 @@ export default function PanelCitas({
       )
     );
     setCitaCancelar(null);
+    if (estado === "cancelada") {
+      if (citaActual) avisarPorWhatsApp(ventana, citaActual, "cancelada");
+      else ventana?.close();
+    }
     alert("Cita cancelada correctamente.");
   }
 
@@ -286,7 +356,7 @@ export default function PanelCitas({
                         {cita.estado === "pendiente" && (
                           <>
                             <button
-                              onClick={() => actualizarEstado(cita.id, "confirmada")}
+                              onClick={() => confirmarCita(cita)}
                               className={claseAccionPrimaria}
                             >
                               Confirmar

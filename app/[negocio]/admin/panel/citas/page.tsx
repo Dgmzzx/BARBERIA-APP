@@ -39,6 +39,7 @@ export default async function PaginaCitas({
       <div className="mt-8">
         <PanelCitas
           negocioId={negocio.id}
+          negocioNombre={negocio.nombre}
           citasIniciales={citas ?? []}
           horarios={(horarios as Horario[]) ?? []}
         />
