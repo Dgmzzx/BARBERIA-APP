@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { Resend } from "resend";
-import { formatearHora12h, normalizarTelefono, validarEmail } from "@/lib/helpers";
+import { formatearHora12h, sanearTelefonoInput, validarEmail, validarTelefono } from "@/lib/helpers";
 
 // Se inicializa Supabase una sola vez afuera porque sus variables
 // no suelen causar el error del constructor durante el build.
@@ -41,12 +41,12 @@ export async function POST(request: Request) {
       );
     }
 
-    const telefonoNormalizado = normalizarTelefono(telefono_cliente);
+    const telefonoNormalizado = sanearTelefonoInput(telefono_cliente.toString());
     const correoLimpio = correo_cliente?.toString().trim() || null;
 
-    if (telefonoNormalizado.length < 8 || telefonoNormalizado.length > 15) {
+    if (!validarTelefono(telefonoNormalizado)) {
       return NextResponse.json(
-        { error: "El teléfono debe tener entre 8 y 15 dígitos." },
+        { error: "El teléfono debe tener 10 dígitos." },
         { status: 400 }
       );
     }

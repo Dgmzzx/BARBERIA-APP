@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { crearClienteSupabase } from "@/lib/supabase/client";
 import type { Negocio, Servicio, Horario } from "@/lib/types";
-import { formatearHora12h, obtenerRangosDelDia, normalizarTelefono, validarTelefono, validarEmail } from "@/lib/helpers";
+import { formatearHora12h, obtenerRangosDelDia, normalizarTelefono, sanearTelefonoInput, validarTelefono, validarEmail } from "@/lib/helpers";
 
 type Paso = "servicio" | "horario" | "datos" | "confirmado";
 
@@ -173,7 +173,7 @@ export default function BookingForm({
       return;
     }
     if (!validarTelefono(telefonoNormalizado)) {
-      setError("El teléfono debe tener entre 8 y 15 dígitos.");
+      setError("El teléfono debe tener 10 dígitos.");
       return;
     }
     if (correoLimpio && !validarEmail(correoLimpio)) {
@@ -513,10 +513,14 @@ export default function BookingForm({
               />
               <input
                 type="tel"
+                inputMode="numeric"
+                pattern="[0-9]{10}"
+                maxLength={10}
+                autoComplete="tel"
                 aria-label="Tu teléfono o WhatsApp"
-                placeholder="Tu teléfono / WhatsApp"
+                placeholder="Tu teléfono / WhatsApp (10 dígitos)"
                 value={telefono}
-                onChange={(e) => setTelefono(e.target.value)}
+                onChange={(e) => setTelefono(sanearTelefonoInput(e.target.value))}
                 className={claseCampo}
               />
               <input
@@ -583,7 +587,7 @@ export default function BookingForm({
                 <button
                   type="button"
                   onClick={confirmarCita}
-                  disabled={!nombre.trim() || !telefono || enviando}
+                  disabled={!nombre.trim() || telefono.length !== 10 || enviando}
                   className={`${claseBotonPrimario} flex-1 ${claseFoco}`}
                 >
                   {enviando ? "Reservando tu cita…" : "Reservar mi cita"}

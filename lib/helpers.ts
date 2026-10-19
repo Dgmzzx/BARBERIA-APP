@@ -65,9 +65,17 @@ export function normalizarTelefono(telefono: string): string {
   return telefono.replace(/[\s\-\(\)\+]/g, "");
 }
 
+export function sanearTelefonoInput(valor: string): string {
+  const digitos = valor.replace(/\D/g, "");
+  const sinLada = digitos.length === 11 && digitos.startsWith("1")
+    ? digitos.slice(1)
+    : digitos;
+  return sinLada.slice(0, 10);
+}
+
 export function validarTelefono(telefono: string): boolean {
   const normalizado = normalizarTelefono(telefono);
-  return normalizado.length >= 8 && normalizado.length <= 15;
+  return /^\d{10}$/.test(normalizado);
 }
 
 export function validarEmail(email: string): boolean {
