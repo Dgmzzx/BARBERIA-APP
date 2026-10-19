@@ -5,7 +5,7 @@ import { crearClienteSupabase } from "@/lib/supabase/client";
 import {
   formatearHora12h,
   formatearFechaLarga,
-  normalizarTelefono,
+  telefonoInternacional,
   badgeColor,
   etiquetaEstado,
 } from "@/lib/helpers";
@@ -114,7 +114,7 @@ export default function PanelCitas({
   }
 
   function abrirWhatsApp(telefono: string) {
-    const normalizado = normalizarTelefono(telefono);
+    const normalizado = telefonoInternacional(telefono);
     if (!normalizado) {
       alert("El cliente no tiene un número de teléfono registrado.");
       return;

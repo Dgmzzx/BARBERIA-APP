@@ -5,7 +5,7 @@ import { crearClienteSupabase } from "@/lib/supabase/client";
 import {
   formatearHora12h,
   formatearFechaLarga,
-  normalizarTelefono,
+  telefonoInternacional,
   badgeColor,
   etiquetaEstado,
 } from "@/lib/helpers";
@@ -79,7 +79,7 @@ export default function FichaCliente({
   }, [onClose]);
 
   function abrirWhatsApp(telefono: string) {
-    const normalizado = normalizarTelefono(telefono);
+    const normalizado = telefonoInternacional(telefono);
     if (!normalizado || normalizado.length < 8) return;
     window.open(`https://wa.me/${normalizado}`, "_blank", "noopener,noreferrer");
   }
@@ -176,7 +176,7 @@ export default function FichaCliente({
                   WhatsApp
                 </button>
                 <a
-                  href={`tel:${normalizarTelefono(cita.telefono_cliente)}`}
+                  href={`tel:+${telefonoInternacional(cita.telefono_cliente)}`}
                   className={claseAccion}
                 >
                   <svg

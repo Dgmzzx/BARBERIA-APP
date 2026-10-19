@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { Resend } from "resend";
-import { formatearHora12h, sanearTelefonoInput, validarEmail, validarTelefono } from "@/lib/helpers";
+import { formatearHora12h, sanearTelefonoInput, telefonoInternacional, validarEmail, validarTelefono } from "@/lib/helpers";
 
 // Se inicializa Supabase una sola vez afuera porque sus variables
 // no suelen causar el error del constructor durante el build.
@@ -50,6 +50,8 @@ export async function POST(request: Request) {
         { status: 400 }
       );
     }
+
+    const telefonoEnlace = telefonoInternacional(telefonoNormalizado);
 
     if (correoLimpio && !validarEmail(correoLimpio)) {
       return NextResponse.json(
@@ -164,7 +166,7 @@ export async function POST(request: Request) {
               </tr>
               <tr>
                 <td style="padding: 8px 0; border-bottom: 1px solid #f0f0f0;"><strong>Teléfono:</strong></td>
-                <td style="padding: 8px 0; border-bottom: 1px solid #f0f0f0;"><a href="tel:${telefonoNormalizado}">${telefonoNormalizado}</a></td>
+                <td style="padding: 8px 0; border-bottom: 1px solid #f0f0f0;"><a href="tel:+${telefonoEnlace}">${telefonoNormalizado}</a></td>
               </tr>
               ${correoLimpio ? `<tr>
                 <td style="padding: 8px 0; border-bottom: 1px solid #f0f0f0;"><strong>Correo:</strong></td>

@@ -73,6 +73,11 @@ export function sanearTelefonoInput(valor: string): string {
   return sinLada.slice(0, 10);
 }
 
+export function telefonoInternacional(telefono: string): string {
+  const normalizado = normalizarTelefono(telefono);
+  return normalizado.length === 10 ? `1${normalizado}` : normalizado;
+}
+
 export function validarTelefono(telefono: string): boolean {
   const normalizado = normalizarTelefono(telefono);
   return /^\d{10}$/.test(normalizado);
