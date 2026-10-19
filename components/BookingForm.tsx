@@ -215,6 +215,23 @@ export default function BookingForm({
     setPaso("confirmado");
   }
 
+  function reiniciarFormulario() {
+    setServicioElegido(null);
+    setFecha("");
+    setHora("");
+    setNombre("");
+    setTelefono("");
+    setCorreo("");
+    setNotas("");
+    setError("");
+    setEnviando(false);
+    setHorasOcupadas([]);
+    setHorasPosibles([]);
+    setCargandoHoras(false);
+    setFechaInvalida("");
+    setPaso("servicio");
+  }
+
   if (paso === "confirmado") {
     return (
       <div
@@ -281,6 +298,14 @@ export default function BookingForm({
           <p className="mt-6 text-[13px] text-white/60">
             Guárdate esta página como tu ticket de reserva.
           </p>
+
+          <button
+            type="button"
+            onClick={reiniciarFormulario}
+            className={`mt-5 w-full ${claseBotonSecundario} ${claseFoco}`}
+          >
+            Reservar otra cita
+          </button>
         </div>
       </div>
     );
