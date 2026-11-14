@@ -1,130 +1,118 @@
-# 💈 Barberia App — Sistema de Citas Premium 💈
+# Barbería App
 
-[![Next.js](https://img.shields.io/badge/Next.js-14-black?style=for-the-badge&logo=next.js)](https://nextjs.org/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)
-[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.x-38B2AC?style=for-the-badge&logo=tailwind-css)](https://tailwindcss.com/)
-[![Supabase](https://img.shields.io/badge/Supabase-Database%20%26%20Auth-green?style=for-the-badge&logo=supabase)](https://supabase.com/)
-[![Resend](https://img.shields.io/badge/Resend-Email_Notifications-orange?style=for-the-badge&logo=resend)](https://resend.com/)
+Aplicación web de reservas para barberías con página pública por negocio y panel de administración. Construida con Next.js 14, TypeScript, Tailwind CSS y Supabase.
 
-Una sofisticada aplicación web multi-negocio diseñada para la reserva y gestión de citas en barberías y salones de estética premium. Construida con una arquitectura robusta, moderna y pensada para escalar como un modelo SaaS (Software as a Service) desde el primer día.
+[![Next.js](https://img.shields.io/badge/Next.js-14-black?logo=next.js)](https://nextjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?logo=typescript)](https://www.typescriptlang.org/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3-38B2AC?logo=tailwind-css)](https://tailwindcss.com/)
+[![Supabase](https://img.shields.io/badge/Supabase-Postgres_%26_Auth-green?logo=supabase)](https://supabase.com/)
 
----
+## Funcionalidades
 
-## ✨ Características Principales
+- **Reserva pública por negocio:** página en `/[slug]` con flujo de tres pasos: servicio, fecha y hora, datos del cliente.
+- **Disponibilidad real:** horarios por día de la semana, varios bloques de atención por día, días bloqueados y horas ya ocupadas.
+- **Panel de administración:** resumen del día, agenda, cambio de estado, reprogramación y cancelación con motivo.
+- **Ficha de cliente:** datos de contacto, historial de citas e historial de cambios.
+- **Gestión de servicios:** crear, editar, activar y desactivar servicios.
+- **Configuración del negocio:** horarios semanales y bloqueo de fechas por vacaciones, feriados u otros motivos.
+- **Avisos en tiempo real:** nuevas citas y recordatorios mediante Server-Sent Events.
+- **Contacto por WhatsApp:** enlaces directos con mensajes prellenados para confirmar, reprogramar o cancelar una cita.
+- **Correo opcional al negocio:** notificación con Resend al recibir una nueva reserva.
 
-*   🚀 **Arquitectura Multi-Negocio (SaaS Ready):** Enrutamiento dinámico `/[negocio]` basado en slugs (ej: `/barberiapapa`). Todas las tablas y relaciones de la base de datos están segmentadas mediante `negocio_id`.
-*   📅 **Formulario de Reserva Inteligente (`BookingForm`):** Un flujo interactivo y multi-paso del lado del cliente que guía al usuario en la selección de servicios, fecha y hora de manera fluida y adaptativa.
-*   🔒 **Gestión de Citas para el Administrador:** Panel privado de administración (`/[negocio]/admin/panel`) con autenticación mediante **Supabase Auth** para visualizar y gestionar la agenda diaria en tiempo real.
-*   ⚡ **Prevención de Conflictos de Horario:** Mecanismo ultra-seguro a nivel de base de datos que evita la sobre-reserva mediante una restricción única (`unique_constraint`) que valida en tiempo real la disponibilidad para un `negocio_id`, fecha y hora específicos.
-*   ✉️ **Notificaciones automáticas por Correo (Opcional):** Integración impecable con **Resend** para notificar al cliente y al negocio tras una confirmación exitosa de la cita.
-*   🎨 **Experiencia Visual de Lujo (Midnight Copper):** Inspirada en la estética premium de los salones modernos. Colores profundos ("Midnight Blue") con acentos metálicos y cálidos de cobre cepillado ("Brushed Copper").
+## Stack
 
----
+- Next.js 14.2 (App Router) y React 18
+- TypeScript 5
+- Tailwind CSS 3
+- Supabase (Postgres, Auth y Realtime)
+- Resend (opcional)
+- date-fns
 
-## 📂 Estructura del Proyecto
-
-El código fuente activo está completamente integrado en la raíz del repositorio siguiendo los estándares de Next.js App Router:
+## Estructura
 
 ```text
-├── app/
-│   ├── api/
-│   │   └── citas/route.ts       # POST: Genera citas eludiendo RLS con la Service Role Key
-│   └── [negocio]/               # Enrutamiento dinámico multi-negocio
-│       ├── page.tsx             # Página pública de reserva para el negocio
-│       └── admin/
-│           ├── login/           # Inicio de sesión con Supabase Auth
-│           └── panel/           # Dashboard privado para el dueño (gestión de citas)
-├── components/
-│   ├── BookingForm.tsx          # Formulario de reserva multi-paso interactivo
-│   ├── PanelCitas.tsx           # Dashboard de visualización y control de citas
-│   ├── AdminSidebar.tsx         # Barra de navegación lateral de administración
-│   ├── AdminConfigForm.tsx      # Configuración del negocio y horarios
-│   └── ServiciosList.tsx        # Catálogo interactivo de servicios del negocio
-├── lib/
-│   ├── supabase/
-│   │   ├── client.ts            # Cliente Supabase del navegador (RLS activo)
-│   │   └── server.ts            # Cliente Supabase del servidor (Manejo de Cookies)
-│   ├── helpers.ts               # Utilidades de fecha y formateadores comunes
-│   └── types.ts                 # Tipados estáticos de TypeScript (Negocio, Servicio, Cita)
-├── supabase/
-│   └── schema.sql               # Esquema SQL completo, datos semilla y políticas de RLS
-├── DESIGN_SYSTEM.md             # Especificación completa del sistema de diseño visual
-└── AGENTS.md                    # Documentación técnica interna y notas de arquitectura
+app/
+  [negocio]/              # Página pública y rutas del panel por slug
+  api/                    # Endpoints de citas, servicios, negocio, bloqueos y SSE
+components/               # Componentes de reserva y administración
+lib/                      # Clientes de Supabase, tipos, helpers y hooks
+supabase/schema.sql       # Esquema, datos iniciales y políticas RLS
 ```
 
-> **⚠️ Nota importante:** El subdirectorio heredado `barberia-app/` se encuentra obsoleto y no debe modificarse. El desarrollo activo reside exclusivamente en los directorios de la raíz.
+## Puesta en marcha
 
----
+### Requisitos
 
-## 🛠️ Guía de Instalación y Configuración
+- Node.js 18.17 o superior
+- Un proyecto de Supabase
+- Una API key de Resend solo si se desea enviar correo
 
-Sigue estos pasos para ejecutar una copia local del proyecto en tu entorno de desarrollo:
+### 1. Instalar dependencias
 
-### 1. Clonar y preparar las dependencias
-Instala todas las dependencias requeridas en la raíz del proyecto:
 ```bash
 npm install
 ```
 
-### 2. Configurar la Base de Datos en Supabase
-1. Crea un proyecto gratuito en [Supabase](https://supabase.com).
-2. Ve al panel de control de tu proyecto y accede al **SQL Editor**.
-3. Copia el contenido completo de `supabase/schema.sql` y ejecútalo para crear las tablas, relaciones, restricciones y poblar la base de datos con datos semilla.
+### 2. Crear la base de datos
 
-### 3. Configurar las Variables de Entorno
-Crea un archivo `.env.local` en la raíz del proyecto (basándote en `.env.example`) y añade tus credenciales:
+En el proyecto de Supabase, abre el **SQL Editor** y ejecuta el contenido completo de `supabase/schema.sql`. El script crea las tablas, índices, políticas RLS y un negocio de ejemplo con slug `barberiapapa`.
+
+Ejecútalo una sola vez en un proyecto nuevo, ya que las tablas se crean sin `IF NOT EXISTS`.
+
+### 3. Configurar variables de entorno
+
+Crea `.env.local` en la raíz del proyecto:
 
 ```env
-# Supabase - Públicas (utilizadas en el navegador)
-NEXT_PUBLIC_SUPABASE_URL=https://tu-proyecto-id.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=tu-clave-anonima-publica
-
-# Supabase - Privada (utilizada solo en API Routes)
-SUPABASE_SERVICE_ROLE_KEY=tu-clave-service-role-privada
-
-# Resend - Envíos de correo electrónico (Opcional)
-RESEND_API_KEY=re_tu_api_key_de_resend
+NEXT_PUBLIC_SUPABASE_URL=https://tu-proyecto.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=tu_anon_key
+SUPABASE_SERVICE_ROLE_KEY=tu_service_role_key
+RESEND_API_KEY=re_tu_api_key
 ```
 
-### 4. Ejecutar el Servidor de Desarrollo
-Inicia el entorno de desarrollo local con el siguiente comando:
+`SUPABASE_SERVICE_ROLE_KEY` solo debe usarse en el servidor. `RESEND_API_KEY` es opcional.
+
+### 4. Iniciar desarrollo
+
 ```bash
 npm run dev
 ```
-La aplicación estará disponible en `http://localhost:3000`. Accede a la página pública del negocio semilla introduciendo su slug en la URL:
-👉 **`http://localhost:3000/barberiapapa`**
 
----
+Con los datos iniciales del esquema:
 
-## 🔐 Configuración de Administradores
+- Reservas: `http://localhost:3000/barberiapapa`
+- Login de administración: `http://localhost:3000/barberiapapa/admin/login`
+- Panel: `http://localhost:3000/barberiapapa/admin/panel`
 
-1. Para que un dueño de negocio pueda gestionar sus citas, crea su cuenta de usuario en Supabase entrando a tu proyecto → **Authentication** → **Users** → **Add user**.
-2. Rellena el correo y la contraseña.
-3. El dueño podrá iniciar sesión directamente desde `http://localhost:3000/barberiapapa/admin/login`. Al autenticarse con éxito, será redirigido de manera automática al panel de gestión privado (`/admin/panel`).
+La portada `/` muestra el negocio definido en `SLUG` dentro de `app/page.tsx` (actualmente `barberiawady`). Si usas los datos del seed, cámbialo a `barberiapapa` o accede directamente a `/[slug]`.
 
----
+### 5. Crear usuario administrador
 
-## 🎨 Sistema de Diseño: Midnight Copper
+En el Dashboard de Supabase entra a **Authentication > Users > Add user** y crea el usuario con correo y contraseña. Ese usuario podrá iniciar sesión en `/[slug]/admin/login`.
 
-La identidad visual rompe con los tradicionales clichés vintage de barberías y se enfoca en un concepto de **lujo moderno y nocturno**:
+## Multi-negocio
 
-*   **Paleta de Colores:**
-    *   `Fondo Principal`: Azul profundo medianoche (`#051424`) para un ambiente inmersivo y premium.
-    *   `Superficies Secundarias`: Grises pizarra (`#1E293B`) que alojan tarjetas, inputs y paneles interactivos.
-    *   `Acento Principal`: Cobre cepillado (`#ffb77b` / `#ffb270`) que evoca destellos metálicos y se utiliza estrictamente para llamadas a la acción, estados activos y elementos clave de interacción.
-*   **Tipografía:**
-    *   `Títulos (Display)`: **Playfair Display**, con alta presencia, serifas elegantes y espaciado de letras ajustado para una estética editorial.
-    *   `Cuerpo de texto`: **Inter**, garantizando legibilidad óptima y descanso visual sobre fondos oscuros.
+Cada negocio se identifica por un `slug` y todos los registros incluyen `negocio_id`. Para agregar otro negocio, crea su fila en `negocios` y sus servicios y horarios en las tablas correspondientes. La página pública quedará disponible en `/[slug]` sin cambios de código.
 
----
+## Scripts
 
-## 🚀 Despliegue en Producción (Vercel)
+```bash
+npm run dev      # Servidor de desarrollo
+npm run build    # Build de producción
+npm run start    # Servidor de producción
+npm run lint     # ESLint
+```
 
-1. Sube tu repositorio de código a **GitHub**.
-2. Importa el proyecto en [Vercel](https://vercel.com) (plan Hobby/Gratuito es ideal).
-3. Configura exactamente las mismas variables de entorno declaradas en tu `.env.local` dentro del panel de configuración de Vercel.
-4. Despliega. Tu aplicación estará en vivo bajo un dominio como `mi-barberia.vercel.app/barberiapapa`. ¡Listo para recibir reservas de tus clientes!
+## Despliegue en Vercel
 
----
+1. Sube el repositorio a GitHub.
+2. Importa el proyecto en Vercel.
+3. Configura las mismas variables de entorno de `.env.local`.
+4. Despliega.
 
-Desarrollado con ❤️ y precisión técnica. ¡Mejora el estilo de tu negocio con reservas fluidas y automáticas!
+Para enviar correos en producción, verifica un dominio en Resend y actualiza el remitente en `app/api/citas/route.ts`; el valor por defecto `onboarding@resend.dev` es solo para pruebas.
+
+## Notas
+
+- El esquema se aplica manualmente desde el SQL Editor de Supabase; el proyecto no incluye herramientas de migración.
+- El endpoint SSE usa el runtime de Node.js, ya configurado en `app/api/sse/route.ts`.
