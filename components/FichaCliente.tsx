@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { crearClienteSupabase } from "@/lib/supabase/client";
+import { useBloqueoScroll } from "@/lib/hooks/useBloqueoScroll";
 import {
   formatearHora12h,
   formatearFechaLarga,
@@ -41,6 +42,8 @@ export default function FichaCliente({
   const [cargando, setCargando] = useState(true);
   const [cambios, setCambios] = useState<CitaHistorial[]>([]);
   const [cargandoCambios, setCargandoCambios] = useState(true);
+
+  useBloqueoScroll();
 
   useEffect(() => {
     const supabase = crearClienteSupabase();
@@ -86,14 +89,14 @@ export default function FichaCliente({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      className="fixed inset-0 z-[60] flex items-center justify-center p-4"
       role="dialog"
       aria-modal="true"
       aria-labelledby="ficha-titulo"
     >
       <div className="fixed inset-0 bg-ink/70" onClick={onClose} aria-hidden="true" />
       <div className="relative flex max-h-[85dvh] w-full max-w-lg flex-col overflow-hidden rounded-2xl border border-line bg-surface shadow-[0_32px_80px_-32px_rgba(0,0,0,0.9)] motion-safe:animate-fade-up">
-        <header className="flex items-center justify-between gap-3 border-b border-line/60 px-5 py-4 sm:px-6">
+        <header className="flex shrink-0 items-center justify-between gap-3 border-b border-line/60 px-5 py-4 sm:px-6">
           <h2
             id="ficha-titulo"
             className="truncate font-display text-xl text-cream"
@@ -103,7 +106,7 @@ export default function FichaCliente({
           <button
             onClick={onClose}
             aria-label="Cerrar ficha"
-            className="-mr-1 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-cream/55 transition-colors hover:bg-white/[0.05] hover:text-cream focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brass/40"
+            className="touch-target -mr-1 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-cream/55 transition-colors hover:bg-white/[0.05] hover:text-cream active:bg-white/[0.08] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brass/40"
           >
             <svg
               width="18"
@@ -121,7 +124,7 @@ export default function FichaCliente({
           </button>
         </header>
 
-        <div className="space-y-6 overflow-y-auto px-5 py-5 sm:px-6">
+        <div className="space-y-6 overflow-y-auto overscroll-contain px-5 py-5 sm:px-6">
           <section>
             <h3 className={claseSeccion}>Datos del cliente</h3>
             <dl className="mt-3 grid grid-cols-[84px_1fr] gap-x-3 gap-y-2 text-sm">
@@ -202,7 +205,7 @@ export default function FichaCliente({
             <h3 className={claseSeccion}>Cita actual</h3>
             <div className="mt-3 rounded-xl border border-line/70 bg-ink/50 p-4">
               <div className="flex items-start justify-between gap-3">
-                <p className="font-display text-base text-cream">
+                <p className="break-words font-display text-base text-cream">
                   {cita.servicios?.nombre ?? "Sin servicio"}
                 </p>
                 <span

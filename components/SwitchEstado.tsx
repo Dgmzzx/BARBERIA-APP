@@ -16,7 +16,7 @@ export default function SwitchEstado({
       aria-checked={activo}
       aria-label={etiqueta}
       onClick={onToggle}
-      className={`relative h-6 w-10 shrink-0 rounded-full transition-colors duration-150 ease-ui focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brass/60 ${
+      className={`touch-target-switch relative h-6 w-10 shrink-0 rounded-full transition-colors duration-150 ease-ui active:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brass/60 ${
         activo ? "bg-brass" : "bg-line"
       }`}
     >

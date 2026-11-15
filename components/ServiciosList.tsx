@@ -128,7 +128,7 @@ export default function ServiciosList({
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between gap-3">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <p className="text-sm text-cream/55">
           {servicios.length === 1 ? "1 servicio" : `${servicios.length} servicios`}
         </p>
@@ -161,7 +161,7 @@ export default function ServiciosList({
               className={`mt-2 ${claseCampo}`}
             />
           </div>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div>
               <label htmlFor="servicio-precio" className={claseEtiqueta}>
                 Precio $
@@ -281,7 +281,7 @@ export default function ServiciosList({
                       className={`mt-2 ${claseCampo}`}
                     />
                   </div>
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                     <div>
                       <label htmlFor={`editar-precio-${s.id}`} className={claseEtiqueta}>
                         Precio $
@@ -354,7 +354,7 @@ export default function ServiciosList({
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
                     <p
-                      className={`text-sm font-medium ${
+                      className={`break-words text-sm font-medium ${
                         s.activo ? "text-cream" : "text-cream/55"
                       }`}
                     >
@@ -364,12 +364,12 @@ export default function ServiciosList({
                       ${s.precio} · {s.duracion_minutos} min
                     </p>
                     {s.descripcion && (
-                      <p className="mt-1.5 text-[13px] leading-relaxed text-cream/55">
+                      <p className="mt-1.5 break-words text-[13px] leading-relaxed text-cream/55">
                         {s.descripcion}
                       </p>
                     )}
                   </div>
-                  <div className="flex shrink-0 items-center gap-2">
+                  <div className="flex shrink-0 items-center gap-3">
                     <button
                       onClick={() => {
                         setEditandoId(s.id);
@@ -380,7 +380,7 @@ export default function ServiciosList({
                           descripcion: s.descripcion ?? "",
                         });
                       }}
-                      className="flex h-9 w-9 items-center justify-center rounded-lg border border-line text-cream/55 transition-colors hover:border-cream/25 hover:text-cream focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brass/40"
+                      className="touch-target flex h-9 w-9 items-center justify-center rounded-lg border border-line text-cream/55 transition-colors hover:border-cream/25 hover:text-cream active:bg-white/[0.06] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brass/40"
                       aria-label={`Editar servicio ${s.nombre}`}
                       title="Editar servicio"
                     >

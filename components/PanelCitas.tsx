@@ -43,7 +43,7 @@ const claseAccionPeligro =
   "rounded-lg border border-line px-3 py-2 text-xs text-cream/70 transition-colors hover:border-red-400/40 hover:text-red-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400/40";
 
 const claseIcono =
-  "flex h-8 w-8 items-center justify-center rounded-lg border border-line text-cream/55 transition-colors hover:border-cream/25 hover:text-cream focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brass/40";
+  "touch-target flex h-8 w-8 items-center justify-center rounded-lg border border-line text-cream/55 transition-colors hover:border-cream/25 hover:text-cream active:bg-white/[0.06] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brass/40";
 
 export default function PanelCitas({
   negocioId,
@@ -414,7 +414,7 @@ export default function PanelCitas({
                           </>
                         )}
 
-                        <div className="ml-auto flex items-center gap-1.5">
+                        <div className="ml-auto flex items-center gap-3 sm:gap-1.5">
                           <button
                             onClick={() => setCitaSeleccionada(cita)}
                             className={claseIcono}

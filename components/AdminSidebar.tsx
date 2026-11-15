@@ -124,7 +124,7 @@ export default function AdminSidebar({
           aria-label="Abrir menú"
           aria-expanded={mobileOpen}
           aria-controls="menu-admin"
-          className="-ml-1 flex h-10 w-10 items-center justify-center rounded-lg text-cream/70 transition-colors hover:bg-white/[0.05] hover:text-cream focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brass/40"
+          className="touch-target -ml-1 flex h-10 w-10 items-center justify-center rounded-lg text-cream/70 transition-colors hover:bg-white/[0.05] hover:text-cream active:bg-white/[0.08] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brass/40"
         >
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" aria-hidden="true">
             <line x1="3" y1="6" x2="21" y2="6" />
@@ -145,7 +145,7 @@ export default function AdminSidebar({
 
       <aside
         id="menu-admin"
-        className={`fixed inset-y-0 left-0 z-40 flex w-72 flex-col border-r border-line bg-surface transition-transform duration-200 ease-ui lg:static lg:z-auto lg:w-64 lg:translate-x-0 xl:w-72 ${
+        className={`fixed inset-y-0 left-0 z-40 flex w-72 max-w-[calc(100vw-3rem)] flex-col border-r border-line bg-surface transition-transform duration-200 ease-ui lg:static lg:z-auto lg:w-64 lg:translate-x-0 xl:w-72 ${
           mobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
         }`}
       >
@@ -155,7 +155,7 @@ export default function AdminSidebar({
             type="button"
             onClick={() => setMobileOpen(false)}
             aria-label="Cerrar menú"
-            className="-mr-1 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-cream/55 transition-colors hover:bg-white/[0.05] hover:text-cream focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brass/40 lg:hidden"
+            className="touch-target -mr-1 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-cream/55 transition-colors hover:bg-white/[0.05] hover:text-cream active:bg-white/[0.08] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brass/40 lg:hidden"
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" aria-hidden="true">
               <line x1="18" y1="6" x2="6" y2="18" />
@@ -166,7 +166,7 @@ export default function AdminSidebar({
 
         <nav
           aria-label="Secciones del panel"
-          className="flex-1 space-y-1 overflow-y-auto px-3 py-4"
+          className="flex-1 space-y-1 overflow-y-auto overscroll-contain px-3 py-4"
         >
           {enlaces.map(({ href, label, Icono }) => {
             const esActivo = activo(href);

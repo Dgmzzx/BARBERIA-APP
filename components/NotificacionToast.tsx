@@ -100,7 +100,7 @@ export default function NotificacionToast({
   if (toasts.length === 0) return null;
 
   return (
-    <div className="pointer-events-none fixed bottom-4 right-4 z-50 flex w-full max-w-sm flex-col gap-2">
+    <div className="pointer-events-none fixed inset-x-4 bottom-[calc(1rem+env(safe-area-inset-bottom,0px))] z-50 flex flex-col gap-2 sm:inset-x-auto sm:right-4 sm:w-full sm:max-w-sm">
       {toasts.map((toast) => (
         <div
           key={toast.id}
@@ -120,7 +120,7 @@ export default function NotificacionToast({
             <button
               onClick={() => remover(toast.id)}
               aria-label="Descartar notificación"
-              className="-mr-1 -mt-1 flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-cream/55 transition-colors hover:bg-white/[0.05] hover:text-cream focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brass/40"
+              className="touch-target -mr-1 -mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-md text-cream/55 transition-colors hover:bg-white/[0.05] hover:text-cream active:bg-white/[0.08] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brass/40"
             >
               <svg
                 width="14"

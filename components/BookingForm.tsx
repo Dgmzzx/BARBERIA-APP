@@ -269,7 +269,7 @@ export default function BookingForm({
             <div className="flex items-start justify-between gap-4 border-b border-white/10 py-3.5">
               <span className="pt-0.5 text-[13px] text-white/60">Servicio</span>
               <span className="text-right">
-                <span className="block text-[15px] font-medium text-cream">
+                <span className="block break-words text-[15px] font-medium text-cream">
                   {servicioElegido?.nombre}
                 </span>
                 <span className="mt-0.5 block text-[13px] text-white/60">
@@ -373,14 +373,14 @@ export default function BookingForm({
                     <div className="flex items-start justify-between gap-4">
                       <div className="min-w-0">
                         <span
-                          className={`block text-[17px] font-medium leading-snug tracking-[-0.01em] ${
+                          className={`block break-words text-[17px] font-medium leading-snug tracking-[-0.01em] ${
                             selected ? "text-cream" : "text-cream/90"
                           }`}
                         >
                           {s.nombre}
                         </span>
                         {s.descripcion && (
-                          <p className="mt-1 text-sm leading-relaxed text-white/60">
+                          <p className="mt-1 break-words text-sm leading-relaxed text-white/60">
                             {s.descripcion}
                           </p>
                         )}
@@ -570,7 +570,7 @@ export default function BookingForm({
                 <div className="flex items-start justify-between gap-4 border-b border-white/10 py-3.5">
                   <span className="pt-0.5 text-[13px] text-white/60">Servicio</span>
                   <span className="text-right">
-                    <span className="block text-[15px] font-medium text-cream">
+                    <span className="block break-words text-[15px] font-medium text-cream">
                       {servicioElegido?.nombre}
                     </span>
                     <span className="mt-0.5 block text-[13px] text-white/60">

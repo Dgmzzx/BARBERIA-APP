@@ -89,7 +89,7 @@ export default async function PaginaReserva({ slug }: { slug: string }) {
       <div className="relative grid gap-10 lg:grid-cols-[minmax(0,5fr)_minmax(0,6fr)] lg:gap-14 xl:gap-16">
         {/* Escaparate */}
         <aside className="text-center sm:text-left lg:sticky lg:top-10 lg:self-start">
-          <h1 className="text-balance font-display text-4xl leading-[1.05] tracking-[-0.01em] text-cream sm:text-5xl">
+          <h1 className="break-words text-balance font-display text-4xl leading-[1.05] tracking-[-0.01em] text-cream sm:text-5xl">
             {negocio.nombre}
           </h1>
 

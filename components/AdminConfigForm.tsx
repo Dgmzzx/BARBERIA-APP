@@ -39,7 +39,7 @@ const claseEtiqueta =
   "block text-[11px] font-medium uppercase tracking-[0.14em] text-cream/55";
 
 const claseIconoEliminar =
-  "flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-cream/55 transition-colors hover:bg-white/[0.05] hover:text-red-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400/40";
+  "touch-target flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-cream/55 transition-colors hover:bg-white/[0.05] hover:text-red-300 active:bg-white/[0.08] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400/40";
 
 function horariosIniciales(negocio: Negocio): HorarioEdit[] {
   const h = (negocio as any).horarios as Horario[] | undefined;
@@ -275,9 +275,9 @@ export default function AdminConfigForm({
                 </div>
 
                 {expandido && activo && (
-                  <div className="space-y-2 px-3 pb-3 pl-10">
+                  <div className="space-y-2 px-3 pb-3 pl-3 sm:pl-10">
                     {bloques.map((bloque) => (
-                      <div key={bloque.orden} className="flex items-center gap-2">
+                      <div key={bloque.orden} className="flex flex-wrap items-center gap-2">
                         <div className="flex items-center gap-2 rounded-lg border border-line bg-ink/60 px-3 py-1.5">
                           <SelectorHora
                             value={bloque.apertura}
@@ -485,12 +485,12 @@ function SelectorHora({
   }
 
   return (
-    <div className="flex items-center gap-1">
+    <div className="flex items-center gap-1 sm:gap-1.5">
       <select
         value={h12}
         onChange={(e) => actualizar({ h12: Number(e.target.value) })}
         aria-label="Hora"
-        className="w-8 cursor-pointer appearance-none bg-transparent text-center font-mono text-sm tabular-nums text-cream outline-none"
+        className="w-8 cursor-pointer appearance-none bg-transparent py-1 text-center font-mono text-sm tabular-nums text-cream outline-none"
       >
         {Array.from({ length: 12 }, (_, i) => i + 1).map((h) => (
           <option key={h} value={h} className="bg-ink">{h}</option>
@@ -501,16 +501,16 @@ function SelectorHora({
         value={min}
         onChange={(e) => actualizar({ min: e.target.value })}
         aria-label="Minutos"
-        className="w-8 cursor-pointer appearance-none bg-transparent text-center font-mono text-sm tabular-nums text-cream outline-none"
+        className="w-8 cursor-pointer appearance-none bg-transparent py-1 text-center font-mono text-sm tabular-nums text-cream outline-none"
       >
         <option value="00" className="bg-ink">00</option>
         <option value="30" className="bg-ink">30</option>
       </select>
-      <div className="ml-1.5 flex overflow-hidden rounded-md border border-line">
+      <div className="ml-1 flex overflow-hidden rounded-md border border-line sm:ml-1.5">
         <button
           type="button"
           onClick={() => actualizar({ periodo: "AM" })}
-          className={`px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest transition-colors ${
+          className={`px-1.5 py-1.5 font-mono text-[10px] uppercase tracking-widest transition-colors sm:px-1.5 sm:text-[9px] ${
             periodo === "AM"
               ? "bg-brass font-semibold text-ink"
               : "text-cream/55 hover:text-cream/80"
@@ -521,7 +521,7 @@ function SelectorHora({
         <button
           type="button"
           onClick={() => actualizar({ periodo: "PM" })}
-          className={`px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest transition-colors ${
+          className={`px-1.5 py-1.5 font-mono text-[10px] uppercase tracking-widest transition-colors sm:px-1.5 sm:text-[9px] ${
             periodo === "PM"
               ? "bg-brass font-semibold text-ink"
               : "text-cream/55 hover:text-cream/80"

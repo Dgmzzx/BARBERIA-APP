@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { crearClienteSupabase } from "@/lib/supabase/client";
+import { useBloqueoScroll } from "@/lib/hooks/useBloqueoScroll";
 import {
   formatearHora12h,
   formatearFechaLarga,
@@ -34,6 +35,8 @@ export default function ReprogramarCitaModal({
   const [horasDisponibles, setHorasDisponibles] = useState<string[]>([]);
   const [cargandoHoras, setCargandoHoras] = useState(false);
   const [fechaInvalida, setFechaInvalida] = useState("");
+
+  useBloqueoScroll();
 
   const hoy = new Date().toISOString().split("T")[0];
 
@@ -103,14 +106,14 @@ export default function ReprogramarCitaModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      className="fixed inset-0 z-[60] flex items-center justify-center p-4"
       role="dialog"
       aria-modal="true"
       aria-labelledby="reprogramar-titulo"
     >
       <div className="fixed inset-0 bg-ink/70" onClick={onClose} aria-hidden="true" />
       <div className="relative flex max-h-[85dvh] w-full max-w-md flex-col overflow-hidden rounded-2xl border border-line bg-surface shadow-[0_32px_80px_-32px_rgba(0,0,0,0.9)] motion-safe:animate-fade-up">
-        <header className="flex items-center justify-between gap-3 border-b border-line/60 px-5 py-4">
+        <header className="flex shrink-0 items-center justify-between gap-3 border-b border-line/60 px-5 py-4">
           <h2
             id="reprogramar-titulo"
             className="font-display text-lg text-cream"
@@ -120,7 +123,7 @@ export default function ReprogramarCitaModal({
           <button
             onClick={onClose}
             aria-label="Cerrar"
-            className="-mr-1 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-cream/55 transition-colors hover:bg-white/[0.05] hover:text-cream focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brass/40"
+            className="touch-target -mr-1 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-cream/55 transition-colors hover:bg-white/[0.05] hover:text-cream active:bg-white/[0.08] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brass/40"
           >
             <svg
               width="18"
@@ -138,12 +141,12 @@ export default function ReprogramarCitaModal({
           </button>
         </header>
 
-        <div className="space-y-5 overflow-y-auto px-5 py-5">
+        <div className="space-y-5 overflow-y-auto overscroll-contain px-5 py-5">
           <div className="rounded-xl border border-line/70 bg-ink/50 p-4">
             <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-cream/55">
               Cita actual
             </p>
-            <p className="mt-1.5 text-sm text-cream">
+            <p className="mt-1.5 break-words text-sm text-cream">
               {cita.servicios?.nombre ?? "Sin servicio"}
             </p>
             <p className="mt-0.5 text-[13px] text-cream/55">
@@ -193,7 +196,7 @@ export default function ReprogramarCitaModal({
                   <button
                     key={h}
                     onClick={() => setNuevaHora(h)}
-                    className={`rounded-lg border py-2.5 font-mono text-[13px] tabular-nums transition-colors duration-150 ease-ui focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brass/40 ${
+                    className={`rounded-lg border py-3 font-mono text-[13px] tabular-nums transition-colors duration-150 ease-ui focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brass/40 ${
                       nuevaHora === h
                         ? "border-brass bg-brass font-semibold text-ink"
                         : "border-line text-cream/70 hover:border-brass/40 hover:text-cream"
@@ -206,21 +209,24 @@ export default function ReprogramarCitaModal({
             </div>
           )}
 
-          <div className="flex gap-2 pt-1">
-            <button
-              onClick={onClose}
-              className="flex-1 rounded-xl border border-line px-4 py-3 text-sm text-cream/70 transition-colors hover:border-cream/25 hover:text-cream focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brass/40"
-            >
-              Cancelar
-            </button>
-            <button
-              onClick={() => onConfirm(nuevaFecha, nuevaHora)}
-              disabled={!nuevaFecha || !nuevaHora}
-              className="flex-1 rounded-xl bg-brass px-4 py-3 text-sm font-semibold text-ink transition-[filter,transform,opacity] duration-150 ease-ui hover:brightness-110 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brass/60 disabled:cursor-not-allowed disabled:opacity-30"
-            >
-              Reprogramar
-            </button>
-          </div>
+        </div>
+
+        <div className="flex shrink-0 gap-2 border-t border-line/60 px-5 py-4">
+          <button
+            type="button"
+            onClick={onClose}
+            className="flex-1 rounded-xl border border-line px-4 py-3 text-sm text-cream/70 transition-colors hover:border-cream/25 hover:text-cream focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brass/40"
+          >
+            Cancelar
+          </button>
+          <button
+            type="button"
+            onClick={() => onConfirm(nuevaFecha, nuevaHora)}
+            disabled={!nuevaFecha || !nuevaHora}
+            className="flex-1 rounded-xl bg-brass px-4 py-3 text-sm font-semibold text-ink transition-[filter,transform,opacity] duration-150 ease-ui hover:brightness-110 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brass/60 disabled:cursor-not-allowed disabled:opacity-30"
+          >
+            Reprogramar
+          </button>
         </div>
       </div>
     </div>

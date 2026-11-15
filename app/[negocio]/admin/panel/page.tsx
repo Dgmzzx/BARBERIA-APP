@@ -60,32 +60,32 @@ export default async function PanelAdmin({
         aria-label="Resumen del día"
         className="mt-6 overflow-hidden rounded-2xl border border-line bg-surface/50"
       >
-        <dl className="grid grid-cols-3 divide-x divide-line/70">
-          <div className="px-4 py-4 sm:px-6 sm:py-5">
+        <dl className="grid grid-cols-1 divide-y divide-line/70 sm:grid-cols-3 sm:divide-x sm:divide-y-0">
+          <div className="flex items-center justify-between gap-4 px-4 py-3.5 sm:block sm:px-6 sm:py-5">
             <dt className="text-[11px] font-medium uppercase tracking-[0.14em] text-cream/55">
               Citas hoy
             </dt>
-            <dd className="mt-1.5 font-display text-3xl tabular-nums text-cream">
+            <dd className="font-display text-2xl tabular-nums text-cream sm:mt-1.5 sm:text-3xl">
               {citasHoyCount}
             </dd>
           </div>
-          <div className="px-4 py-4 sm:px-6 sm:py-5">
+          <div className="flex items-center justify-between gap-4 px-4 py-3.5 sm:block sm:px-6 sm:py-5">
             <dt className="text-[11px] font-medium uppercase tracking-[0.14em] text-cream/55">
               Pendientes
             </dt>
             <dd
-              className={`mt-1.5 font-display text-3xl tabular-nums ${
+              className={`font-display text-2xl tabular-nums sm:mt-1.5 sm:text-3xl ${
                 pendientesCount > 0 ? "text-brass" : "text-cream/40"
               }`}
             >
               {pendientesCount}
             </dd>
           </div>
-          <div className="px-4 py-4 sm:px-6 sm:py-5">
+          <div className="flex items-center justify-between gap-4 px-4 py-3.5 sm:block sm:px-6 sm:py-5">
             <dt className="text-[11px] font-medium uppercase tracking-[0.14em] text-cream/55">
               Completadas
             </dt>
-            <dd className="mt-1.5 font-display text-3xl tabular-nums text-cream">
+            <dd className="font-display text-2xl tabular-nums text-cream sm:mt-1.5 sm:text-3xl">
               {completadasHoy}
             </dd>
           </div>
